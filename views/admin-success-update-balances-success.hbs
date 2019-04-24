@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+    
+<head>
+    <title>Registration Page</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
+    <!-- <script src="project.js"></script> -->
+
+</head>
+    
+<body>
+
+    <div class="defcontainer">
+        <div class="defheader">
+
+        </div>
+        
+        <div class="defmenu">
+            <div class='list-group'>
+                <a href="logout" class="list-group-item">Logout</a>
+                <a href="registration-logged-in" class="list-group-item">Registration</a>
+                <a href="trading-success" class="list-group-item">Trading</a>
+                <a href="admin-success" class="list-group-item list-group-item-info">Admin Panel</a>
+            </div>
+        </div>
+        
+        <div class="defcontent">
+            <br>
+            <div class='chfont container'>
+
+                <p><i>{{message}}</i></p>
+                <div class="row">
+                    <div class="col">
+                        <form onsubmit="return confirm('Do you really want to update the user?') "action='/admin-success-update-balance-success', method='POST'>
+                        <label for="stocksearch">User ID</label>
+                        <input type="text" class="form-control" name="user_id" id="user_id" placeholder="User ID">
+                    </div>
+                    <div class="col">
+                        <label for="stocksearch">Balance</label>
+                      <input type="number" class="form-control" name="user_balance" id="user_balance" placeholder="Balance">
+                    </div>
+                </div>
+                <p>&nbsp;</p>
+
+                <button type="submit" class="btn btn-primary">Update Balance</button>
+            </form>
+
+
+
+
+
+        </div>
+                <footer class="chfont page-footer font-small blue">
+            <div class="footer-copyright text-center py-3">© 2010 Copyright:
+            <a href="">Stock Trader</a>  All Rights Reserved
+
+        </footer>
+    </div> 
+
+    <!-- check if user inputs are valid -->
+
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script type='text/javascript' src='bundle_1.js'></script>
+    </body>
+</html>
