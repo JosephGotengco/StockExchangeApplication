@@ -21,6 +21,7 @@ var assert = require('assert');
 
 //#------ This line makes a link (like css link) for the folder that contains placeholders for hbs files------#//
 hbs.registerPartials(__dirname + '/views/partials');
+
 module.exports = app;
 
 mongoose.Promise = global.Promise;
@@ -34,7 +35,7 @@ var app = express();
 app.set('view engine', 'hbs');
 
 //#------ Lines below help parse data that comes in from users (webpages); don't need to touch these ------#//
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
@@ -53,7 +54,6 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false
 }));
-
 
 passport.serializeUser(function(user, done) {
         done(null, user); 
@@ -319,11 +319,50 @@ app.get('/trading', (request, response) => {
 	})
 });
 
-app.get('/trading-success', isAuthenticated, (request, response) => {
+app.get('/trading-success', isAuthenticated, async(request, response) => {
+	try{
+	var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
+	var json = rate.data.rates;
+	var cad = json.CAD;
+	var usd = json.USD;
+	var eur = json.EUR;
+	var jpy = json.JPY;
+	var aud = json.AUD;
+	var hkd = json.HKD;
+	var gbp = json.GBP;
+	var hkd = json.HKD;
+	var mxn = json.MXN;
+	var inr = json.INR;
+	var cny = json.CNY;
+
+	console.log(cad)
 	response.render('trading-success.hbs', {
-		title: 'Welcome to the trading page.'
-	})
+		title: 'Welcome to the trading page.',
+		cad: cad,
+		usd: usd,
+		eur: eur,
+		jpy: jpy,
+		aud: aud,
+		hkd: hkd,
+		gbp: gbp,
+		hkd: hkd,
+		mxn: mxn,
+		inr: inr,
+		cny: cny
+	});
+	}
+	catch(err){
+		console.log(err)
+	}
 });
+// hbs.registerHelper('currency_rate', async(error, result) =>{
+// 	var rate = await axios.get('https://api.exchangeratesapi.io/latest');
+// 	var json = rate.data.rates
+	
+// 	for(rate in json) {
+// 		if
+// 	}
+// });
 
 app.post('/trading-success-search', isAuthenticated, async(request, response) => {
 	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)
