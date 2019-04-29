@@ -15,6 +15,7 @@ var utils = require('./utils');
 var cookieParser = require('cookie-parser');
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
+var moment = require('moment');
 
 
 // vvvvvvv CONFIGURATION vvvvvv //
@@ -319,50 +320,139 @@ app.get('/trading', (request, response) => {
 	})
 });
 
+app.get('/test-end-point/:id', isAuthenticated, async(request, response) => {
+    try {
+        console.log("#---------TEST END POINT---------#");
+        // console.log(Object.keys(request));
+        console.log(request.params);
+       var id = request.body.id
+       console.log(id)
+
+        var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
+        var json = rate.data.rates;
+        var cad = json.CAD;
+        var usd = json.USD;
+        var eur = json.EUR;
+        var jpy = json.JPY;
+        var aud = json.AUD;
+        var hkd = json.HKD;
+        var gbp = json.GBP;
+        var hkd = json.HKD;
+        var mxn = json.MXN;
+        var inr = json.INR;
+        var cny = json.CNY;
+
+        response.render('trading-success.hbs', {
+            title: 'Welcome to the trading page.',
+            cad: cad,
+            usd: usd,
+            eur: eur,
+            jpy: jpy,
+            aud: aud,
+            hkd: hkd,
+            gbp: gbp,
+            hkd: hkd,
+            mxn: mxn,
+            inr: inr,
+            cny: cny
+        });
+    } catch(e) {
+        console.error(e);
+    }
+
+})
+
 app.get('/trading-success', isAuthenticated, async(request, response) => {
 	try{
-	var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
-	var json = rate.data.rates;
-	var cad = json.CAD;
-	var usd = json.USD;
-	var eur = json.EUR;
-	var jpy = json.JPY;
-	var aud = json.AUD;
-	var hkd = json.HKD;
-	var gbp = json.GBP;
-	var hkd = json.HKD;
-	var mxn = json.MXN;
-	var inr = json.INR;
-	var cny = json.CNY;
+		var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
+		// stocks = ['BTC', 'AAPL', 'TSLA', 'GOOG', 'SBUX', 'FB', 'BA', 'BABA', 'NKE', 'AMZN']
 
-	console.log(cad)
-	response.render('trading-success.hbs', {
-		title: 'Welcome to the trading page.',
-		cad: cad,
-		usd: usd,
-		eur: eur,
-		jpy: jpy,
-		aud: aud,
-		hkd: hkd,
-		gbp: gbp,
-		hkd: hkd,
-		mxn: mxn,
-		inr: inr,
-		cny: cny
+		// for (stock in stocks) {
+		// 	if(stock == 'BTC') {
+		// 		var stocks = await axios.get(`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`)
+		// 	}
+		// }
+		// var currencies = await axios.get(`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`)
+		var json = rate.data.rates;
+		var cad = json.CAD;
+		var usd = json.USD;
+		var eur = json.EUR;
+		var jpy = json.JPY;
+		var aud = json.AUD;
+		var hkd = json.HKD;
+		var gbp = json.GBP;
+		var hkd = json.HKD;
+		var mxn = json.MXN;
+		var inr = json.INR;
+		var cny = json.CNY;
+
+		console.log(cad)
+		response.render('trading-success.hbs', {
+			title: 'Welcome to the trading page.',
+			cad: cad,
+			usd: usd,
+			eur: eur,
+			jpy: jpy,
+			aud: aud,
+			hkd: hkd,
+			gbp: gbp,
+			hkd: hkd,
+			mxn: mxn,
+			inr: inr,
+			cny: cny
 	});
 	}
 	catch(err){
 		console.log(err)
 	}
 });
-// hbs.registerHelper('currency_rate', async(error, result) =>{
-// 	var rate = await axios.get('https://api.exchangeratesapi.io/latest');
-// 	var json = rate.data.rates
+
+app.post('/trading-success-currencies', isAuthenticated, async(request, response) => {
 	
-// 	for(rate in json) {
-// 		if
-// 	}
-// });
+	response.render('trading-success-currencies-ticker.hbs');
+});
+
+app.post('/trading-success-stocks', isAuthenticated, async(request, response) => {
+	try{
+		var yesterday = moment().subtract(1, 'days');
+		var date = yesterday.format('YYYYDDMM');
+
+		var stock_info = await axios.get('https://cloud.iexapis.com/stable/tops?token=sk_291eaf03571b4f0489b0198ac1af487d&symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN');
+		var json = stock_info.data;
+
+		var yest_stock_info = await axios.get(`https://cloud.iexapis.com/stable/tops?token=sk_291eaf03571b4f0489b0198ac1af487d&symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN/${date}`);
+		var yest_json = yest_stock_info.data;
+
+		response.render('trading-success-stocks-ticker.hbs', {
+			nflx_info: json[0].lastSalePrice,
+			aapl_info: json[1].lastSalePrice,
+			tsla_info: json[2].lastSalePrice,
+			goog_info: json[3].lastSalePrice,
+			sbux_info: json[4].lastSalePrice,
+			fb_info: json[5].lastSalePrice,
+			ba_info: json[6].lastSalePrice,
+			baba_info: json[7].lastSalePrice,
+			nke_info: json[8].lastSalePrice,
+			amzn_info: json[9].lastSalePrice,
+
+			yest_nflx_info: yest_json[0].lastSalePrice,
+			yest_aapl_info: yest_json[1].lastSalePrice,
+			yest_tsla_info: yest_json[2].lastSalePrice,
+			yest_goog_info: yest_json[3].lastSalePrice,
+			yest_sbux_info: yest_json[4].lastSalePrice,
+			yest_fb_info: yest_json[5].lastSalePrice,
+			yest_ba_info: yest_json[6].lastSalePrice,
+			yest_baba_info: yest_json[7].lastSalePrice,
+			yest_nke_info: yest_json[8].lastSalePrice,
+			// yest_amzn_info: yest_json[9].lastSalePrice,
+			yest_title: "Welcome to the trading page."
+		});
+	}	
+	catch(err) {
+		console.log(err);
+	};
+});
+
 
 app.post('/trading-success-search', isAuthenticated, async(request, response) => {
 	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)

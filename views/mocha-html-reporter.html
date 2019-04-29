@@ -1,0 +1,14 @@
+<!-- document start -->
+<head>
+	<link rel="stylesheet" href="mocha/mocha.css">
+</head>
+<body>
+	<div id="mocha"></div>
+	<!-- include mocha.js and chai.js -->
+	<script src="node_modules/mocha/mocha.js"></script>
+	<script type="text/javascript">mocha.setup('bdd');expect = chai.expect;</script>
+	<script src="test.js"></script>
+	<!-- import javascript files and test files -->
+	<script type="text/javascript">mocha.run();</script>
+</body>
+<!-- document end -->

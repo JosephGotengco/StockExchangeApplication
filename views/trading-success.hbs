@@ -33,14 +33,20 @@
             <br>
             <div class='chfont container'>
                 <!-- <script type="text/javascript">DukascopyApplet = {"type":"runboard","params":{"instruments":"BTC/USD,TSLA/USD,AAPL/USD,EUR/JPY,GBP/JPY,USD/CAD,XAU/USD,AUD/USD,USD/CHF,NZD/USD,E_Brent,E_SandP-500,E_DJE50XX,E_N225Jap","showDelta":true,"showDeltaPercent":true,"animationSpeed":["100000"],"fontSize":"12","fontFamily":["Verdana, Geneva, sans-serif"],"instrumentColor":"#666666","priceColor":"#000000","delimeterColor":"#0000FF","bgColor":"#FFFFFF","width":"100%","height":"30","adv":"popup"}};</script><script type="text/javascript" src="https://freeserv-static.dukascopy.com/2.0/core.js"></script> -->
-                <div class="form-group btn-group">
-                <form action='/trading-success-search' method="POST">
-                    <select>
-                        <option value="Currencies">Currencies</option>
-                        <option value="Stocks">Stocks</option>
-                    </select>
-                    <marquee behaviour="scroll" scrollamount=10 bgcolor="black"><span style="color: red"><b>CAD:</b></span><span style="color: white">{{cad}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>EUR:</b></span> <span style="color: white">{{eur}}</span><img src="../images/greentriangle.png" height=25px width=25px hspace="8">, <span style="color: red"><b>JPY:</b></span> <span style="color: white">{{jpy}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>AUD:</b></span> <span style="color: white">{{aud}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>HKD:</b></span> <span style="color: white">{{hkd}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>GBP:</b></span> <span style="color: white">{{gbp}}</span><img src="../images/greentriangle.png" height=25px width=25px hspace="8">, <span style="color: red"><b>HKD:</b></span> <span style="color: white">{{hkd}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>MXN:</b></span> <span style="color: white">{{mxn}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>INR:</b></span> <span style="color: white">{{inr}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10">, <span style="color: red"><b>CNY:</b></span> <span style="color: white">{{cny}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></marquee></form>
-                </div>
+                <form action='/trading-success-stocks' method="POST">
+                    <button type="submit" class="btn btn-primary">Stocks</button>
+                </form>
+                <marquee behaviour="scroll" scrollamount=10 bgcolor="black"  onmouseover="this.stop();" onmouseleave="this.start();">
+                  <a href="/test-end-point/CAD"><span style="color: red"><b>CAD:</b></span><span style="color: white">{{cad}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>,
+                  <a href="/test-end-point/EUR"><span style="color: red"><b>EUR:</b></span> <span style="color: white">{{eur}}</span><img src="../images/greentriangle.png" height=25px width=25px hspace="8"></a>, 
+                  <a href="/test-end-point/JPY"><span style="color: red"><b>JPY:</b></span> <span style="color: white">{{jpy}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>, 
+                  <a href="/test-end-point/AUD"><span style="color: red"><b>AUD:</b></span> <span style="color: white">{{aud}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>, 
+                  <a href="/test-end-point/HKD"><span style="color: red"><b>HKD:</b></span> <span style="color: white">{{hkd}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>,<a href="/test-end-point/GBP"><span style="color: red"><b>GBP:</b></span> <span style="color: white">{{gbp}}</span><img src="../images/greentriangle.png" height=25px width=25px hspace="8"></a>, 
+                  <a href="/test-end-point/HKD"><span style="color: red"><b>HKD:</b></span> <span style="color: white">{{hkd}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>, 
+                  <a href="/test-end-point/MXN"><span style="color: red"><b>MXN:</b></span> <span style="color: white">{{mxn}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>, 
+                  <a href="/test-end-point/INR"><span style="color: red"><b>INR:</b></span> <span style="color: white">{{inr}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>, 
+                  <a href="/test-end-point/CNY"><span style="color: red"><b>CNY:</b></span> <span style="color: white">{{cny}}</span><img src="../images/redtriangle.png" height=15px width=15px hspace="10"></a>
+                </marquee>
                 <p class="font-italic">Please note all prices are in USD.</p>
                 <p class="font-weight-bold">{{title}}</p>
                 <p class="font-weight-bold">{{head}}</p>
