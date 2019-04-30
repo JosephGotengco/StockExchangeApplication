@@ -358,7 +358,7 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 
 
 
-app.get('/test-end-point/:id', isAuthenticated, async(request, response) => {
+app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 	try {
 		console.log("#---------TEST END POINT---------#");
 		// console.log(Object.keys(request));
@@ -392,7 +392,14 @@ app.get('/test-end-point/:id', isAuthenticated, async(request, response) => {
 			inr: inr,
 			cny: cny
 		});
-	} catch(e) {
+
+
+		
+	} 
+	
+	
+	
+	catch(e) {
 		console.error(e);
 	}
 
