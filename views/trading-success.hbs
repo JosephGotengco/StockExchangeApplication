@@ -1,120 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
-    <title></title>
-    <meta charset="utf-8">
-    <link rel='stylesheet' href='testcss.css'>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-    <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />   
+  <title></title>
+  <meta charset="utf-8">
+  <link rel='stylesheet' href='testcss.css'>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
+  <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
 
 </head>
-    
+
 <body>
 
-    <div class="defcontainer">
-        <div class="defheader">
+  <div class="defcontainer">
+    <div class="defheader">
+
+    </div>
+
+    <div class="defmenu">
+      <div class='list-group'>
+        <a href="logout" class="list-group-item">Logout</a>
+        <a href="registration-logged-in" class="list-group-item">Registration</a>
+        <a href="trading-success" class="list-group-item list-group-item-info">Trading</a>
+        <a href="admin-success" class="list-group-item">Admin Panel</a>
+      </div>
+    </div>
+
+    <div class="defcontent">
+      <br>
+      <div class='chfont container'>
+        <marquee behaviour="scroll" scrollamount=10 bgcolor="black" onmouseover="this.stop();"
+          onmouseleave="this.start();">
+          <a href="/news/currency/CAD"><span style="color: red"><b>CAD:</b></span><span
+              style="color: white">{{cad}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/EUR"><span style="color: red"><b>EUR:</b></span> <span
+              style="color: white">{{eur}}</span><img src="../images/greentriangle.png" height=25px width=25px
+              hspace="8"></a>,
+          <a href="/news/currency/JPY"><span style="color: red"><b>JPY:</b></span> <span
+              style="color: white">{{jpy}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/AUD"><span style="color: red"><b>AUD:</b></span> <span
+              style="color: white">{{aud}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/HKD"><span style="color: red"><b>HKD:</b></span> <span
+              style="color: white">{{hkd}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/GBP"><span style="color: red"><b>GBP:</b></span> <span
+              style="color: white">{{gbp}}</span><img src="../images/greentriangle.png" height=25px width=25px
+              hspace="8"></a>,
+          <a href="/news/currency/HKD"><span style="color: red"><b>HKD:</b></span> <span
+              style="color: white">{{hkd}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/MXN"><span style="color: red"><b>MXN:</b></span> <span
+              style="color: white">{{mxn}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/INR"><span style="color: red"><b>INR:</b></span> <span
+              style="color: white">{{inr}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>,
+          <a href="/news/currency/CNY"><span style="color: red"><b>CNY:</b></span> <span
+              style="color: white">{{cny}}</span><img src="../images/redtriangle.png" height=15px width=15px
+              hspace="10"></a>
+        </marquee>
+        <p class="font-italic">Please note all prices are in USD.</p>
+        <p class="font-weight-bold">{{title}}</p>
+        <p class="font-weight-bold">{{head}}</p>
+
+        <br>
+
+        <div class="form-group btn-group">
+          <form action="/trading-success-search" method="POST">
+            <label for="stocksearch">Stock Search Price</label>
+            <input type="text" class="form-control" name='stocksearch' id="stocksearch"
+              placeholder="Stock Ticker e.g. TSLA">
+            <p>&nbsp;</p>
+            <input type="submit" class="btn btn-primary" value="Search">
+          </form>
 
         </div>
-        
-        <div class="defmenu">
-            <div class='list-group'>
-                <a href="logout" class="list-group-item">Logout</a>
-                <a href="registration-logged-in" class="list-group-item">Registration</a>
-                <a href="trading-success" class="list-group-item list-group-item-info">Trading</a>
-                <a href="admin-success" class="list-group-item">Admin Panel</a>
+
+        <p>&nbsp;</p>
+
+        <form action="/trading-success-buy" method="POST">
+          <div class="row">
+            <div class="col">
+              <label for="stocksearch">Buy Stock</label>
+              <input type="text" class="form-control" name="buystockticker" id="buystockticker"
+                placeholder="Enter Stock Ticker e.g FB">
             </div>
-        </div>
-        
-        <div class="defcontent">
-            <br>
-            <div class='chfont container'>
-                
-                <p class="font-italic">Please note all prices are in USD.</p>
-                <p class="font-weight-bold">{{title}}</p>
-                <p class="font-weight-bold">{{head}}</p>
-
-                    <br>
-
-                  <div class="form-group btn-group">
-                <form action="/trading-success-search" method="POST">
-                    <label for="stocksearch">Stock Search Price</label>
-                    <input type="text" class="form-control" name='stocksearch' id="stocksearch" placeholder="Stock Ticker e.g. TSLA">
-                    <p>&nbsp;</p>
-                    <input type="submit" class="btn btn-primary" value="Search">
-                </form>
-                
-                </div>
-
-                  <p>&nbsp;</p>
-
-                <form action="/trading-success-buy" method="POST">
-                  <div class="row">
-                    <div class="col">
-                        <label for="stocksearch">Buy Stock</label>
-                      <input type="text" class="form-control" name="buystockticker" id="buystockticker" placeholder="Enter Stock Ticker e.g FB">
-                    </div>
-                    <div class="col">
-                        <label for="stocksearch">Quantity</label>
-                      <input type="number" class="form-control" name="buystockqty" id="buystockqty" placeholder="Enter Stock Ticker e.g FB">
-                    </div>
-                  </div>
-                  <p>&nbsp;</p>
-                  <button type="submit" class="btn btn-primary">Buy</button>
-                </form>
-
-                <p>&nbsp;</p>
-                <form action="/trading-success-sell" method="POST">
-                <div class="row">
-                    <div class="col">
-                        <label for="stocksearch">Sell Stock</label>
-                      <input type="text" class="form-control" name="sellstockticker" id="sellstockticker" placeholder="Enter Stock Ticker e.g FB">
-                    </div>
-                    <div class="col">
-                        <label for="stocksearch">Quantity</label>
-                      <input type="number" class="form-control" name="sellstockqty" id="sellstockqty" placeholder="Enter Stock Ticker e.g FB">
-                    </div>
-                  </div>
-                  <p>&nbsp;</p>
-                  <button type="submit" class="btn btn-primary">Sell</button>
-                  </form>
-
-                    <p>&nbsp;</p>
-
-                <form action="/trading-success-holdings" method="POST">
-                <label for="stockholdings"></label>
-
-                <input type="submit" class="btn btn-primary" value="Show Stocks and Cash Amount">
-
-                </form>
-
+            <div class="col">
+              <label for="stocksearch">Quantity</label>
+              <input type="number" class="form-control" name="buystockqty" id="buystockqty"
+                placeholder="Enter Stock Ticker e.g FB">
             </div>
-                
-                <br>
-                    
+          </div>
+          <p>&nbsp;</p>
+          <button type="submit" class="btn btn-primary">Buy</button>
+        </form>
 
-                <br><br>
-
-                </form>
-
+        <p>&nbsp;</p>
+        <form action="/trading-success-sell" method="POST">
+          <div class="row">
+            <div class="col">
+              <label for="stocksearch">Sell Stock</label>
+              <input type="text" class="form-control" name="sellstockticker" id="sellstockticker"
+                placeholder="Enter Stock Ticker e.g FB">
             </div>
+            <div class="col">
+              <label for="stocksearch">Quantity</label>
+              <input type="number" class="form-control" name="sellstockqty" id="sellstockqty"
+                placeholder="Enter Stock Ticker e.g FB">
+            </div>
+          </div>
+          <p>&nbsp;</p>
+          <button type="submit" class="btn btn-primary">Sell</button>
+        </form>
 
-        </div>
-        <footer class="chfont page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-            <a href="">Stock Trader</a>  All Rights Reserved
+        <p>&nbsp;</p>
 
-        </footer>
-    </div> 
+        <form action="/trading-success-holdings" method="POST">
+          <label for="stockholdings"></label>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+          <input type="submit" class="btn btn-primary" value="Show Stocks and Cash Amount">
 
-    </body>
+        </form>
+
+      </div>
+
+      <br>
+
+
+      <br><br>
+
+      </form>
+
+    </div>
+
+  </div>
+  <footer class="chfont page-footer font-small blue">
+    <div class="footer-copyright text-center py-3">© 2019 Copyright:
+      <a href="">Stock Trader</a> All Rights Reserved
+
+  </footer>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+
 </html>
