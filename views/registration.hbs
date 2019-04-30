@@ -3,30 +3,36 @@
 <head>
     <title>Registration Page</title>
     <meta charset="utf-8">
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel='stylesheet' href='testcss.css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <!--<link href="../css/style.css" rel="stylesheet" type="text/css">-->
 </head>
     
 <body>
-<div class="defcontainer">
 
-
-        <div class="defheader">
-        </div>
         
-
-        <div class="defmenu">
-            <div class='list-group'>
-                <a href="login" class="list-group-item">Login</a>
-                <a href="register" class="list-group-item list-group-item-info">Registration</a>
-                <a href="trading" class="list-group-item">Trading</a>
-                <a href="admin" class="list-group-item">Admin Panel</a>
+        <!-- NAV BAR -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">
+            <img src="logo.png" width="115" height="20" alt="Logo">
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse text-right" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link" href="/trading-success">Trading <span class="sr-only">(current)</span></a>
+              <a class="nav-item nav-link" href="/trading-portfolio">Portfolio</a>
             </div>
-        </div>
+            <a href="login"><button type="button" class="btn btn-outline-info">Login</button></a>
+            <a href="admin-success"><button type="button" class="btn btn-outline-info">Admin</button></a>
+          </div>
+        </nav>
         
 
         <div class="defcontent">
@@ -40,30 +46,27 @@
 
                   <div class="form-group">
                     <label for="firstname">First Name</label>
-                    <input type="text" class="form-control" name='firstname' id="firstname" placeholder="First name must be 3-30 characters long and must only contain letters.">
+                    <input type="text" class="form-control border border-right-0" name='firstname' id="firstname" placeholder="First name must be 3-30 characters long and must only contain letters.">
                   </div>
                   <div class="form-group">
                     <label for="lastname">Last Name</label>
-                    <input type="text" class="form-control" name='lastname' id="lastname" placeholder="Last name must be 3-30 characters long and must only contain letters.">
+                    <input type="text" class="form-control border border-right-0" name='lastname' id="lastname" placeholder="Last name must be 3-30 characters long and must only contain letters.">
                   </div>
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" class="form-control" name='username' id="username" placeholder="Username must have 5-15 characters and may only be alphanumeric.">
+                    <input type="text" class="form-control border border-right-0" name='username' id="username" placeholder="Username must have 5-15 characters and may only be alphanumeric.">
                   </div>
                   <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" name='password' id="password" placeholder="Password must have 5-15 characters and may only be alphanumeric.">
+                    <input type="password" class="form-control border border-right-0" name='password' id="password" placeholder="Password must have 5-15 characters and may only be alphanumeric.">
                   </div>
                   <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" class="form-control" name='confirm_password' id="confirm_password" placeholder="Confirm Password">
+                    <input type="password" class="form-control border border-right-0" name='confirm_password' id="confirm_password" placeholder="Confirm Password">
                   </div>
-                    <input type="submit" class="btn btn-secondary" value="Register">
-
+                    <input type="submit" class="btn btn-info" value="Register">
                 <br><br>
                 </form>
-
-                <div id='submission'></div>
             </div>
         </div>
 

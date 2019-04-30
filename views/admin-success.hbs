@@ -8,65 +8,107 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <!-- <script src="project.js"></script> -->
 
 </head>
     
 <body>
-
-    <div class="defcontainer">
-        <div class="defheader">
-
-        </div>
         
-        <div class="defmenu">
-            <div class='list-group'>
-                <a href="logout" class="list-group-item">Logout</a>
-                <a href="registration-logged-in" class="list-group-item">Registration</a>
-                <a href="trading-success" class="list-group-item">Trading</a>
-                <a href="admin-success" class="list-group-item list-group-item-info">Admin Panel</a>
+        <!-- NAV BAR -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">
+            <img src="logo.png" width="115" height="20" alt="Logo">
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse text-right" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link" href="/trading-success">Trading <span class="sr-only">(current)</span></a>
+              <a class="nav-item nav-link" href="/trading-portfolio">Portfolio</a>
+            </div>
+            <a href="logout"><button type="button" class="btn btn-outline-danger">Logout</button></a>
+            <a href="admin-success"><button type="button" class="btn btn-outline-info">Admin</button></a>
+          </div>
+        </nav>
+
+
+        <!-- Admin Panel -->
+        <div class="container">
+            <div class="jumbotron jumbotron-fluid">
+                 <div class='container'>
+                        <h1>Welcome to the Admin Page</h1>
+                        <br>
+                        </p>
+                        <div>
+                                <div>
+                                    <table name="mytable">
+                                        <tr style="background-color: white; border-padding:20px;">
+                                            <th style= "padding:20px" name="id">ID</th>
+                                            <th style= "padding:20px" name="username">Username</th>
+                                            <th style= "padding:20px" name="firstname">First name</th>
+                                            <th style= "padding:20px" name="lastname">Last Name</th>
+                                            <th style= "padding:20px" name="balance">Balance</th>
+                                            <th style= "padding:20px" name="balance">Type</th>
+                                        </tr>
+                                        <p>
+                                        {{#each result}}
+                                                <tr style="background-color: white;">
+                                                    <td style= "padding:20px">{{this._id}}</td>
+                                                    <td style= "padding:20px">{{this.username}}</td>
+                                                    <td style= "padding:20px">{{this.firstname}}</td>
+                                                    <td style= "padding:20px">{{this.lastname}}</td>
+                                                    <td style= "padding:20px">{{this.cash2}}</td>
+                                                    <td style= "padding:20px">{{this.type}}</td>
+                                                </tr>
+                                        {{/each}}
+                                        </p>
+                                        </table>
+                                </div>
+                          </div>
+                          <br>
+                          <div class="form-group">
+                             <form action="/admin-success-user-accounts" method="POST">
+                                <input type="submit" class="btn btn-info" id="loadport" value="Load Portfolio">
+                             </form> 
+                          </div>
+                        </div>
+                        <br>
+                        <div class='container'>
+                            <p><i>{{message}}</i></p>
+                            <div class="row">
+                                <div class="col">
+                                    <form onsubmit="return confirm('Do you really want to delete the user?') "action='/admin-success-delete-user-success', method='POST'>
+                                        <label for="stocksearch">Enter Username to Delete</label>
+                                        <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
+                                        <br>
+                                            <p>
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </p>
+                                        <br>
+                                    </form>
+                                </div>
+                              </div>
+                        </div>
+                    </div>
+                  </div>
             </div>
         </div>
-        
-        <div class="defcontent">
-            <br>
-            <div class='chfont container'>
 
-                <form action ="/admin-success-user-accounts" method="POST">
-                <p>{{title}}</p>
-
-                    <br>
-
-                    <div class="form-group">
-
-                        <button type="submit" class="btn btn-secondary">All User Accounts</button>
-                    </div>
-                </form>
-                <br>
-                <form action ="/admin-success-delete-user" method="POST">
-                    <br>
-                    <div class="form-group">
-
-                        <button type="submit" class="btn btn-secondary">Delete Accounts</button>
-                    </div>
-                </form>
-                    <br>
-
-                <br><br>
-                
-            </div>
-
+    <!-- Footer -->
+    <footer class="chfont page-footer font-small blue">
+        <div class="footer-copyright text-center py-3">© 2019 Copyright:
+            <a href="">Stock Trader All Rights Reserved </a>
         </div>
-                <footer class="chfont page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-            <a href="">Stock Trader</a>  All Rights Reserved
+    </footer> 
 
-        </footer>
-    </div> 
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script type='text/javascript' src='bundle_1.js'></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     </body>
 </html>

@@ -33,7 +33,7 @@
                 <p><i>{{message}}</i></p>
                 <div class="row">
                     <div class="col">
-                        <form onsubmit="return confirm('Do you really want to delete the user?') "action='/admin-success-delete-user-success', method='POST'>
+                        <form  id="deleteuser" action='/admin-success-delete-user-success', method='POST'>
                             <label for="stocksearch">Enter Username to Delete</label>
                             <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
                             <br>

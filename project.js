@@ -40,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
+app.use(express.static('views/images')); 
 
 hbs.registerHelper('dbConnection', function(req,res) {
 	var url = "mongodb://localhost:27017/accounts";
@@ -53,6 +54,8 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false
 }));
+
+
 
 
 passport.serializeUser(function(user, done) {
@@ -325,6 +328,12 @@ app.get('/trading-success', isAuthenticated, (request, response) => {
 	})
 });
 
+app.get('/trading-portfolio', isAuthenticated, (request, response) => {
+	response.render('trading-portfolio.hbs', {
+		title: 'Welcome to the Portfolio Page.'
+	})
+});
+
 app.post('/trading-success-search', isAuthenticated, async(request, response) => {
 	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)
 
@@ -524,7 +533,7 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 	}
 });
 
-app.post('/trading-success-holdings', isAuthenticated, (request, response) => {
+app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => {
 	var stocks = request.session.passport.user.stocks;
 	var num_stocks = stocks.length;
 	var stock_keys = [];
@@ -545,7 +554,7 @@ app.post('/trading-success-holdings', isAuthenticated, (request, response) => {
 		}
 	}
 
-	response.render('trading-success.hbs', {
+	response.render('trading-portfolio.hbs', {
 		title: message,
 		head: `Cash: $${cash2[0]}`
 	})
@@ -575,8 +584,8 @@ app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if (err) {
 				res.send('Unable to fetch Accounts');
-			}
-			res.render('admin-success-user-accounts-list.hbs', {
+			}	
+			res.render('admin-success.hbs', {
 				result: result
 			});
 		});
@@ -591,7 +600,7 @@ app.post('/admin-success-delete-user', isAdmin, function(req, res, next) {
 			if(err) {
 				res.send('Unable to fetch Accounts');
 			}
-			res.render('admin-success-delete-user-success.hbs', {
+			res.render('admin-success.hbs', {
 				result: result
 			});
 		});
@@ -637,7 +646,7 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 						if(result === undefined || result.length == 0) {
 							message = 'No user exists with that username';
 							console.log(message)
-							res.render('admin-success-delete-user-success.hbs', {
+							res.render('admin-success.hbs', {
 								message: message
 							});
 						}else {
@@ -645,7 +654,7 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 								if(err) throw err;
 								console.log("User Deleted");
 								message ='User is Deleted';
-								res.render('admin-success-delete-user-success.hbs', {
+								res.render('admin-success.hbs', {
 								message: message
 							});
 								db.close();

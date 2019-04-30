@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-    <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <!--<link href="../css/style.css" rel="stylesheet" type="text/css">-->
@@ -29,8 +28,8 @@
           </button>
           <div class="collapse navbar-collapse text-right" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-item nav-link active" href="/trading-success">Trading <span class="sr-only">(current)</span></a>
-              <a class="nav-item nav-link" href="/trading-portfolio">Portfolio</a>
+              <a class="nav-item nav-link" href="/trading-success">Trading</a>
+              <a class="nav-item nav-link active" href="/trading-portfolio">Portfolio</a>
             </div>
             <a href="logout"><button type="button" class="btn btn-outline-danger">Logout</button></a>
             <a href="admin-success"><button type="button" class="btn btn-outline-info">Admin</button></a>
@@ -38,68 +37,22 @@
         </nav>
 
 
-
-        <!-- Check Stock Price -->
+        <!-- Portfolio -->
         <div class="container">
             <div class="jumbotron jumbotron-fluid">
               <div class="container">
-                <h1 class="display-4">Check Stock Price</h1>
+                <h1 class="display-4">Your Portfolio</h1>
                 <p class="lead">Please note all prices are in USD.</p>
               </div>
                  <div class='chfont container'>
                     <p class="font-weight-bold">{{title}}</p>
                     <p class="font-weight-bold">{{head}}</p>
                         <br>
-                    <div class="input-group btn-group">
-                        <form action="/trading-success-search" method="POST">
-                            <label for="stocksearch">Stock Search Price</label>
-                            <input type="text" class="form-control border border-right-0" name="stocksearch" id="stocksearch" placeholder="Stock Ticker e.g. TSLA">
-                            <br><br><br><br>
-                            <input type="submit" class="btn btn-info" value="Search">
+                         <form action="/trading-portfolio-holdings" method="POST">
+                            <input type="submit" class="btn btn-info" id="loadport" value="Load Portfolio">
                          </form>   
-                    </div>
+   
                   </div>
-            </div>
-        </div>
-
-        <!-- Buy & Sell Stock -->
-        <div class="container">
-            <div class="jumbotron jumbotron-fluid">
-              <div class="container">
-                <h1 class="display-4">Buy & Sell Stocks</h1>
-                <p class="lead">Please note all prices are in USD.</p>
-              </div>
-                 <div class='chfont container'>
-                     <form action="/trading-success-buy" method="POST">
-                      <div class="row">
-                        <div class="col">
-                          <label for="stocksearch">Buy Stock</label>
-                          <input type="text" class="form-control border border-right-0" name="buystockticker" id="buystockticker" placeholder="Enter Stock Ticker e.g FB">
-                        </div>
-                        <div class="col">
-                          <label for="stocksearch">Quantity</label>
-                          <input type="number" class="form-control border border-right-0" name="buystockqty" id="buystockqty" placeholder="Enter Quantity">
-                        </div>
-                      </div>
-                      <br>
-                      <input type="submit" class="btn btn-info" value="Buy">
-                    </form>
-                    <br><br>
-                    <form action="/trading-success-sell" method="POST">
-                      <div class="row">
-                          <div class="col">
-                              <label for="stocksearch">Sell Stock</label>
-                            <input type="text" class="form-control" name="sellstockticker" id="sellstockticker" placeholder="Enter Stock Ticker e.g FB">
-                          </div>
-                          <div class="col">
-                              <label for="stocksearch">Quantity</label>
-                            <input type="number" class="form-control" name="sellstockqty" id="sellstockqty" placeholder="Enter Quantity">
-                          </div>
-                        </div>
-                        <br>
-                        <input type="submit" class="btn btn-info" value="Sell">
-                    </form>
-                </div>
             </div>
         </div>
 
