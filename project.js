@@ -358,17 +358,25 @@ app.get('/test-end-point/:id', isAuthenticated, async(request, response) => {
         });
     } catch(e) {
         console.error(e);
-    }
+    };
+});
 
-})
+// var getCurrentRate = async(err, res) =>{
+// 	var yesterday = moment().subtract(1, 'days');
+// 	var date = yesterday.format('YYYY-MM-DD');
 
+// 	var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
+// 	var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}`);
+
+
+// }
 app.get('/trading-success', isAuthenticated, async(request, response) => {
 	try{
-		var yesterday = moment().subtract(1, 'days');
+		var yesterday = moment().subtract(2, 'days');
 		var date = yesterday.format('YYYY-MM-DD');
 
 		var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
-		var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}`);
+		var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}?base=USD`);
 		// stocks = ['BTC', 'AAPL', 'TSLA', 'GOOG', 'SBUX', 'FB', 'BA', 'BABA', 'NKE', 'AMZN']
 
 		// for (stock in stocks) {
@@ -381,7 +389,7 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		var yest_json = yest_rate.data.rates;
 
 		var cad = json.CAD;
-		var usd = json.USD;
+		var bgn = json.BGN;
 		var eur = json.EUR;
 		var jpy = json.JPY;
 		var aud = json.AUD;
@@ -392,7 +400,7 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		var cny = json.CNY;
 
 		var yest_cad = yest_json.CAD;
-		var yest_usd = yest_json.USD;
+		var yest_bgn = yest_json.BGN;
 		var yest_eur = yest_json.EUR;
 		var yest_jpy = yest_json.JPY;
 		var yest_aud = yest_json.AUD;
@@ -402,66 +410,78 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		var yest_inr = yest_json.INR;
 		var yest_cny = yest_json.CNY;
 
-		array1 = [cad, usd, eur, jpy, aud, hkd, gbp, mxn, inr, cny];
-		array2 = [yest_cad, yest_usd, yest_eur, yest_jpy, yest_aud, yest_hkd, yest_gbp, yest_mxn, yest_inr, yest_cny];
+		array1 = [cad, bgn, eur, jpy, aud, hkd, gbp, mxn, inr, cny];
+		array2 = [yest_cad, yest_bgn, yest_eur, yest_jpy, yest_aud, yest_hkd, yest_gbp, yest_mxn, yest_inr, yest_cny];
+		
+		// ------------------TEST---------------------
 
-		console.log(parseInt(array1[0]) >= parseInt(array2[0]))
-		console.log(parseInt(array1[1]) >= parseInt(array2[1]))
-		console.log(parseInt(array1[2]) >= parseInt(array2[2]))
-		console.log(parseInt(array1[3]) >= parseInt(array2[3]))
-		console.log(parseInt(array1[4]) >= parseInt(array2[4]))
-		console.log(parseInt(array1[5]) >= parseInt(array2[5]))
-		console.log(parseInt(array1[6]) >= parseInt(array2[6]))
-		console.log(parseInt(array1[7]) >= parseInt(array2[7]))
-		console.log(parseInt(array1[8]) >= parseInt(array2[8]))
-		console.log(parseInt(array1[9]) >= parseInt(array2[9]))
+		// console.log(cad + " " + yest_cad)
+		// console.log(parseFloat(array1[0]) >= parseFloat(array2[0]))
+		// console.log(bgn + " " + yest_bgn)
+		// console.log(parseFloat(array1[1]) >= parseFloat(array2[1]))
+		// console.log(eur + " " + yest_eur)
+		// console.log(parseFloat(array1[2]) >= parseFloat(array2[2]))
+		// console.log(jpy + " " + yest_jpy)
+		// console.log(parseFloat(array1[3]) >= parseFloat(array2[3]))
+		// console.log(aud + " " + yest_aud)
+		// console.log(parseFloat(array1[4]) >= parseFloat(array2[4]))
+		// console.log(hkd + " " + yest_hkd)
+		// console.log(parseFloat(array1[5]) >= parseFloat(array2[5]))
+		// console.log(gbp + " " + yest_gbp)
+		// console.log(parseFloat(array1[6]) >= parseFloat(array2[6]))
+		// console.log(mxn + " " + yest_mxn)
+		// console.log(parseFloat(array1[7]) >= parseFloat(array2[7]))
+		// console.log(inr + " " + yest_inr)
+		// console.log(parseFloat(array1[8]) >= parseFloat(array2[8]))
+		// console.log(cny + " " + yest_cny)
+		// console.log(parseFloat(array1[9]) >= parseFloat(array2[9]))
 
-		if(parseInt(array1[0]) >= parseInt(array2[0])){
+		if(parseFloat(array1[0]) >= parseFloat(array2[0])){
 			img0 ="../images/greentriangle.png";
 		}else{
 			img0 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[1]) >= parseInt(array2[1])){
+		if(parseFloat(array1[1]) >= parseFloat(array2[1])){
 			img1 ="../images/greentriangle.png";
 		}else{
 			img1 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[2]) >= parseInt(array2[2])){
+		if(parseFloat(array1[2]) >= parseFloat(array2[2])){
 			img2 ="../images/greentriangle.png";
 		}else{
 			img2 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[3]) >= parseInt(array2[3])){
+		if(parseFloat(array1[3]) >= parseFloat(array2[3])){
 			img3 ="../images/greentriangle.png";
 		}else{
 			img3 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[4]) >= parseInt(array2[4])){
+		if(parseFloat(array1[4]) >= parseFloat(array2[4])){
 			img4 ="../images/greentriangle.png";
 		}else{
 			img4 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[5]) >= parseInt(array2[5])){
+		if(parseFloat(array1[5]) >= parseFloat(array2[5])){
 			img5 ="../images/greentriangle.png";
 		}else{
 			img5 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[6]) >= parseInt(array2[6])){
+		if(parseFloat(array1[6]) >= parseFloat(array2[6])){
 			img6 ="../images/greentriangle.png";
 		}else{
 			img6 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[7]) >= parseInt(array2[7])){
+		if(parseFloat(array1[7]) >= parseFloat(array2[7])){
 			img7 ="../images/greentriangle.png";
 		}else{
 			img7 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[8]) >= parseInt(array2[8])){
+		if(parseFloat(array1[8]) >= parseFloat(array2[8])){
 			img8 ="../images/greentriangle.png";
 		}else{
 			img8 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[9]) >= parseInt(array2[9])){
+		if(parseFloat(array1[9]) >= parseFloat(array2[9])){
 			img9 ="../images/greentriangle.png";
 		}else{
 			img9 ="../images/redtriangle.png";
@@ -471,7 +491,7 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		console.log(cad)
 		response.render('trading-success.hbs', {
 			cad: cad,
-			usd: usd,
+			bgn: bgn,
 			eur: eur,
 			jpy: jpy,
 			aud: aud,
@@ -512,11 +532,6 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 	}
 });
 
-app.post('/trading-success-currencies', isAuthenticated, async(request, response) => {
-	
-	response.render('trading-success-currencies-ticker.hbs');
-});
-
 app.post('/trading-success-stocks', isAuthenticated, async(request, response) => {
 	try{
 						
@@ -548,66 +563,77 @@ app.post('/trading-success-stocks', isAuthenticated, async(request, response) =>
 		array1 = [nflx_info, aapl_info, tsla_info, goog_info, sbux_info, fb_info, ba_info, baba_info, nke_info, amzn_info];
 		array2 = [yest_nflx_info, yest_aapl_info, yest_tsla_info, yest_goog_info, yest_sbux_info, yest_fb_info, yest_ba_info, yest_baba_info, yest_nke_info, yest_amzn_info];
 
-
-		console.log(parseInt(array1[0]) >= parseInt(array2[0]))
-		console.log(parseInt(array1[1]) >= parseInt(array2[1]))
-		console.log(parseInt(array1[2]) >= parseInt(array2[2]))
-		console.log(parseInt(array1[3]) >= parseInt(array2[3]))
-		console.log(parseInt(array1[4]) >= parseInt(array2[4]))
-		console.log(parseInt(array1[5]) >= parseInt(array2[5]))
-		console.log(parseInt(array1[6]) >= parseInt(array2[6]))
-		console.log(parseInt(array1[7]) >= parseInt(array2[7]))
-		console.log(parseInt(array1[8]) >= parseInt(array2[8]))
-		console.log(parseInt(array1[9]) >= parseInt(array2[9]))
+		// ------------------TEST---------------------
+		
+		// console.log(nflx_info, yest_nflx_info)
+		// console.log(parseFloat(array1[0]) >= parseFloat(array2[0]))
+		// console.log(aapl_info, yest_aapl_info)
+		// console.log(parseFloat(array1[1]) >= parseFloat(array2[1]))
+		// console.log(tsla_info, yest_tsla_info)
+		// console.log(parseFloat(array1[2]) >= parseFloat(array2[2]))
+		// console.log(goog_info, yest_goog_info)
+		// console.log(parseFloat(array1[3]) >= parseFloat(array2[3]))
+		// console.log(sbux_info, yest_sbux_info)
+		// console.log(parseFloat(array1[4]) >= parseFloat(array2[4]))
+		// console.log(fb_info, yest_fb_info)
+		// console.log(parseFloat(array1[5]) >= parseFloat(array2[5]))
+		// console.log(ba_info, yest_ba_info)
+		// console.log(parseFloat(array1[6]) >= parseFloat(array2[6]))
+		// console.log(baba_info, yest_baba_info)
+		// console.log(parseFloat(array1[7]) >= parseFloat(array2[7]))
+		// console.log(nke_info, yest_nke_info)
+		// console.log(parseFloat(array1[8]) >= parseFloat(array2[8]))
+		// console.log(amzn_info, yest_amzn_info)
+		// console.log(parseFloat(array1[9]) >= parseFloat(array2[9]))
 		
 
 
-		if(parseInt(array1[0]) >= parseInt(array2[0])){
+		if(parseFloat(array1[0]) >= parseFloat(array2[0])){
 			img0 ="../images/greentriangle.png";
 		}else{
 			img0 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[1]) >= parseInt(array2[1])){
+		if(parseFloat(array1[1]) >= parseFloat(array2[1])){
 			img1 ="../images/greentriangle.png";
 		}else{
 			img1 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[2]) >= parseInt(array2[2])){
+		if(parseFloat(array1[2]) >= parseFloat(array2[2])){
 			img2 ="../images/greentriangle.png";
 		}else{
 			img2 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[3]) >= parseInt(array2[3])){
+		if(parseFloat(array1[3]) >= parseFloat(array2[3])){
 			img3 ="../images/greentriangle.png";
 		}else{
 			img3 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[4]) >= parseInt(array2[4])){
+		if(parseFloat(array1[4]) >= parseFloat(array2[4])){
 			img4 ="../images/greentriangle.png";
 		}else{
 			img4 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[5]) >= parseInt(array2[5])){
+		if(parseFloat(array1[5]) >= parseFloat(array2[5])){
 			img5 ="../images/greentriangle.png";
 		}else{
 			img5 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[6]) >= parseInt(array2[6])){
+		if(parseFloat(array1[6]) >= parseFloat(array2[6])){
 			img6 ="../images/greentriangle.png";
 		}else{
 			img6 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[7]) >= parseInt(array2[7])){
+		if(parseFloat(array1[7]) >= parseFloat(array2[7])){
 			img7 ="../images/greentriangle.png";
 		}else{
 			img7 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[8]) >= parseInt(array2[8])){
+		if(parseFloat(array1[8]) >= parseFloat(array2[8])){
 			img8 ="../images/greentriangle.png";
 		}else{
 			img8 ="../images/redtriangle.png";
 		};
-		if(parseInt(array1[9]) >= parseInt(array2[9])){
+		if(parseFloat(array1[9]) >= parseFloat(array2[9])){
 			img9 ="../images/greentriangle.png";
 		}else{
 			img9 ="../images/redtriangle.png";
