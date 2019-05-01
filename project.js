@@ -255,7 +255,7 @@ app.get('/', (request, response) => {
 	request.session.destroy(function (err) {
 		response.render('login.hbs', {
 			title: 'Welcome to the login page.'
-		})
+		});
 	});
 });
 
@@ -264,7 +264,7 @@ app.get('/login', (request, response) => {
 	request.session.destroy(function (err) {
 		response.render('login.hbs', {
 			title: 'Welcome to the login page.'
-		})
+		});
 	});
 });
 
@@ -273,7 +273,7 @@ app.get('/login-fail', (request, response) => {
 	request.session.destroy(function (err) {
 		response.render('login.hbs', {
 			title: 'You have entered an invalid username or password. Please try again or create a new account.'
-		})
+		});
 	});
 });
 
@@ -324,19 +324,6 @@ passport.use(new LocalStrategy(
 ));
 
 // ^^^^^^ LOGIN ^^^^^^ //
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -432,6 +419,11 @@ app.get('/news/currency/:id', isAuthenticated, async (request, response) => {
 
 })
 
+app.get('/trading-portfolio', isAuthenticated, (request, response) => {
+	response.render('trading-portfolio.hbs', {
+		title: 'Welcome to the Portfolio Page.'
+	})
+});
 
 app.post('/trading-success-search', isAuthenticated, async (request, response) => {
 	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)
@@ -654,6 +646,32 @@ app.post('/trading-success-holdings', isAuthenticated, (request, response) => {
 	}
 
 	response.render('trading-success.hbs', {
+		title: message,
+		head: `Cash: $${cash2[0]}`
+	})
+});
+
+app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => {
+	var stocks = request.session.passport.user.stocks;
+	var num_stocks = stocks.length;
+	var stock_keys = [];
+	var cash = request.session.passport.user.cash;
+	var message = 'Shares: \n';
+	var cash2 = request.session.passport.user.cash2;
+
+	if (num_stocks === 0) {
+		message = 'You currently do not have any stocks.';
+	} else {
+		var i;
+		for (i = 0; i < num_stocks; i++) {
+			stock_keys.push(Object.keys(stocks[i]));
+			var key_value = stocks[i][stock_keys[i][0]];
+			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
+			console.log(message);
+		}
+	}
+
+	response.render('trading-portfolio.hbs', {
 		title: message,
 		head: `Cash: $${cash2[0]}`
 	})
