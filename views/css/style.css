@@ -15,6 +15,15 @@ body {
     margin-top: 75px;
 }
 
+
+.nav-margin {
+    margin-bottom: 75px;
+}
+
+.nav-margin-trading {
+    margin-bottom: 35px;
+}
+
 .title {
     text-align: center;
 }
@@ -25,4 +34,17 @@ body {
 
 .copyright {
     color: white;
+}
+
+
+.content {
+    display: flex;
+    height: 65vh;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.not-login-msg {
+    width: 50%;
 }

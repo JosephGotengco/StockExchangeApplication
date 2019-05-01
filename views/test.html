@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <link rel='stylesheet' href='testcss.css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
+    <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
+    <!--<link href="../css/style.css" rel="stylesheet" type="text/css">-->
+
+</head>
+    
+<body>
+
+    <div class="defcontainer">
+        <div class="defheader"></div> 
+    </div>
+        
+
+        <!-- NAV BAR -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">
+            <img src="../images/logo.png" width="115" height="20" alt="Logo">
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse text-right" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-item nav-link" href="#"></a>
+              <a class="nav-item nav-link" href="#">Pricing</a>
+            </div>
+            <a href="logout"><button type="button" class="btn btn-outline-danger">Logout</button></a>
+            <a href="admin-success"><button type="button" class="btn btn-outline-info">Admin</button></a>
+          </div>
+        </nav>
+
+        <!-- Check Stock Price -->
+        <div class="container">
+            <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                <h1 class="display-4">Check Stock Price</h1>
+                <p class="lead">Please note all prices are in USD.</p>
+              </div>
+                 <div class='chfont container'>
+                    <p class="font-weight-bold">{{title}}</p>
+                    <p class="font-weight-bold">{{head}}</p>
+                        <br>
+                    <div class="input-group btn-group">
+                        <form action="/trading-success-search" method="POST">
+                            <label for="stocksearch">Stock Search Price</label>
+                            <input type="text" class="form-control border border-right-0" placeholder="Stock Ticker e.g. TSLA">
+                            <br><br><br><br>
+                            <input type="submit" class="btn btn-info" value="Search">
+                         </form>   
+                    </div>
+                  </div>
+            </div>
+        </div>
+
+        <!-- Buy & Sell Stock -->
+        <div class="container">
+            <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                <h1 class="display-4">Buy & Sell Stocks</h1>
+                <p class="lead">Please note all prices are in USD.</p>
+              </div>
+                 <div class='chfont container'>
+                     <form action="/trading-success-buy" method="POST">
+                      <div class="row">
+                        <div class="col">
+                          <label for="stocksearch">Buy Stock</label>
+                          <input type="text" class="form-control border border-right-0" name="buystockticker" id="buystockticker" placeholder="Enter Stock Ticker e.g FB">
+                        </div>
+                        <div class="col">
+                          <label for="stocksearch">Quantity</label>
+                          <input type="number" class="form-control border border-right-0" name="buystockqty" id="buystockqty" placeholder="Enter Quantity">
+                        </div>
+                      </div>
+                      <br>
+                      <input type="submit" class="btn btn-info" value="Buy">
+                    </form>
+                    <br><br>
+                    <form action="/trading-success-sell" method="POST">
+                      <div class="row">
+                          <div class="col">
+                              <label for="stocksearch">Sell Stock</label>
+                            <input type="text" class="form-control" name="sellstockticker" id="sellstockticker" placeholder="Enter Stock Ticker e.g FB">
+                          </div>
+                          <div class="col">
+                              <label for="stocksearch">Quantity</label>
+                            <input type="number" class="form-control" name="sellstockqty" id="sellstockqty" placeholder="Enter Quantity">
+                          </div>
+                        </div>
+                        <br>
+                        <input type="submit" class="btn btn-info" value="Sell">
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    <footer class="chfont page-footer font-small blue">
+        <div class="footer-copyright text-center py-3">© 2019 Copyright:
+            <a href="">Stock Trader All Rights Reserved </a>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    </body>
+</html>
