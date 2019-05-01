@@ -364,7 +364,11 @@ app.get('/test-end-point/:id', isAuthenticated, async(request, response) => {
 
 app.get('/trading-success', isAuthenticated, async(request, response) => {
 	try{
+		var yesterday = moment().subtract(1, 'days');
+		var date = yesterday.format('YYYY-MM-DD');
+
 		var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
+		var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}`);
 		// stocks = ['BTC', 'AAPL', 'TSLA', 'GOOG', 'SBUX', 'FB', 'BA', 'BABA', 'NKE', 'AMZN']
 
 		// for (stock in stocks) {
@@ -374,6 +378,8 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		// }
 		// var currencies = await axios.get(`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`)
 		var json = rate.data.rates;
+		var yest_json = yest_rate.data.rates;
+
 		var cad = json.CAD;
 		var usd = json.USD;
 		var eur = json.EUR;
@@ -381,14 +387,89 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		var aud = json.AUD;
 		var hkd = json.HKD;
 		var gbp = json.GBP;
-		var hkd = json.HKD;
 		var mxn = json.MXN;
 		var inr = json.INR;
 		var cny = json.CNY;
 
+		var yest_cad = yest_json.CAD;
+		var yest_usd = yest_json.USD;
+		var yest_eur = yest_json.EUR;
+		var yest_jpy = yest_json.JPY;
+		var yest_aud = yest_json.AUD;
+		var yest_hkd = yest_json.HKD;
+		var yest_gbp = yest_json.GBP;
+		var yest_mxn = yest_json.MXN;
+		var yest_inr = yest_json.INR;
+		var yest_cny = yest_json.CNY;
+
+		array1 = [cad, usd, eur, jpy, aud, hkd, gbp, mxn, inr, cny];
+		array2 = [yest_cad, yest_usd, yest_eur, yest_jpy, yest_aud, yest_hkd, yest_gbp, yest_mxn, yest_inr, yest_cny];
+
+		console.log(parseInt(array1[0]) >= parseInt(array2[0]))
+		console.log(parseInt(array1[1]) >= parseInt(array2[1]))
+		console.log(parseInt(array1[2]) >= parseInt(array2[2]))
+		console.log(parseInt(array1[3]) >= parseInt(array2[3]))
+		console.log(parseInt(array1[4]) >= parseInt(array2[4]))
+		console.log(parseInt(array1[5]) >= parseInt(array2[5]))
+		console.log(parseInt(array1[6]) >= parseInt(array2[6]))
+		console.log(parseInt(array1[7]) >= parseInt(array2[7]))
+		console.log(parseInt(array1[8]) >= parseInt(array2[8]))
+		console.log(parseInt(array1[9]) >= parseInt(array2[9]))
+
+		if(parseInt(array1[0]) >= parseInt(array2[0])){
+			img0 ="../images/greentriangle.png";
+		}else{
+			img0 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[1]) >= parseInt(array2[1])){
+			img1 ="../images/greentriangle.png";
+		}else{
+			img1 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[2]) >= parseInt(array2[2])){
+			img2 ="../images/greentriangle.png";
+		}else{
+			img2 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[3]) >= parseInt(array2[3])){
+			img3 ="../images/greentriangle.png";
+		}else{
+			img3 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[4]) >= parseInt(array2[4])){
+			img4 ="../images/greentriangle.png";
+		}else{
+			img4 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[5]) >= parseInt(array2[5])){
+			img5 ="../images/greentriangle.png";
+		}else{
+			img5 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[6]) >= parseInt(array2[6])){
+			img6 ="../images/greentriangle.png";
+		}else{
+			img6 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[7]) >= parseInt(array2[7])){
+			img7 ="../images/greentriangle.png";
+		}else{
+			img7 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[8]) >= parseInt(array2[8])){
+			img8 ="../images/greentriangle.png";
+		}else{
+			img8 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[9]) >= parseInt(array2[9])){
+			img9 ="../images/greentriangle.png";
+		}else{
+			img9 ="../images/redtriangle.png";
+		};
+
+
 		console.log(cad)
 		response.render('trading-success.hbs', {
-			title: 'Welcome to the trading page.',
 			cad: cad,
 			usd: usd,
 			eur: eur,
@@ -396,10 +477,34 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 			aud: aud,
 			hkd: hkd,
 			gbp: gbp,
-			hkd: hkd,
 			mxn: mxn,
 			inr: inr,
-			cny: cny
+			cny: cny,
+
+			// yest_cad: yest_cad,
+			// yest_usd: yest_usd,
+			// yest_eur: yest_eur,
+			// yest_jpy: yest_jpy,
+			// yest_aud: yest_aud,
+			// yest_hkd: yest_hkd,
+			// yest_gbp: yest_gbp,
+			// yest_mxn: yest_mxn,
+			// yest_inr: yest_inr,
+			// yest_cny: yest_cny,
+
+			img0: img0,
+			img1: img1,
+			img2: img2,
+			img3: img3,
+			img4: img4,
+			img5: img5,
+			img6: img6,
+			img7: img7,
+			img8: img8,
+			img9: img9,
+			HTMLforImage: "<img src = ",
+			alt: " height=20px; width=20px; hspace=2; padding=2px;>",
+			title: "Welcome to the trading page."
 	});
 	}
 	catch(err){
@@ -414,38 +519,136 @@ app.post('/trading-success-currencies', isAuthenticated, async(request, response
 
 app.post('/trading-success-stocks', isAuthenticated, async(request, response) => {
 	try{
-		var yesterday = moment().subtract(1, 'days');
-		var date = yesterday.format('YYYYDDMM');
-
-		var stock_info = await axios.get('https://cloud.iexapis.com/stable/tops?token=sk_291eaf03571b4f0489b0198ac1af487d&symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN');
+						
+		var stock_info = await axios.get('https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m');
 		var json = stock_info.data;
 
-		var yest_stock_info = await axios.get(`https://cloud.iexapis.com/stable/tops?token=sk_291eaf03571b4f0489b0198ac1af487d&symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN/${date}`);
-		var yest_json = yest_stock_info.data;
+		nflx_info = json['NFLX'].chart.slice(-1)[0].close,
+		aapl_info = json['AAPL'].chart.slice(-1)[0].close,
+		tsla_info = json['TSLA'].chart.slice(-1)[0].close,
+		goog_info = json['GOOG'].chart.slice(-1)[0].close,
+		sbux_info = json['SBUX'].chart.slice(-1)[0].close,
+		fb_info = json['FB'].chart.slice(-1)[0].close,
+		ba_info = json['BA'].chart.slice(-1)[0].close,
+		baba_info = json['BABA'].chart.slice(-1)[0].close,
+		nke_info = json['NKE'].chart.slice(-1)[0].close,
+		amzn_info = json['AMZN'].chart.slice(-1)[0].close, 
+		yest_nflx_info = json['NFLX'].chart.slice(-2)[0].close,
+		yest_aapl_info = json['AAPL'].chart.slice(-2)[0].close,
+		yest_tsla_info = json["TSLA"].chart.slice(-2)[0].close,
+		yest_goog_info = json['GOOG'].chart.slice(-2)[0].close,
+		yest_sbux_info = json['SBUX'].chart.slice(-2)[0].close,
+		yest_fb_info = json['FB'].chart.slice(-2)[0].close,
+		yest_ba_info = json['BA'].chart.slice(-2)[0].close,
+		yest_baba_info = json['BABA'].chart.slice(-2)[0].close,
+		yest_nke_info = json['NKE'].chart.slice(-2)[0].close,
+		yest_amzn_info = json['AMZN'].chart.slice(-2)[0].close
 
+
+		array1 = [nflx_info, aapl_info, tsla_info, goog_info, sbux_info, fb_info, ba_info, baba_info, nke_info, amzn_info];
+		array2 = [yest_nflx_info, yest_aapl_info, yest_tsla_info, yest_goog_info, yest_sbux_info, yest_fb_info, yest_ba_info, yest_baba_info, yest_nke_info, yest_amzn_info];
+
+
+		console.log(parseInt(array1[0]) >= parseInt(array2[0]))
+		console.log(parseInt(array1[1]) >= parseInt(array2[1]))
+		console.log(parseInt(array1[2]) >= parseInt(array2[2]))
+		console.log(parseInt(array1[3]) >= parseInt(array2[3]))
+		console.log(parseInt(array1[4]) >= parseInt(array2[4]))
+		console.log(parseInt(array1[5]) >= parseInt(array2[5]))
+		console.log(parseInt(array1[6]) >= parseInt(array2[6]))
+		console.log(parseInt(array1[7]) >= parseInt(array2[7]))
+		console.log(parseInt(array1[8]) >= parseInt(array2[8]))
+		console.log(parseInt(array1[9]) >= parseInt(array2[9]))
+		
+
+
+		if(parseInt(array1[0]) >= parseInt(array2[0])){
+			img0 ="../images/greentriangle.png";
+		}else{
+			img0 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[1]) >= parseInt(array2[1])){
+			img1 ="../images/greentriangle.png";
+		}else{
+			img1 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[2]) >= parseInt(array2[2])){
+			img2 ="../images/greentriangle.png";
+		}else{
+			img2 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[3]) >= parseInt(array2[3])){
+			img3 ="../images/greentriangle.png";
+		}else{
+			img3 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[4]) >= parseInt(array2[4])){
+			img4 ="../images/greentriangle.png";
+		}else{
+			img4 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[5]) >= parseInt(array2[5])){
+			img5 ="../images/greentriangle.png";
+		}else{
+			img5 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[6]) >= parseInt(array2[6])){
+			img6 ="../images/greentriangle.png";
+		}else{
+			img6 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[7]) >= parseInt(array2[7])){
+			img7 ="../images/greentriangle.png";
+		}else{
+			img7 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[8]) >= parseInt(array2[8])){
+			img8 ="../images/greentriangle.png";
+		}else{
+			img8 ="../images/redtriangle.png";
+		};
+		if(parseInt(array1[9]) >= parseInt(array2[9])){
+			img9 ="../images/greentriangle.png";
+		}else{
+			img9 ="../images/redtriangle.png";
+		};
+	
 		response.render('trading-success-stocks-ticker.hbs', {
-			nflx_info: json[0].lastSalePrice,
-			aapl_info: json[1].lastSalePrice,
-			tsla_info: json[2].lastSalePrice,
-			goog_info: json[3].lastSalePrice,
-			sbux_info: json[4].lastSalePrice,
-			fb_info: json[5].lastSalePrice,
-			ba_info: json[6].lastSalePrice,
-			baba_info: json[7].lastSalePrice,
-			nke_info: json[8].lastSalePrice,
-			amzn_info: json[9].lastSalePrice,
+			nflx_info: json['NFLX'].chart.slice(-1)[0].close,
+			aapl_info: json['AAPL'].chart.slice(-1)[0].close,
+			tsla_info: json['TSLA'].chart.slice(-1)[0].close,
+			goog_info: json['GOOG'].chart.slice(-1)[0].close,
+			sbux_info: json['SBUX'].chart.slice(-1)[0].close,
+			fb_info: json['FB'].chart.slice(-1)[0].close,
+			ba_info: json['BA'].chart.slice(-1)[0].close,
+			baba_info: json['BABA'].chart.slice(-1)[0].close,
+			nke_info: json['NKE'].chart.slice(-1)[0].close,
+			amzn_info: json['AMZN'].chart.slice(-1)[0].close,
 
-			yest_nflx_info: yest_json[0].lastSalePrice,
-			yest_aapl_info: yest_json[1].lastSalePrice,
-			yest_tsla_info: yest_json[2].lastSalePrice,
-			yest_goog_info: yest_json[3].lastSalePrice,
-			yest_sbux_info: yest_json[4].lastSalePrice,
-			yest_fb_info: yest_json[5].lastSalePrice,
-			yest_ba_info: yest_json[6].lastSalePrice,
-			yest_baba_info: yest_json[7].lastSalePrice,
-			yest_nke_info: yest_json[8].lastSalePrice,
-			// yest_amzn_info: yest_json[9].lastSalePrice,
-			yest_title: "Welcome to the trading page."
+			// yest_nflx_info: json['NFLX'].chart.slice(-2)[0].close,
+			// yest_aapl_info: json['AAPL'].chart.slice(-2)[0].close,
+			// yest_tsla_info: json['TSLA'].chart.slice(-2)[0].close,
+			// yest_goog_info: json['GOOG'].chart.slice(-2)[0].close,
+			// yest_sbux_info: json['SBUX'].chart.slice(-2)[0].close,
+			// yest_fb_info: json['FB'].chart.slice(-2)[0].close,
+			// yest_ba_info: json['BA'].chart.slice(-2)[0].close,
+			// yest_baba_info: json['BABA'].chart.slice(-2)[0].close,
+			// yest_nke_info: json['NKE'].chart.slice(-2)[0].close,
+			// yest_amzn_info: json['AMZN'].chart.slice(-2)[0].close,
+
+			img0: img0,
+			img1: img1,
+			img2: img2,
+			img3: img3,
+			img4: img4,
+			img5: img5,
+			img6: img6,
+			img7: img7,
+			img8: img8,
+			img9: img9,
+			HTMLforImage: "<img src = ",
+			alt: " height=20px; width=20px; hspace=3; padding=2px;>",
+			title: "Welcome to the trading page."
 		});
 	}	
 	catch(err) {
