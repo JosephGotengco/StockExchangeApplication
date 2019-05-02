@@ -3,12 +3,10 @@ const express = require('express');
 const router = new express.Router();
 var utils = require('../utils');
 
-
-// End point if user goes to registeration webpage but is already logged in
-
 router
 .route('/registration-logged-in')
 .get(isAuthenticated, (request, response) => {
+// End point if user goes to registeration webpage but is already logged in
 	response.render('registration-logged-in.hbs', {
 		title: 'You are already logged in. Logout to make a new account.'
 	})
@@ -16,14 +14,17 @@ router
 
 
 
+
 router
-.route('/register')
+.route("/register")
 .get((request, response) => {
+// End point for a new user
 	response.render('registration.hbs', {
 		title: 'To create an account please enter credentials.'
 	})
 })
 .post((request, response) => {
+// Post end point for registering a new user
 
 	var firstname = request.body.firstname;
 	var lastname = request.body.lastname;
@@ -119,6 +120,8 @@ function check_uniq (string_input) {
 	return flag;
 }
 
+
+
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
 		console.log(request.session.passport);
@@ -127,4 +130,5 @@ function isAuthenticated(request, response, next) {
 		response.redirect('/');
 	}
 }
-module.exports = router
+
+module.exports = router;

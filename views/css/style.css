@@ -1,0 +1,53 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    height: 100%;
+    font-family: 'Roboto Slab', serif;
+}
+
+.content-margin {
+    margin-top: 75px;
+}
+
+
+.nav-margin {
+    margin-bottom: 75px;
+}
+
+.nav-margin-trading {
+    margin-bottom: 35px;
+}
+
+.title {
+    text-align: center;
+}
+
+.footer-margin {
+    height: 150px;
+}
+
+.copyright {
+    color: white;
+    font-size: 12px;
+}
+
+
+.content {
+    display: flex;
+    height: 65vh;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.not-login-msg {
+    width: 50%;
+}

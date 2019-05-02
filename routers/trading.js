@@ -18,16 +18,9 @@ hbs.registerHelper('dbConnection', function(req,res) {
 	return url;
 })
 
-
-
-
-
-
-
-
 router
 .route('/trading')
-.get((request, response) => {
+.post((request, response) => {
 	response.render('trading.hbs', {
 		title: 'You are not logged in. You must be logged in to view this page.'
 	})
@@ -276,6 +269,7 @@ router
 })
 
 
+
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
 		console.log(request.session.passport);
@@ -284,5 +278,4 @@ function isAuthenticated(request, response, next) {
 		response.redirect('/');
 	}
 }
-
-module.exports = router
+module.exports = router;
