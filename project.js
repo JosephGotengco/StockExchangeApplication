@@ -19,7 +19,8 @@ var moment = require('moment');
 
 var stockFunc = require('./feature_functions/chartStockData');
 var currFunc = require('./feature_functions/chartCurrData');
-
+var marqueeStock = require('./feature_functions/MarqueeStock');
+var marqueeCurrency = require('./feature_functions/MarqueeCurrency');
 // vvvvvvv CONFIGURATION vvvvvv //
 
 //#------ This line makes a link (like css link) for the folder that contains placeholders for hbs files------#//
@@ -324,159 +325,7 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 	console.log("Trading Success");
 	try{
 		ssn = request.session;
-			var getMarqueeCurrency = async() => {
-			var yesterday = moment().subtract(2, 'days');
-			var date = yesterday.format('YYYY-MM-DD');
-	
-			var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
-			var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}?base=USD`);
-	
-			var json = rate.data.rates;
-			var yest_json = yest_rate.data.rates;
-	
-			var cad = json.CAD;
-			var bgn = json.BGN;
-			var eur = json.EUR;
-			var jpy = json.JPY;
-			var aud = json.AUD;
-			var hkd = json.HKD;
-			var gbp = json.GBP;
-			var mxn = json.MXN;
-			var inr = json.INR;
-			var cny = json.CNY;
-	
-			var yest_cad = yest_json.CAD;
-			var yest_bgn = yest_json.BGN;
-			var yest_eur = yest_json.EUR;
-			var yest_jpy = yest_json.JPY;
-			var yest_aud = yest_json.AUD;
-			var yest_hkd = yest_json.HKD;
-			var yest_gbp = yest_json.GBP;
-			var yest_mxn = yest_json.MXN;
-			var yest_inr = yest_json.INR;
-			var yest_cny = yest_json.CNY;
-	
-			array1 = [cad, bgn, eur, jpy, aud, hkd, gbp, mxn, inr, cny];
-			array2 = [yest_cad, yest_bgn, yest_eur, yest_jpy, yest_aud, yest_hkd, yest_gbp, yest_mxn, yest_inr, yest_cny];
-	
-			console.log(parseInt(array1[0]) >= parseInt(array2[0]))
-			console.log(parseInt(array1[1]) >= parseInt(array2[1]))
-			console.log(parseInt(array1[2]) >= parseInt(array2[2]))
-			console.log(parseInt(array1[3]) >= parseInt(array2[3]))
-			console.log(parseInt(array1[4]) >= parseInt(array2[4]))
-			console.log(parseInt(array1[5]) >= parseInt(array2[5]))
-			console.log(parseInt(array1[6]) >= parseInt(array2[6]))
-			console.log(parseInt(array1[7]) >= parseInt(array2[7]))
-			console.log(parseInt(array1[8]) >= parseInt(array2[8]))
-			console.log(parseInt(array1[9]) >= parseInt(array2[9]))
-	
-			if(parseInt(array1[0]) >= parseInt(array2[0])){
-				img0 ="../images/greentriangle.png";
-			}else{
-				img0 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[1]) >= parseInt(array2[1])){
-				img1 ="../images/greentriangle.png";
-			}else{
-				img1 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[2]) >= parseInt(array2[2])){
-				img2 ="../images/greentriangle.png";
-			}else{
-				img2 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[3]) >= parseInt(array2[3])){
-				img3 ="../images/greentriangle.png";
-			}else{
-				img3 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[4]) >= parseInt(array2[4])){
-				img4 ="../images/greentriangle.png";
-			}else{
-				img4 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[5]) >= parseInt(array2[5])){
-				img5 ="../images/greentriangle.png";
-			}else{
-				img5 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[6]) >= parseInt(array2[6])){
-				img6 ="../images/greentriangle.png";
-			}else{
-				img6 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[7]) >= parseInt(array2[7])){
-				img7 ="../images/greentriangle.png";
-			}else{
-				img7 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[8]) >= parseInt(array2[8])){
-				img8 ="../images/greentriangle.png";
-			}else{
-				img8 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[9]) >= parseInt(array2[9])){
-				img9 ="../images/greentriangle.png";
-			}else{
-				img9 ="../images/redtriangle.png";
-			};
-	
-	
-			var currencyDataList = [
-				{
-					code: "CAD",
-					price: cad,
-					img: img0
-				},
-				{
-					code: "BGN",
-					price: bgn,
-					img: img1 
-				},
-				{
-					code: "EUR",				
-					price: eur,
-					img: img2 
-				},
-				{
-					code: "JPY",
-					price: jpy,
-					img: img3 
-				},
-				{
-					code: "AUD",
-					price: aud,
-					img: img4 
-				},
-				{
-					code: "HKD",
-					price: hkd,
-					img: img5 
-				},
-				{
-					code: "GBP",
-					price: gbp,
-					img: img6 
-				},
-				{
-					code: "MXN",
-					price: mxn,
-					img: img7 
-				},
-				{
-					code: "INR",
-					price: inr,
-					img: img8 
-				},
-				{
-					code: "CNY",
-					price: cny,
-					img: img9 
-				}
-			]
-			
-			return currencyDataList
-		}
+
 
 		var defaultPreference = "currency";
 		if (ssn.preference === undefined) {
@@ -484,7 +333,7 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 		}
 
 		if (ssn.currencyDataList === undefined) {
-			var currencyDataList = await getMarqueeCurrency();			
+			var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 			ssn.currencyDataList = currencyDataList
 		}
 
@@ -505,161 +354,12 @@ app.post('/trading-success-currencies', isAuthenticated, async(request, response
 
 app.post('/trading-success-stocks', isAuthenticated, async(request, response) => {
 	try{
-		var getMarqueeStock = async() => {
-			var stock_info = await axios.get('https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m');
-			var json = stock_info.data;
-	
-			nflx_info = json['NFLX'].chart.slice(-1)[0].close,
-			aapl_info = json['AAPL'].chart.slice(-1)[0].close,
-			tsla_info = json['TSLA'].chart.slice(-1)[0].close,
-			goog_info = json['GOOG'].chart.slice(-1)[0].close,
-			sbux_info = json['SBUX'].chart.slice(-1)[0].close,
-			fb_info = json['FB'].chart.slice(-1)[0].close,
-			ba_info = json['BA'].chart.slice(-1)[0].close,
-			baba_info = json['BABA'].chart.slice(-1)[0].close,
-			nke_info = json['NKE'].chart.slice(-1)[0].close,
-			amzn_info = json['AMZN'].chart.slice(-1)[0].close, 
-			yest_nflx_info = json['NFLX'].chart.slice(-2)[0].close,
-			yest_aapl_info = json['AAPL'].chart.slice(-2)[0].close,
-			yest_tsla_info = json["TSLA"].chart.slice(-2)[0].close,
-			yest_goog_info = json['GOOG'].chart.slice(-2)[0].close,
-			yest_sbux_info = json['SBUX'].chart.slice(-2)[0].close,
-			yest_fb_info = json['FB'].chart.slice(-2)[0].close,
-			yest_ba_info = json['BA'].chart.slice(-2)[0].close,
-			yest_baba_info = json['BABA'].chart.slice(-2)[0].close,
-			yest_nke_info = json['NKE'].chart.slice(-2)[0].close,
-			yest_amzn_info = json['AMZN'].chart.slice(-2)[0].close
-	
-	
-			array1 = [nflx_info, aapl_info, tsla_info, goog_info, sbux_info, fb_info, ba_info, baba_info, nke_info, amzn_info];
-			array2 = [yest_nflx_info, yest_aapl_info, yest_tsla_info, yest_goog_info, yest_sbux_info, yest_fb_info, yest_ba_info, yest_baba_info, yest_nke_info, yest_amzn_info];
-	
-	
-			console.log(parseInt(array1[0]) >= parseInt(array2[0]))
-			console.log(parseInt(array1[1]) >= parseInt(array2[1]))
-			console.log(parseInt(array1[2]) >= parseInt(array2[2]))
-			console.log(parseInt(array1[3]) >= parseInt(array2[3]))
-			console.log(parseInt(array1[4]) >= parseInt(array2[4]))
-			console.log(parseInt(array1[5]) >= parseInt(array2[5]))
-			console.log(parseInt(array1[6]) >= parseInt(array2[6]))
-			console.log(parseInt(array1[7]) >= parseInt(array2[7]))
-			console.log(parseInt(array1[8]) >= parseInt(array2[8]))
-			console.log(parseInt(array1[9]) >= parseInt(array2[9]))
-			
-	
-	
-			if(parseInt(array1[0]) >= parseInt(array2[0])){
-				img0 ="../images/greentriangle.png";
-			}else{
-				img0 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[1]) >= parseInt(array2[1])){
-				img1 ="../images/greentriangle.png";
-			}else{
-				img1 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[2]) >= parseInt(array2[2])){
-				img2 ="../images/greentriangle.png";
-			}else{
-				img2 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[3]) >= parseInt(array2[3])){
-				img3 ="../images/greentriangle.png";
-			}else{
-				img3 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[4]) >= parseInt(array2[4])){
-				img4 ="../images/greentriangle.png";
-			}else{
-				img4 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[5]) >= parseInt(array2[5])){
-				img5 ="../images/greentriangle.png";
-			}else{
-				img5 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[6]) >= parseInt(array2[6])){
-				img6 ="../images/greentriangle.png";
-			}else{
-				img6 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[7]) >= parseInt(array2[7])){
-				img7 ="../images/greentriangle.png";
-			}else{
-				img7 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[8]) >= parseInt(array2[8])){
-				img8 ="../images/greentriangle.png";
-			}else{
-				img8 ="../images/redtriangle.png";
-			};
-			if(parseInt(array1[9]) >= parseInt(array2[9])){
-				img9 ="../images/greentriangle.png";
-			}else{
-				img9 ="../images/redtriangle.png";
-			};
-		
-	
-			var stockDataList = [
-				{
-					code: "NFLX",
-					price: json['NFLX'].chart.slice(-1)[0].close,
-					img: img0
-				},
-				{
-					code: "AAPL",
-					price: json['AAPL'].chart.slice(-1)[0].close,
-					img: img1 
-				},
-				{
-					code: "TSLA",				
-					price: json['TSLA'].chart.slice(-1)[0].close,
-					img: img2 
-				},
-				{
-					code: "GOOG",
-					price: json['GOOG'].chart.slice(-1)[0].close,
-					img: img3 
-				},
-				{
-					code: "SBUX",
-					price: json['SBUX'].chart.slice(-1)[0].close,
-					img: img4 
-				},
-				{
-					code: "FB",
-					price: json['FB'].chart.slice(-1)[0].close,
-					img: img5 
-				},
-				{
-					code: "BA",
-					price: json['BA'].chart.slice(-1)[0].close,
-					img: img6 
-				},
-				{
-					code: "BABA",
-					price: json['BABA'].chart.slice(-1)[0].close,
-					img: img7 
-				},
-				{
-					code: "NKE",
-					price: json['NKE'].chart.slice(-1)[0].close,
-					img: img8 
-				},
-				{
-					code: "AMZN",
-					price: json['AMZN'].chart.slice(-1)[0].close,
-					img: img9 
-				}
-			]
 
-			return stockDataList
-		}
 
 		ssn.preference = "stock";
-		console.log(ssn.preference)
+		// console.log(ssn.preference)
 		if (ssn.stockDataList === undefined) {
-			var stockDataList = await getMarqueeStock();
+			var stockDataList = await marqueeStock.getMarqueeStock();
 			ssn.stockDataList = stockDataList
 		}
 
@@ -748,27 +448,27 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 		switch(ssn.preference) {
 			case "stock":
 				if (ssn.stockDataList === undefined) {
-					var stockDataList = await getMarqueeStock();
+					var stockDataList = await marqueeStock.getMarqueeStock();
 					ssn.stockDataList = stockDataList;
 				}
 				var marqueeData = ssn.stockDataList;
 				break;
 			case "currency":
 				if (ssn.currencyDataList === undefined) {
-					var currencyDataList = await getMarqueeCurrency();			
+					var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 					ssn.currencyDataList = currencyDataList;
 				}
 				var marqueeData = ssn.currencyDataList;
 				break;
 			case undefined:
 				if (ssn.currencyDataList === undefined) {
-					var currencyDataList = await getMarqueeCurrency();			
+					var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 					ssn.currencyDataList = currencyDataList;
 				}
 				var marqueeData = ssn.currencyDataList;
 				break;
 		}
-		console.log(ssn.preference)
+		// console.log(ssn.preference)
 		response.render('trading-success.hbs', {
 				title: message,
 				head: `Cash balance: $${cash2[0]}`,
@@ -795,7 +495,7 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 		var stock_price = stock_info.data.latestPrice;
 		var total_cost = Math.round(stock_price*qty*100)/100;
 		var cash_remaining = Math.round((cash2 - total_cost)*100)/100;
-		var stock_holding = {[stock]:parseInt(qty)};
+		var stock_holding = {[stock]:parseFloat(qty)};
 
 		if ((cash_remaining >= 0) && (total_cost !== 0) && (qty > 0)) {
 
@@ -803,8 +503,8 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 
 			if (index >= 0) {
 				var stock_qty = request.session.passport.user.stocks[index][stock];
-				var stock_remaining = parseInt(qty) + parseInt(stock_qty);
-				stock_holding = {[stock]:parseInt(stock_remaining)};
+				var stock_remaining = parseFloat(qty) + parseFloat(stock_qty);
+				stock_holding = {[stock]:parseFloat(stock_remaining)};
 				stocks[index] = stock_holding;
 				cash2[0] = cash_remaining;
 			}
@@ -849,27 +549,27 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 		switch(ssn.preference) {
 			case "stock":
 				if (ssn.stockDataList === undefined) {
-					var stockDataList = await getMarqueeStock();
+					var stockDataList = await marqueeStock.getMarqueeStock();
 					ssn.stockDataList = stockDataList;
 				}
 				var marqueeData = ssn.stockDataList;
 				break;
 			case "currency":
 				if (ssn.currencyDataList === undefined) {
-					var currencyDataList = await getMarqueeCurrency();			
+					var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 					ssn.currencyDataList = currencyDataList;
 				}
 				var marqueeData = ssn.currencyDataList;
 				break;
 			case undefined:
 				if (ssn.currencyDataList === undefined) {
-					var currencyDataList = await getMarqueeCurrency();			
+					var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 					ssn.currencyDataList = currencyDataList;
 				}
 				var marqueeData = ssn.currencyDataList;
 				break;
 		}
-		console.log(ssn.preference)
+		// console.log(ssn.preference)
 	response.render('trading-success.hbs', {
 					title: message,
 					head: `Cash balance: $${cash2[0]}`,
@@ -895,7 +595,7 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 	var _id = request.session.passport.user._id;
 	var cash = request.session.passport.user.cash;
 	var cash2 = request.session.passport.user.cash2;
-	var qty = parseInt(request.body.sellstockqty);
+	var qty = parseFloat(request.body.sellstockqty);
 	var stock = (request.body.sellstockticker).toUpperCase();
 	var stocks = request.session.passport.user.stocks;
 
@@ -922,7 +622,7 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 			console.log(stocks);
 
 			if (stock_remaining > 0) {
-				var stock_holding = {[stock]:parseInt(stock_remaining)};
+				var stock_holding = {[stock]:parseFloat(stock_remaining)};
 				stocks[index] = stock_holding;
 				cash2[0] = remaining_balance;
 			}
@@ -955,27 +655,27 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 	switch(ssn.preference) {
 		case "stock":
 			if (ssn.stockDataList === undefined) {
-				var stockDataList = await getMarqueeStock();
+				var stockDataList = await marqueeStock.getMarqueeStock();
 				ssn.stockDataList = stockDataList;
 			}
 			var marqueeData = ssn.stockDataList;
 			break;
 		case "currency":
 			if (ssn.currencyDataList === undefined) {
-				var currencyDataList = await getMarqueeCurrency();			
+				var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 				ssn.currencyDataList = currencyDataList;
 			}
 			var marqueeData = ssn.currencyDataList;
 			break;
 		case undefined:
 			if (ssn.currencyDataList === undefined) {
-				var currencyDataList = await getMarqueeCurrency();			
+				var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 				ssn.currencyDataList = currencyDataList;
 			}
 			var marqueeData = ssn.currencyDataList;
 			break;
 	}
-	console.log(ssn.preference)
+	// console.log(ssn.preference)
 	response.render('trading-success.hbs', {
 		title: message,
 		head: `Cash balance: $${cash2[0]}`,
@@ -1017,27 +717,27 @@ app.post('/trading-success-holdings', isAuthenticated, async(request, response) 
 	switch(ssn.preference) {
 		case "stock":
 			if (ssn.stockDataList === undefined) {
-				var stockDataList = await getMarqueeStock();
+				var stockDataList = await marqueeStock.getMarqueeStock();
 				ssn.stockDataList = stockDataList;
 			}
 			var marqueeData = ssn.stockDataList;
 			break;
 		case "currency":
 			if (ssn.currencyDataList === undefined) {
-				var currencyDataList = await getMarqueeCurrency();			
+				var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 				ssn.currencyDataList = currencyDataList;
 			}
 			var marqueeData = ssn.currencyDataList;
 			break;
 		case undefined:
 			if (ssn.currencyDataList === undefined) {
-				var currencyDataList = await getMarqueeCurrency();			
+				var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
 				ssn.currencyDataList = currencyDataList;
 			}
 			var marqueeData = ssn.currencyDataList;
 			break;
 	}
-	console.log(ssn.preference)
+	// console.log(ssn.preference)
 	response.render('trading-success.hbs', {
 		title: message,
 		head: `Cash: $${cash2[0]}`,
@@ -1248,7 +948,7 @@ app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
 
 app.post('/admin-success-update-balances-success', isAdmin, function(req, res, next){
 	var user_id_to_update = req.body.user_id
-	var user_balance = parseInt(req.body.user_balance)
+	var user_balance = parseFloat(req.body.user_balance)
 	console.log(user_balance);
 	var balance_to_list = []
 	balance_to_list[0] = user_balance

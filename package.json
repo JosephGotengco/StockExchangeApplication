@@ -1,13 +1,13 @@
 {
-  "name": "class_9",
+  "name": "summer_project",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --exit",
     "start": "node project.js"
   },
-  "author": "Michael J",
+  "author": "Team Stock Name",
   "license": "ISC",
   "dependencies": {
     "assert": "^1.4.1",
@@ -39,7 +39,10 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "cheerio": "^1.0.0-rc.3",
     "mocha": "^6.1.4",
-    "mocha-simple-html-reporter": "^1.1.0"
+    "mocha-simple-html-reporter": "^1.1.0",
+    "nock": "^10.0.6",
+    "supertest": "^4.0.2"
   }
 }

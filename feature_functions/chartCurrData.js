@@ -1,6 +1,6 @@
 var axios = require("axios");
 var moment = require("moment");
-
+var formatDate = require("./formatDate");
 var getCurrData = async(curr) => {
     try {
         if (typeof curr != "string") {
@@ -10,12 +10,9 @@ var getCurrData = async(curr) => {
         var date = new Date();
         var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
         var lastDay = moment().subtract(30, 'days');
-        var formatted_firstDay = formatDate(firstDay);
-        var formatted_lastDay = formatDate(lastDay);
-        // console.log(formatted_firstDay);
-        // console.log(formatted_lastDay);
+        var formatted_firstDay = formatDate.formatDate(firstDay);
+        var formatted_lastDay = formatDate.formatDate(lastDay);
         var response = await axios.get(`https://api.exchangeratesapi.io/history?start_at=${formatted_lastDay}&end_at=${formatted_firstDay}&symbols=${curr}&base=USD`);
-        // console.log(response)
         var response_data = response.data.rates
         // console.log(response_data)
         var labels = Object.keys(response_data)
@@ -43,15 +40,12 @@ var getCurrData = async(curr) => {
         for (var i=0;i<chart_data.length;i++) {
             result[Object.keys(chart_data[i])[0]] = Object.values(chart_data[i])[0];
         }
+        // console.log(result)
         return result
     } catch(e) {
-        if (e instanceof TypeError || e.message === "wrong type") {
+        if (e instanceof TypeError && e.message === "wrong type") {
             return false
         }
-        // console.log(e.response.data);
-        // console.log(e.response.status);
-        // console.log(`Symbols \'${curr}'\ are invalid.`)
-        // console.log(e.response.data["error"])
         if (e.response === undefined) {
             return false
         } if (e.response.data["error"] === `Symbols \'${curr}'\ are invalid.` || e.response.status === 400) {
@@ -65,20 +59,13 @@ var getCurrData = async(curr) => {
 
 
 
-function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2) month = '0' + month;
-    if (day.length < 2) day = '0' + day;
-
-    return [year, month, day].join('-');
+// getCurrData("CAD")
+var main = async() => {
+    var response = await getCurrData("CAD");
+    // console.log(response);
 }
 
-// getCurrData(1)
-
+main()
 
 module.exports = {
     getCurrData
