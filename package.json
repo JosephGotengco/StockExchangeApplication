@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Michael J",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "axios": "^0.18.0",
     "bcrypt": "^3.0.5",
     "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.4",
@@ -27,6 +28,7 @@
     "handlebars": "^4.1.1",
     "hbs": "^4.0.3",
     "jsonwebtoken": "^8.5.1",
+    "mocha": "^6.1.4",
     "mongoose": "^5.4.20",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",

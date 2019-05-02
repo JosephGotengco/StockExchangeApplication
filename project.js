@@ -34,7 +34,7 @@ var app = express();
 app.set('view engine', 'hbs');
 
 //#------ Lines below help parse data that comes in from users (webpages); don't need to touch these ------#//
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
@@ -312,6 +312,18 @@ passport.use(new LocalStrategy(
 
 
 // Holy Moly VVVVVVVVVVVVVVVVVVVVVVV Hell nah
+
+app.get('/newsfeed',(request, response)=> {
+	response.render('news-feed.hbs', {
+		title: 'Stock news.'
+	})
+});
+
+app.get('/currency', (request, response)=> {
+	response.render('currency.hbs', {
+		title: 'Stock and Currency.'
+	})
+});
 
 app.get('/trading', (request, response) => {
 	response.render('trading.hbs', {
