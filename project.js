@@ -15,14 +15,16 @@ var utils = require('./utils');
 var cookieParser = require('cookie-parser');
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
+var moment = require('moment');
 
+var stockFunc = require('./feature_functions/chartStockData');
+var currFunc = require('./feature_functions/chartCurrData');
 
 // vvvvvvv CONFIGURATION vvvvvv //
 
 //#------ This line makes a link (like css link) for the folder that contains placeholders for hbs files------#//
-hbs.registerPartials(__dirname + '/views/partials');
+hbs.registerPartials(__dirname + '/views/partials/');
 
-module.exports = app;
 
 mongoose.Promise = global.Promise;
 
@@ -30,6 +32,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/accounts", { useNewUrlParser: true });
 
 var app = express();
+var ssn;
 
 //#------ Sets the view engine to hbs which allows the application (this file) to use hbs files instead of html files ------#//
 app.set('view engine', 'hbs');
@@ -66,7 +69,7 @@ passport.deserializeUser(function(user, done) {
 app.use((request, response, next) => {
 	var time = new Date().toString();
 	var log_entry = `${time}: ${request.method} ${request.url}`;
-	console.log(log_entry);
+	// console.log(log_entry);
 	fs.appendFile('server.log', log_entry + '\n', (error) => {
 		if (error) {
 			console.log('Unable to log message');
@@ -91,7 +94,6 @@ var account_schema = new mongoose.Schema({
 	}
 });
 // ^^^^^^^ CONFIGURATION ^^^^^^^ //
-
 
 
 
@@ -232,7 +234,6 @@ function check_uniq (string_input) {
 // vvvvvv LOGIN vvvvvv //
 
 const user_account = mongoose.model("user_accounts", account_schema);
-// var Users = mongoose.model('user_accounts', account_schema);
 
 
 // End point for logging in (First Page a user sees)
@@ -320,35 +321,176 @@ app.get('/trading', (request, response) => {
 });
 
 app.get('/trading-success', isAuthenticated, async(request, response) => {
+	console.log("Trading Success");
 	try{
-	var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
-	var json = rate.data.rates;
-	var cad = json.CAD;
-	var usd = json.USD;
-	var eur = json.EUR;
-	var jpy = json.JPY;
-	var aud = json.AUD;
-	var hkd = json.HKD;
-	var gbp = json.GBP;
-	var hkd = json.HKD;
-	var mxn = json.MXN;
-	var inr = json.INR;
-	var cny = json.CNY;
+		ssn = request.session;
+			var getMarqueeCurrency = async() => {
+			var yesterday = moment().subtract(2, 'days');
+			var date = yesterday.format('YYYY-MM-DD');
+	
+			var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
+			var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}?base=USD`);
+	
+			var json = rate.data.rates;
+			var yest_json = yest_rate.data.rates;
+	
+			var cad = json.CAD;
+			var bgn = json.BGN;
+			var eur = json.EUR;
+			var jpy = json.JPY;
+			var aud = json.AUD;
+			var hkd = json.HKD;
+			var gbp = json.GBP;
+			var mxn = json.MXN;
+			var inr = json.INR;
+			var cny = json.CNY;
+	
+			var yest_cad = yest_json.CAD;
+			var yest_bgn = yest_json.BGN;
+			var yest_eur = yest_json.EUR;
+			var yest_jpy = yest_json.JPY;
+			var yest_aud = yest_json.AUD;
+			var yest_hkd = yest_json.HKD;
+			var yest_gbp = yest_json.GBP;
+			var yest_mxn = yest_json.MXN;
+			var yest_inr = yest_json.INR;
+			var yest_cny = yest_json.CNY;
+	
+			array1 = [cad, bgn, eur, jpy, aud, hkd, gbp, mxn, inr, cny];
+			array2 = [yest_cad, yest_bgn, yest_eur, yest_jpy, yest_aud, yest_hkd, yest_gbp, yest_mxn, yest_inr, yest_cny];
+	
+			console.log(parseInt(array1[0]) >= parseInt(array2[0]))
+			console.log(parseInt(array1[1]) >= parseInt(array2[1]))
+			console.log(parseInt(array1[2]) >= parseInt(array2[2]))
+			console.log(parseInt(array1[3]) >= parseInt(array2[3]))
+			console.log(parseInt(array1[4]) >= parseInt(array2[4]))
+			console.log(parseInt(array1[5]) >= parseInt(array2[5]))
+			console.log(parseInt(array1[6]) >= parseInt(array2[6]))
+			console.log(parseInt(array1[7]) >= parseInt(array2[7]))
+			console.log(parseInt(array1[8]) >= parseInt(array2[8]))
+			console.log(parseInt(array1[9]) >= parseInt(array2[9]))
+	
+			if(parseInt(array1[0]) >= parseInt(array2[0])){
+				img0 ="../images/greentriangle.png";
+			}else{
+				img0 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[1]) >= parseInt(array2[1])){
+				img1 ="../images/greentriangle.png";
+			}else{
+				img1 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[2]) >= parseInt(array2[2])){
+				img2 ="../images/greentriangle.png";
+			}else{
+				img2 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[3]) >= parseInt(array2[3])){
+				img3 ="../images/greentriangle.png";
+			}else{
+				img3 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[4]) >= parseInt(array2[4])){
+				img4 ="../images/greentriangle.png";
+			}else{
+				img4 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[5]) >= parseInt(array2[5])){
+				img5 ="../images/greentriangle.png";
+			}else{
+				img5 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[6]) >= parseInt(array2[6])){
+				img6 ="../images/greentriangle.png";
+			}else{
+				img6 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[7]) >= parseInt(array2[7])){
+				img7 ="../images/greentriangle.png";
+			}else{
+				img7 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[8]) >= parseInt(array2[8])){
+				img8 ="../images/greentriangle.png";
+			}else{
+				img8 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[9]) >= parseInt(array2[9])){
+				img9 ="../images/greentriangle.png";
+			}else{
+				img9 ="../images/redtriangle.png";
+			};
+	
+	
+			var currencyDataList = [
+				{
+					code: "CAD",
+					price: cad,
+					img: img0
+				},
+				{
+					code: "BGN",
+					price: bgn,
+					img: img1 
+				},
+				{
+					code: "EUR",				
+					price: eur,
+					img: img2 
+				},
+				{
+					code: "JPY",
+					price: jpy,
+					img: img3 
+				},
+				{
+					code: "AUD",
+					price: aud,
+					img: img4 
+				},
+				{
+					code: "HKD",
+					price: hkd,
+					img: img5 
+				},
+				{
+					code: "GBP",
+					price: gbp,
+					img: img6 
+				},
+				{
+					code: "MXN",
+					price: mxn,
+					img: img7 
+				},
+				{
+					code: "INR",
+					price: inr,
+					img: img8 
+				},
+				{
+					code: "CNY",
+					price: cny,
+					img: img9 
+				}
+			]
+			
+			return currencyDataList
+		}
 
-	console.log(cad)
-	response.render('trading-success.hbs', {
-		title: 'Welcome to the trading page.',
-		cad: cad,
-		usd: usd,
-		eur: eur,
-		jpy: jpy,
-		aud: aud,
-		hkd: hkd,
-		gbp: gbp,
-		hkd: hkd,
-		mxn: mxn,
-		inr: inr,
-		cny: cny
+		var defaultPreference = "currency";
+		if (ssn.preference === undefined) {
+			ssn.preference = defaultPreference
+		}
+
+		if (ssn.currencyDataList === undefined) {
+			var currencyDataList = await getMarqueeCurrency();			
+			ssn.currencyDataList = currencyDataList
+		}
+
+		response.render('trading-success.hbs', {
+			title: "Welcome to the trading page.",
+			marqueeData: ssn.currencyDataList
 	});
 	}
 	catch(err){
@@ -356,59 +498,231 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 	}
 });
 
+app.post('/trading-success-currencies', isAuthenticated, async(request, response) => {
+	
+	response.render('trading-success-currencies-ticker.hbs');
+});
+
+app.post('/trading-success-stocks', isAuthenticated, async(request, response) => {
+	try{
+		var getMarqueeStock = async() => {
+			var stock_info = await axios.get('https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m');
+			var json = stock_info.data;
+	
+			nflx_info = json['NFLX'].chart.slice(-1)[0].close,
+			aapl_info = json['AAPL'].chart.slice(-1)[0].close,
+			tsla_info = json['TSLA'].chart.slice(-1)[0].close,
+			goog_info = json['GOOG'].chart.slice(-1)[0].close,
+			sbux_info = json['SBUX'].chart.slice(-1)[0].close,
+			fb_info = json['FB'].chart.slice(-1)[0].close,
+			ba_info = json['BA'].chart.slice(-1)[0].close,
+			baba_info = json['BABA'].chart.slice(-1)[0].close,
+			nke_info = json['NKE'].chart.slice(-1)[0].close,
+			amzn_info = json['AMZN'].chart.slice(-1)[0].close, 
+			yest_nflx_info = json['NFLX'].chart.slice(-2)[0].close,
+			yest_aapl_info = json['AAPL'].chart.slice(-2)[0].close,
+			yest_tsla_info = json["TSLA"].chart.slice(-2)[0].close,
+			yest_goog_info = json['GOOG'].chart.slice(-2)[0].close,
+			yest_sbux_info = json['SBUX'].chart.slice(-2)[0].close,
+			yest_fb_info = json['FB'].chart.slice(-2)[0].close,
+			yest_ba_info = json['BA'].chart.slice(-2)[0].close,
+			yest_baba_info = json['BABA'].chart.slice(-2)[0].close,
+			yest_nke_info = json['NKE'].chart.slice(-2)[0].close,
+			yest_amzn_info = json['AMZN'].chart.slice(-2)[0].close
+	
+	
+			array1 = [nflx_info, aapl_info, tsla_info, goog_info, sbux_info, fb_info, ba_info, baba_info, nke_info, amzn_info];
+			array2 = [yest_nflx_info, yest_aapl_info, yest_tsla_info, yest_goog_info, yest_sbux_info, yest_fb_info, yest_ba_info, yest_baba_info, yest_nke_info, yest_amzn_info];
+	
+	
+			console.log(parseInt(array1[0]) >= parseInt(array2[0]))
+			console.log(parseInt(array1[1]) >= parseInt(array2[1]))
+			console.log(parseInt(array1[2]) >= parseInt(array2[2]))
+			console.log(parseInt(array1[3]) >= parseInt(array2[3]))
+			console.log(parseInt(array1[4]) >= parseInt(array2[4]))
+			console.log(parseInt(array1[5]) >= parseInt(array2[5]))
+			console.log(parseInt(array1[6]) >= parseInt(array2[6]))
+			console.log(parseInt(array1[7]) >= parseInt(array2[7]))
+			console.log(parseInt(array1[8]) >= parseInt(array2[8]))
+			console.log(parseInt(array1[9]) >= parseInt(array2[9]))
+			
+	
+	
+			if(parseInt(array1[0]) >= parseInt(array2[0])){
+				img0 ="../images/greentriangle.png";
+			}else{
+				img0 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[1]) >= parseInt(array2[1])){
+				img1 ="../images/greentriangle.png";
+			}else{
+				img1 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[2]) >= parseInt(array2[2])){
+				img2 ="../images/greentriangle.png";
+			}else{
+				img2 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[3]) >= parseInt(array2[3])){
+				img3 ="../images/greentriangle.png";
+			}else{
+				img3 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[4]) >= parseInt(array2[4])){
+				img4 ="../images/greentriangle.png";
+			}else{
+				img4 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[5]) >= parseInt(array2[5])){
+				img5 ="../images/greentriangle.png";
+			}else{
+				img5 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[6]) >= parseInt(array2[6])){
+				img6 ="../images/greentriangle.png";
+			}else{
+				img6 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[7]) >= parseInt(array2[7])){
+				img7 ="../images/greentriangle.png";
+			}else{
+				img7 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[8]) >= parseInt(array2[8])){
+				img8 ="../images/greentriangle.png";
+			}else{
+				img8 ="../images/redtriangle.png";
+			};
+			if(parseInt(array1[9]) >= parseInt(array2[9])){
+				img9 ="../images/greentriangle.png";
+			}else{
+				img9 ="../images/redtriangle.png";
+			};
+		
+	
+			var stockDataList = [
+				{
+					code: "NFLX",
+					price: json['NFLX'].chart.slice(-1)[0].close,
+					img: img0
+				},
+				{
+					code: "AAPL",
+					price: json['AAPL'].chart.slice(-1)[0].close,
+					img: img1 
+				},
+				{
+					code: "TSLA",				
+					price: json['TSLA'].chart.slice(-1)[0].close,
+					img: img2 
+				},
+				{
+					code: "GOOG",
+					price: json['GOOG'].chart.slice(-1)[0].close,
+					img: img3 
+				},
+				{
+					code: "SBUX",
+					price: json['SBUX'].chart.slice(-1)[0].close,
+					img: img4 
+				},
+				{
+					code: "FB",
+					price: json['FB'].chart.slice(-1)[0].close,
+					img: img5 
+				},
+				{
+					code: "BA",
+					price: json['BA'].chart.slice(-1)[0].close,
+					img: img6 
+				},
+				{
+					code: "BABA",
+					price: json['BABA'].chart.slice(-1)[0].close,
+					img: img7 
+				},
+				{
+					code: "NKE",
+					price: json['NKE'].chart.slice(-1)[0].close,
+					img: img8 
+				},
+				{
+					code: "AMZN",
+					price: json['AMZN'].chart.slice(-1)[0].close,
+					img: img9 
+				}
+			]
+
+			return stockDataList
+		}
+
+		ssn.preference = "stock";
+		console.log(ssn.preference)
+		if (ssn.stockDataList === undefined) {
+			var stockDataList = await getMarqueeStock();
+			ssn.stockDataList = stockDataList
+		}
+
+		response.render('trading-success-stocks-ticker.hbs', {
+			title: "Welcome to the trading page.",
+			marqueeData: ssn.stockDataList
+		});
+	}	
+	catch(err) {
+		console.log(err);
+	};
+});
+
+
 
 
 app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 	try {
-		console.log("#---------TEST END POINT---------#");
+		console.log("#---------CURRENCY NEWS POINT---------#");
 		// console.log(Object.keys(request));
-		console.log(request.params);
+		var currency_code = request.params.id;
+		var chart_data = await currFunc.getCurrData(currency_code);
+		// console.log(chart_data);
+		var labels = Object.keys(chart_data);
+		var data = Object.values(chart_data);
 
-		var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
-		var json = rate.data.rates;
-		var cad = json.CAD;
-		var usd = json.USD;
-		var eur = json.EUR;
-		var jpy = json.JPY;
-		var aud = json.AUD;
-		var hkd = json.HKD;
-		var gbp = json.GBP;
-		var hkd = json.HKD;
-		var mxn = json.MXN;
-		var inr = json.INR;
-		var cny = json.CNY;
-
-		response.render('trading-success.hbs', {
+		response.render('currency-info.hbs', {
 			title: 'Welcome to the trading page.',
-			cad: cad,
-			usd: usd,
-			eur: eur,
-			jpy: jpy,
-			aud: aud,
-			hkd: hkd,
-			gbp: gbp,
-			hkd: hkd,
-			mxn: mxn,
-			inr: inr,
-			cny: cny
+			chart_title: `${currency_code} Price`,
+			labels: labels,
+			data: data
 		});
-
-
-		
 	} 
-	
-	
-	
 	catch(e) {
 		console.error(e);
 	}
+})
 
+app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
+	try {
+		console.log("#---------STOCK NEWS POINT---------#");
+		// console.log(Object.keys(request));
+		var ticker = request.params.id;
+		var chart_data = await stockFunc.getStockData(ticker);
+		// console.log(chart_data);
+		var labels = Object.keys(chart_data);
+		var data = Object.values(chart_data);
+
+		response.render('stock-info.hbs', {
+			title: 'Welcome to the trading page.',
+			chart_title: `${ticker} Price`,
+			labels: labels,
+			data: data
+		});
+	} 
+	catch(e) {
+		console.error(e);
+	}
 })
 
 
 app.post('/trading-success-search', isAuthenticated, async(request, response) => {
 	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)
-
 	var stock = request.body.stocksearch;
 	var cash2 = request.session.passport.user.cash2;
 
@@ -420,7 +734,8 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 			var stock_price = stock_info.data.latestPrice;
 
 			message = `The price of the selected ticker '${stock.toUpperCase()}' which belongs to '${stock_name}' is currently: $${stock_price} USD.`;
-			
+
+
 		}
 		catch (err) {
 			if (stock === '') {
@@ -429,10 +744,35 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 			else {
 				message = `Sorry the stock ticker '${stock}' is invalid.`;
 			}
-		}	
+		}
+		switch(ssn.preference) {
+			case "stock":
+				if (ssn.stockDataList === undefined) {
+					var stockDataList = await getMarqueeStock();
+					ssn.stockDataList = stockDataList;
+				}
+				var marqueeData = ssn.stockDataList;
+				break;
+			case "currency":
+				if (ssn.currencyDataList === undefined) {
+					var currencyDataList = await getMarqueeCurrency();			
+					ssn.currencyDataList = currencyDataList;
+				}
+				var marqueeData = ssn.currencyDataList;
+				break;
+			case undefined:
+				if (ssn.currencyDataList === undefined) {
+					var currencyDataList = await getMarqueeCurrency();			
+					ssn.currencyDataList = currencyDataList;
+				}
+				var marqueeData = ssn.currencyDataList;
+				break;
+		}
+		console.log(ssn.preference)
 		response.render('trading-success.hbs', {
 				title: message,
-				head: `Cash balance: $${cash2[0]}`
+				head: `Cash balance: $${cash2[0]}`,
+				marqueeData: marqueeData
 				})
 
 });
@@ -506,10 +846,34 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 			message = `Sorry the stock ticker '${request.body.buystockticker}' is invalid.`;
 		}
 	}
-
+		switch(ssn.preference) {
+			case "stock":
+				if (ssn.stockDataList === undefined) {
+					var stockDataList = await getMarqueeStock();
+					ssn.stockDataList = stockDataList;
+				}
+				var marqueeData = ssn.stockDataList;
+				break;
+			case "currency":
+				if (ssn.currencyDataList === undefined) {
+					var currencyDataList = await getMarqueeCurrency();			
+					ssn.currencyDataList = currencyDataList;
+				}
+				var marqueeData = ssn.currencyDataList;
+				break;
+			case undefined:
+				if (ssn.currencyDataList === undefined) {
+					var currencyDataList = await getMarqueeCurrency();			
+					ssn.currencyDataList = currencyDataList;
+				}
+				var marqueeData = ssn.currencyDataList;
+				break;
+		}
+		console.log(ssn.preference)
 	response.render('trading-success.hbs', {
 					title: message,
-					head: `Cash balance: $${cash2[0]}`
+					head: `Cash balance: $${cash2[0]}`,
+					marqueeData: marqueeData
 				})
 
 	function check_existence(stock) {
@@ -588,9 +952,34 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 			message = `You do not own any shares with the ticker '${stock}'.`;
 		}
 	}
+	switch(ssn.preference) {
+		case "stock":
+			if (ssn.stockDataList === undefined) {
+				var stockDataList = await getMarqueeStock();
+				ssn.stockDataList = stockDataList;
+			}
+			var marqueeData = ssn.stockDataList;
+			break;
+		case "currency":
+			if (ssn.currencyDataList === undefined) {
+				var currencyDataList = await getMarqueeCurrency();			
+				ssn.currencyDataList = currencyDataList;
+			}
+			var marqueeData = ssn.currencyDataList;
+			break;
+		case undefined:
+			if (ssn.currencyDataList === undefined) {
+				var currencyDataList = await getMarqueeCurrency();			
+				ssn.currencyDataList = currencyDataList;
+			}
+			var marqueeData = ssn.currencyDataList;
+			break;
+	}
+	console.log(ssn.preference)
 	response.render('trading-success.hbs', {
 		title: message,
-		head: `Cash balance: $${cash2[0]}`
+		head: `Cash balance: $${cash2[0]}`,
+		marqueeData: marqueeData
 	})		
 
 	function check_existence(stock) {
@@ -605,7 +994,66 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 	}
 });
 
-app.post('/trading-success-holdings', isAuthenticated, (request, response) => {
+app.post('/trading-success-holdings', isAuthenticated, async(request, response) => {
+	var stocks = request.session.passport.user.stocks;
+	var num_stocks = stocks.length;
+	var stock_keys = [];
+	var cash = request.session.passport.user.cash;
+	var message = 'Shares: \n';
+	var cash2 = request.session.passport.user.cash2;
+
+	if (num_stocks === 0) {
+		message = 'You currently do not have any stocks.';
+	}
+	else {
+		var i;
+		for (i = 0; i < num_stocks; i++) {
+			stock_keys.push(Object.keys(stocks[i]));
+			var key_value = stocks[i][stock_keys[i][0]];
+			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
+			console.log(message);
+		}
+	}
+	switch(ssn.preference) {
+		case "stock":
+			if (ssn.stockDataList === undefined) {
+				var stockDataList = await getMarqueeStock();
+				ssn.stockDataList = stockDataList;
+			}
+			var marqueeData = ssn.stockDataList;
+			break;
+		case "currency":
+			if (ssn.currencyDataList === undefined) {
+				var currencyDataList = await getMarqueeCurrency();			
+				ssn.currencyDataList = currencyDataList;
+			}
+			var marqueeData = ssn.currencyDataList;
+			break;
+		case undefined:
+			if (ssn.currencyDataList === undefined) {
+				var currencyDataList = await getMarqueeCurrency();			
+				ssn.currencyDataList = currencyDataList;
+			}
+			var marqueeData = ssn.currencyDataList;
+			break;
+	}
+	console.log(ssn.preference)
+	response.render('trading-success.hbs', {
+		title: message,
+		head: `Cash: $${cash2[0]}`,
+		marqueeData: marqueeData
+	})
+});
+
+
+
+app.get('/trading-portfolio', isAuthenticated, (request, response) => {
+	response.render('trading-portfolio.hbs', {
+		title: 'Welcome to the Portfolio Page.'
+	})
+});
+
+app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => {
 	var stocks = request.session.passport.user.stocks;
 	var num_stocks = stocks.length;
 	var stock_keys = [];
@@ -626,11 +1074,12 @@ app.post('/trading-success-holdings', isAuthenticated, (request, response) => {
 		}
 	}
 
-	response.render('trading-success.hbs', {
+	response.render('trading-portfolio.hbs', {
 		title: message,
 		head: `Cash: $${cash2[0]}`
 	})
 });
+
 
 app.get('/admin', (request, response) => {
 	response.render('admin-restricted-not-logged-in.hbs', {
@@ -686,14 +1135,14 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 	console.log(user_name_to_delete)
 	console.log(username)
 	if(user_name_to_delete == username){
-		res.render('admin-success-delete-user-success.hbs', {
+		res.render('admin-success-user-accounts-list.hbs', {
 			message: "Cannot delete your own account!"
 		});
 		return;
 	}else{
 		if(user_name_to_delete == '') {
-			res.render('admin-success-delete-user-success.hbs', {
-				message: "Cannot be empty"
+			res.render('admin-success-user-accounts-list.hbs', {
+				message: "Cannot be empty",
 			});
 		}else{
 			// try {
@@ -710,7 +1159,7 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 							message = 'Unable to Delete Account';
 							console.log(message)
 							// console.log(err);
-							res.render('admin-success-delete-user-success.hbs', {
+							res.render('admin-success-user-accounts-list.hbs', {
 								message: message
 							});
 						};
@@ -718,7 +1167,7 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 						if(result === undefined || result.length == 0) {
 							message = 'No user exists with that username';
 							console.log(message)
-							res.render('admin-success-delete-user-success.hbs', {
+							res.render('admin-success-user-accounts-list.hbs', {
 								message: message
 							});
 						}else {
@@ -726,8 +1175,8 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 								if(err) throw err;
 								console.log("User Deleted");
 								message ='User is Deleted';
-								res.render('admin-success-delete-user-success.hbs', {
-								message: message
+								res.render('admin-success-user-accounts-list.hbs', {
+								message: message,
 							});
 								db.close();
 							});
@@ -853,7 +1302,7 @@ app.get('*', errorPage, (request, response) => {
 
 function errorPage(request, response, next) {
 	if (request.session.passport !== undefined) {
-		console.log(request.session.passport);
+		// console.log(request.session.passport);
 		next();
 	} else {
 		// response.redirect('/login');
@@ -865,7 +1314,7 @@ function errorPage(request, response, next) {
 
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
-		console.log(request.session.passport);
+		// console.log(request.session.passport);
 		next();
 	} else {
 		response.redirect('/');
@@ -874,7 +1323,7 @@ function isAuthenticated(request, response, next) {
 
 function isAdmin(request, response, next) {
 	if ((request.session.passport !== undefined) && (request.session.passport.user.type === 'admin')) {
-		console.log(request.session.passport);
+		// console.log(request.session.passport);
 		next();
 	} else {
 		response.redirect('/admin-restricted');
@@ -886,3 +1335,5 @@ app.listen(8080, () => {
 	console.log('Server is up on port 8080');
 	utils.init();
 });
+
+module.exports = app;

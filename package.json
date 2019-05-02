@@ -28,6 +28,7 @@
     "handlebars": "^4.1.1",
     "hbs": "^4.0.3",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
     "mongoose": "^5.4.20",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
