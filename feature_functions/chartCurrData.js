@@ -12,6 +12,8 @@ var getCurrData = async(curr) => {
         var lastDay = moment().subtract(30, 'days');
         var formatted_firstDay = formatDate.formatDate(firstDay);
         var formatted_lastDay = formatDate.formatDate(lastDay);
+        // console.log(formatted_firstDay);
+        // console.log(formatted_lastDay);
         var response = await axios.get(`https://api.exchangeratesapi.io/history?start_at=${formatted_lastDay}&end_at=${formatted_firstDay}&symbols=${curr}&base=USD`);
         var response_data = response.data.rates
         // console.log(response_data)
@@ -60,12 +62,12 @@ var getCurrData = async(curr) => {
 
 
 // getCurrData("CAD")
-var main = async() => {
-    var response = await getCurrData("CAD");
-    // console.log(response);
-}
+// var main = async() => {
+//     var response = await getCurrData("CAD");
+//     console.log(response);
+// }
 
-main()
+// main()
 
 module.exports = {
     getCurrData

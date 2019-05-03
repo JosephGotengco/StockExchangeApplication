@@ -5,6 +5,7 @@ var should = require('chai').should();
 var cheerio = require('cheerio');
 var chai = require('chai'), chaiHttp = require('chai-http');
 const nock = require('nock');
+var moment = require("moment");
 
 chai.use(chaiHttp);
 const app = require('../project');
@@ -22,15 +23,19 @@ beforeEach(() => {
   .reply(200, mock_data);
 });
 
+
 beforeEach(() => {
   nock('https://api.exchangeratesapi.io')
   .get('/latest?base=USD')
   .reply(200, exchange_rate_mock_data);
 });
 
+var yesterday = moment().subtract(2, 'days');
+var date = yesterday.format('YYYY-MM-DD');
+
 beforeEach(() => {
   nock('https://api.exchangeratesapi.io')
-  .get('/2019-04-30?base=USD')
+  .get(`/${date}?base=USD`)
   .reply(200, yest_exchange_rate_mock_data);
 });
 
@@ -111,7 +116,7 @@ describe('GET /logout', function () {
   });
 });
 
-describe('GET /register', function () {
+describe('GET/POST /register', function () {
   it("should return webpage with title of 'To create an account please enter credentials.' ", function (done) {
       request(app)
           .get('/register')
