@@ -30,7 +30,7 @@ hbs.registerPartials(__dirname + '/views/partials/');
 mongoose.Promise = global.Promise;
 
 // password login
-mongoose.connect("mongodb://localhost:27017/accounts", { useNewUrlParser: true });
+mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", { useNewUrlParser: true });
 
 var app = express();
 var ssn;
@@ -47,7 +47,7 @@ app.use(passport.session());
 app.use(cookieParser());
 
 hbs.registerHelper('dbConnection', function(req,res) {
-	var url = "mongodb://localhost:27017/accounts";
+	var url = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true";
 	return url;
 })
 
@@ -241,7 +241,8 @@ const user_account = mongoose.model("user_accounts", account_schema);
 app.get('/', (request, response) => {
 	request.session.destroy(function(err) {
 		response.render('login.hbs', {
-			title: 'Welcome to the login page.'
+			title: 'Welcome to the login page.',
+			display: "Login"
 		})
 	});
 });
@@ -250,7 +251,8 @@ app.get('/', (request, response) => {
 app.get('/login', (request, response) => {
 	request.session.destroy(function(err) {
 		response.render('login.hbs', {
-			title: 'Welcome to the login page.'
+			title: 'Welcome to the login page.',
+			display: "Login"
 		})
 	});
 });
@@ -258,8 +260,10 @@ app.get('/login', (request, response) => {
 // End point if user has invalid credentials
 app.get('/login-fail', (request, response) => {
 	request.session.destroy(function(err) {
+		response.status(200);
 		response.render('login.hbs', {
-			title: 'You have entered an invalid username or password. Please try again or create a new account.'
+			title: 'You have entered an invalid username or password. Please try again or create a new account.',
+			display: "Login"
 		})
 	});
 });
@@ -306,6 +310,24 @@ passport.use(new LocalStrategy(
 
 
 
+app.get("/news-hub", isAuthenticated, async(request, response) => {
+	if (ssn.stockDataList === undefined) {
+		var stockDataList = await marqueeStock.getMarqueeStock();
+		ssn.stockDataList = stockDataList;
+	}
+
+	if (ssn.currencyDataList === undefined) {
+		var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
+		ssn.currencyDataList = currencyDataList;
+	}
+
+
+	response.render("news-hub.hbs", {
+		title: 'Stock and Currency.',
+		currencyDataList: ssn.currencyDataList,
+		stockDataList: ssn.stockDataList
+	})
+});
 
 
 
@@ -317,12 +339,13 @@ passport.use(new LocalStrategy(
 
 app.get('/trading', (request, response) => {
 	response.render('trading.hbs', {
-		title: 'You are not logged in. You must be logged in to view this page.'
+		title: 'You are not logged in. You must be logged in to view this page.',
+		display: "Trading"
 	})
 });
 
 app.get('/trading-success', isAuthenticated, async(request, response) => {
-	console.log("Trading Success");
+	// console.log("Trading Success");
 	try{
 		ssn = request.session;
 
@@ -339,7 +362,8 @@ app.get('/trading-success', isAuthenticated, async(request, response) => {
 
 		response.render('trading-success.hbs', {
 			title: "Welcome to the trading page.",
-			marqueeData: ssn.currencyDataList
+			marqueeData: ssn.currencyDataList,
+			display: "Trading"
 	});
 	}
 	catch(err){
@@ -365,7 +389,8 @@ app.post('/trading-success-stocks', isAuthenticated, async(request, response) =>
 
 		response.render('trading-success-stocks-ticker.hbs', {
 			title: "Welcome to the trading page.",
-			marqueeData: ssn.stockDataList
+			marqueeData: ssn.stockDataList,
+			display: "Trading"
 		});
 	}	
 	catch(err) {
@@ -378,7 +403,7 @@ app.post('/trading-success-stocks', isAuthenticated, async(request, response) =>
 
 app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 	try {
-		console.log("#---------CURRENCY NEWS POINT---------#");
+		// console.log("#---------CURRENCY NEWS POINT---------#");
 		// console.log(Object.keys(request));
 		var currency_code = request.params.id;
 		var chart_data = await currFunc.getCurrData(currency_code);
@@ -390,8 +415,9 @@ app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 			title: 'Welcome to the trading page.',
 			chart_title: `${currency_code} Price`,
 			labels: labels,
-			data: data
-		});
+			data: data,
+			display: `${currency_code} Price`
+		})
 	} 
 	catch(e) {
 		console.error(e);
@@ -400,7 +426,7 @@ app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 
 app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
 	try {
-		console.log("#---------STOCK NEWS POINT---------#");
+		// console.log("#---------STOCK NEWS POINT---------#");
 		// console.log(Object.keys(request));
 		var ticker = request.params.id;
 		var chart_data = await stockFunc.getStockData(ticker);
@@ -412,7 +438,8 @@ app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
 			title: 'Welcome to the trading page.',
 			chart_title: `${ticker} Price`,
 			labels: labels,
-			data: data
+			data: data,
+			display: `${ticker} Price`
 		});
 	} 
 	catch(e) {
@@ -445,6 +472,7 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 				message = `Sorry the stock ticker '${stock}' is invalid.`;
 			}
 		}
+
 		switch(ssn.preference) {
 			case "stock":
 				if (ssn.stockDataList === undefined) {
@@ -472,7 +500,8 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 		response.render('trading-success.hbs', {
 				title: message,
 				head: `Cash balance: $${cash2[0]}`,
-				marqueeData: marqueeData
+				marqueeData: marqueeData,
+				display: "Trading"
 				})
 
 });
@@ -511,13 +540,13 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 			else {
 				cash2[0] = cash_remaining;
 				
-				console.log("cash_remaining after else, after cash=cash_remain:"+cash_remaining);
+				// console.log("cash_remaining after else, after cash=cash_remain:"+cash_remaining);
 
 
 				stocks.push(stock_holding);
 			}
-			console.log('cash_remaining before update:'+cash_remaining);
-			console.log('cash added to database' + cash);
+			// console.log('cash_remaining before update:'+cash_remaining);
+			// console.log('cash added to database' + cash);
 
 			db.collection('user_accounts').updateOne(
 				{ "_id": ObjectID(_id)},
@@ -573,7 +602,8 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 	response.render('trading-success.hbs', {
 					title: message,
 					head: `Cash balance: $${cash2[0]}`,
-					marqueeData: marqueeData
+					marqueeData: marqueeData,
+					display: "Trading"
 				})
 
 	function check_existence(stock) {
@@ -619,7 +649,7 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 		}
 		else if ((stock_qty >= qty) && (total_sale > 0)) {
 			var db = utils.getDb();
-			console.log(stocks);
+			// console.log(stocks);
 
 			if (stock_remaining > 0) {
 				var stock_holding = {[stock]:parseFloat(stock_remaining)};
@@ -679,7 +709,8 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 	response.render('trading-success.hbs', {
 		title: message,
 		head: `Cash balance: $${cash2[0]}`,
-		marqueeData: marqueeData
+		marqueeData: marqueeData,
+		display: "Trading"
 	})		
 
 	function check_existence(stock) {
@@ -711,7 +742,7 @@ app.post('/trading-success-holdings', isAuthenticated, async(request, response) 
 			stock_keys.push(Object.keys(stocks[i]));
 			var key_value = stocks[i][stock_keys[i][0]];
 			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
-			console.log(message);
+			// console.log(message);
 		}
 	}
 	switch(ssn.preference) {
@@ -741,7 +772,8 @@ app.post('/trading-success-holdings', isAuthenticated, async(request, response) 
 	response.render('trading-success.hbs', {
 		title: message,
 		head: `Cash: $${cash2[0]}`,
-		marqueeData: marqueeData
+		marqueeData: marqueeData,
+		display: "Trading"
 	})
 });
 
@@ -749,7 +781,8 @@ app.post('/trading-success-holdings', isAuthenticated, async(request, response) 
 
 app.get('/trading-portfolio', isAuthenticated, (request, response) => {
 	response.render('trading-portfolio.hbs', {
-		title: 'Welcome to the Portfolio Page.'
+		title: 'Welcome to the Portfolio Page.',
+		display: "Portfolio"
 	})
 });
 
@@ -770,13 +803,14 @@ app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => 
 			stock_keys.push(Object.keys(stocks[i]));
 			var key_value = stocks[i][stock_keys[i][0]];
 			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
-			console.log(message);
+			// console.log(message);
 		}
 	}
 
 	response.render('trading-portfolio.hbs', {
 		title: message,
-		head: `Cash: $${cash2[0]}`
+		head: `Cash: $${cash2[0]}`,
+		display: "Portfolio"
 	})
 });
 
@@ -800,7 +834,7 @@ app.get('/admin-success', isAdmin, (request, response) => {
  });
 
 app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
-	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+	mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
 		assert.equal(null, err);
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if (err) {
@@ -815,7 +849,7 @@ app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
 });
 
 app.post('/admin-success-delete-user', isAdmin, function(req, res, next) {
-	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+	mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
 		assert.equal(null, err);
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if(err) {
@@ -832,8 +866,8 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 	var user_name_to_delete = req.body.user_id;
 	var username = req.session.passport.user.username;
 
-	console.log(user_name_to_delete)
-	console.log(username)
+	// console.log(user_name_to_delete)
+	// console.log(username)
 	if(user_name_to_delete == username){
 		res.render('admin-success-user-accounts-list.hbs', {
 			message: "Cannot delete your own account!"
@@ -848,7 +882,7 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 			// try {
 				// console.log(user_id_to_delete);
 				message = '';
-				mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+				mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
 					assert.equal(null, err);
 
 					var query = { username: user_name_to_delete }
@@ -932,7 +966,7 @@ app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
 })
 
 app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
-	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+	mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
 		assert.equal(null, err);
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if (err) {
@@ -960,7 +994,7 @@ app.post('/admin-success-update-balances-success', isAdmin, function(req, res, n
 	}else{
 	console.log(user_id_to_update);
 		message = '';
-		mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+		mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
 			assert.equal(null, err);
 			var query = { _id: ObjectID(user_id_to_update) }
 			//console.log(query)
@@ -994,7 +1028,9 @@ app.post('/admin-success-update-balances-success', isAdmin, function(req, res, n
 		})
 	}})
 
+
 app.get('*', errorPage, (request, response) => {
+	response.status(400)
 	response.render('404.hbs', {
 		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
 	})
@@ -1006,6 +1042,7 @@ function errorPage(request, response, next) {
 		next();
 	} else {
 		// response.redirect('/login');
+		response.status(400);
 		response.render('404x.hbs', {
 			title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
 		})
