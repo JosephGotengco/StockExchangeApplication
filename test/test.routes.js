@@ -22,6 +22,17 @@ beforeEach(() => {
   .reply(200, mock_data);
 });
 
+beforeEach(() => {
+  nock('https://api.exchangeratesapi.io')
+  .get('/latest?base=USD')
+  .reply(200, exchange_rate_mock_data);
+});
+
+beforeEach(() => {
+  nock('https://api.exchangeratesapi.io')
+  .get('/2019-04-30?base=USD')
+  .reply(200, yest_exchange_rate_mock_data);
+});
 
 describe('GET /unknown-endpoint', function () {
     it("should return webpage with title of 'Sorry the URL \'localhost:8080/unknown-endpoint\' does not exist.' ", function (done) {
@@ -49,7 +60,6 @@ describe('GET /login-fail', function () {
       .end(function(err, res) {
         var $ = cheerio.load(res.text);
         expect(res).to.have.status(200);
-      //   console.log(res.text)
         var title = $('div > h1').text();
         assert.equal(title, 'You have entered an invalid username or password. Please try again or create a new account.')
         done()
@@ -72,7 +82,6 @@ it("should return webpage with title of 'Welcome to the login page.' ", function
         // Only way to see what was returned (as far as I know) is to use .end and a callback
         .end(function(err, res) {
         // res is the app's response for the end point (whatever page gave for response.render() or response.send())
-        // Console.log(res) 
         expect(res).to.have.status(200);
         var $ = cheerio.load(res.text);
         var title = $('div > h1').text();
@@ -129,7 +138,6 @@ describe('GET /register', function () {
           'confirm_password': 'validPassword'
         })
         .then((res) => {
-          // console.log(res.text);
           expect(res).to.have.status(200);
           var $ = cheerio.load(res.text);
           var title = $('h1[class=title]').text();
@@ -150,7 +158,6 @@ describe('GET /register', function () {
           'confirm_password': 'validPassword'
         })
         .then((res) => {
-          // console.log(res.text);
           expect(res).to.have.status(200);
           var $ = cheerio.load(res.text);
           var title = $('h1[class=title]').text();
@@ -171,7 +178,6 @@ describe('GET /register', function () {
           'confirm_password': 'validPassword'
         })
         .then((res) => {
-          // console.log(res.text);
           expect(res).to.have.status(200);
           var $ = cheerio.load(res.text);
           var title = $('h1[class=title]').text();
@@ -192,7 +198,7 @@ describe('GET /register', function () {
           'confirm_password': 'validPassword'
         })
         .then((res) => {
-          // console.log(res.text);
+          // (res.text);
           expect(res).to.have.status(200);
           var $ = cheerio.load(res.text);
           var title = $('h1[class=title]').text();
@@ -213,7 +219,7 @@ describe('GET /register', function () {
           'confirm_password': ''
         })
         .then((res) => {
-          // console.log(res.text);
+          // (res.text);
           expect(res).to.have.status(200);
           var $ = cheerio.load(res.text);
           var title = $('h1[class=title]').text();
@@ -234,7 +240,7 @@ describe('GET /register', function () {
   //         'confirm_password': 'validPassword'
   //       })
   //       .then((res) => {
-  //         // console.log(res.text);
+  //         // (res.text);
   //         expect(res).to.have.status(200);
   //         var $ = cheerio.load(res.text);
   //         var title = $('h1[class=title]').text();
@@ -285,7 +291,7 @@ describe('POST /login', function () {
           // back to the server in the next request:
         return agent.get('/trading-success')
             .then(function (res) {
-                // console.log(res.text)
+                // (res.text)
                 var $ = cheerio.load(res.text);
                 var title = $('div[role=alert]').text();
                 var display = $('title').text();
@@ -312,7 +318,7 @@ describe('POST /login', function () {
           .then(function (res) {
             // Expect to be redirected
             expect(res).to.redirect;
-            // console.log(res.text)
+            // (res.text)
             var $ = cheerio.load(res.text);
             var title = $('h1[class=title]').text();
             var display = $('title').text();
@@ -339,7 +345,6 @@ describe('POST /login', function () {
           .then(function (res) {
             // Expect to be redirected
             expect(res).to.redirect;
-            // console.log(res.text)
             var $ = cheerio.load(res.text);
             var title = $('h1[class=title]').text();
             var display = $('title').text();
@@ -450,7 +455,6 @@ describe('GET /news/currency/:currencyCode', function () {
         .then(function (res) {
         return agent.get('/news/currency/CAD')
             .then(function (res) {
-                // console.log(res.text)
                 var $ = cheerio.load(res.text);
                 var display = $('title').text();
                 assert.equal(display, "CAD Price");
@@ -476,7 +480,6 @@ describe('GET /news/stock/:ticker', function () {
         .then(function (res) {
         return agent.get('/news/stock/FB')
             .then(function (res) {
-                // console.log(res.text);
                 var $ = cheerio.load(res.text);
                 var display = $('title').text();
                 assert.equal(display, "FB Price");
@@ -3839,4 +3842,84 @@ const mock_data = {
       }
     ]
   }
+}
+
+var yest_exchange_rate_mock_data = {
+  "base": "USD",
+  "rates": {
+    "BGN": 1.74344803,
+    "NZD": 1.4980388661,
+    "ILS": 3.6056338028,
+    "RUB": 64.3696737386,
+    "CAD": 1.3438224282,
+    "USD": 1.0,
+    "PHP": 51.8140488501,
+    "CHF": 1.0195221965,
+    "AUD": 1.4183455161,
+    "JPY": 111.3656623284,
+    "TRY": 5.9647887324,
+    "HKD": 7.845159565,
+    "MYR": 4.1285434124,
+    "HRK": 6.6081297914,
+    "CZK": 22.8730611517,
+    "IDR": 14221.5011588518,
+    "DKK": 6.6541272954,
+    "NOK": 8.6181137458,
+    "HUF": 287.9033695846,
+    "GBP": 0.7688357996,
+    "MXN": 18.9720984133,
+    "THB": 31.9147798181,
+    "ISK": 121.4120164022,
+    "ZAR": 14.2827598502,
+    "BRL": 3.9267249064,
+    "SGD": 1.3605812088,
+    "PLN": 3.8213585309,
+    "INR": 69.5859333214,
+    "KRW": 1165.9921554644,
+    "RON": 4.2428240328,
+    "CNY": 6.7339097878,
+    "SEK": 9.4802995186,
+    "EUR": 0.8914244963
+  },
+  "date": "2019-04-30"
+}
+
+var exchange_rate_mock_data = {
+  "base": "USD",
+  "rates": {
+    "BGN": 1.7443810203,
+    "NZD": 1.508740635,
+    "ILS": 3.5975740278,
+    "RUB": 65.334909026,
+    "CAD": 1.3435604709,
+    "USD": 1.0,
+    "PHP": 51.7508027114,
+    "CHF": 1.0184623618,
+    "AUD": 1.4243667499,
+    "JPY": 111.4966107742,
+    "TRY": 5.9643239386,
+    "HKD": 7.8449875134,
+    "MYR": 4.1369960756,
+    "HRK": 6.6128255441,
+    "CZK": 22.8754905458,
+    "IDR": 14250.0,
+    "DKK": 6.6584909026,
+    "NOK": 8.6915804495,
+    "HUF": 288.9760970389,
+    "GBP": 0.7664109882,
+    "MXN": 18.9499643239,
+    "THB": 32.0246164823,
+    "ISK": 122.5472707813,
+    "ZAR": 14.4646806993,
+    "BRL": 3.9328398145,
+    "SGD": 1.3609525508,
+    "PLN": 3.8173385658,
+    "INR": 69.3738851231,
+    "KRW": 1163.1733856582,
+    "RON": 4.2439350696,
+    "CNY": 6.7345701035,
+    "SEK": 9.5299678915,
+    "EUR": 0.8919015341
+  },
+  "date": "2019-05-02"
 }
