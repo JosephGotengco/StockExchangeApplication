@@ -29,90 +29,107 @@
             line-height: 1.5;
             height: 100%;
         }
-        .header {
-            margin-left: 20%;
-            display: inline-block;
-            padding-top: 50px;
+
+        {{!-- .side1 {
+            background-color: #55efc4;
         }
-        .header2 {
-            float: right;
-            margin-right: 20%;
-            padding-top: 50px;
+        .side2 {
+            background-color: #fd79a8;
+        } --}}
+
+        .card{
+            width: 45%;
+            max-height: 250px;
+            margin: 5px auto;
         }
-        .container{
+
+        .column-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .columns{
-            float: left;
-            width: 25%;
-            padding: 0 10px;
+
+        .thinner {
+            font-weight:400;
         }
-        .rightcolum{
-            border-left: solid black 1px;
+
+        img {
+            width: 100%;
+            height: 100px;
         }
-        .leftcolum{
-            border-right: solid black 1px;
+
+        .card-body {
+            max-height: 50%;
         }
-        .footer-margin{
-            height:150px;
+
+        .bottom-space {
+            padding-bottom: 100px;
         }
-        @media (min-width: 768px) {
-            .innerbox {
-                width: 750px;
-            }
-        }
-        @media (min-width: 992px) {
-            .innerbox{
-                width: 970px;
-            }
-        }
-        @media (min-width: 1200px) {
-            .innerbox {
-                width: 1170px;
-            }
-        }
+
     </style>
 </head>
 
 <body>
 
 {{> loggedInNavbar}}
+<div class="container bottom-space">
+  <div class="row">
+    <div class="col-sm-6 side1">
+        <div class="container">
 
-<h1 class="header">Stock</h1>
-<h1 class="header2">Currency</h1>
 
-<div class="div">
-    <div class="columns">
-        <div class="card" style="width: 18rem;">
-            <img src="../images/tsla.png" alt="tesla">
-            <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <div class="row">
+                    <div class="col-md-12 column-header"><h1 class="thinner">STOCKS</h1></div>
             </div>
+
+            <div class="row">
+                {{#each stockDataList}}
+                    <div class="card">
+                        <a href="/news/stock/{{{this.code}}}">
+                            <img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">{{{this.code}}}</h5>
+                                <p class="card-text">Price: {{{this.price}}}</p>
+                            </div>
+                        </a>
+                    </div>
+                {{/each}}
+            </div>
+
+
         </div>
     </div>
-    <div class="columns leftcolum">
-        <div class="card" style="width: 18rem;">
-            <img src="../images/download.png" class="card-img-top" alt="apple">
-            <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+
+
+
+
+    <div class="col-sm-6 side2">
+        <div class="container">
+
+            <div class="row">
+                    <div class="col-md-12 column-header"><h1 class="thinner">CURRENCY</h1></div>
             </div>
+
+            <div class="row">
+
+                {{#each currencyDataList}}
+                    <div class="card">
+                        <a href="/news/currency/{{{this.code}}}" target="_blank">
+                            <img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">{{{this.code}}}</h5>
+                                <p class="card-text">Price: {{{this.price}}}</p>
+                            </div>
+                        </a>
+                    </div>
+                {{/each}}
+            </div>
+            </div>
+
+
         </div>
     </div>
-    <div class="columns rightcolum">
-        <div class="card" style="width: 18rem;">
-            <img src="..." class="card-img-top" alt="...">
-            <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            </div>
-        </div>
-    </div>
-    <div class="columns">
-        <div class="card" style="width: 18rem;">
-            <img src="..." class="card-img-top" alt="...">
-            <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
     {{> footer}}

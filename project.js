@@ -260,6 +260,7 @@ app.get('/login', (request, response) => {
 // End point if user has invalid credentials
 app.get('/login-fail', (request, response) => {
 	request.session.destroy(function(err) {
+		response.status(200);
 		response.render('login.hbs', {
 			title: 'You have entered an invalid username or password. Please try again or create a new account.',
 			display: "Login"
@@ -309,11 +310,24 @@ passport.use(new LocalStrategy(
 
 
 
-// app.get("/news-hub", (request, response) => {
-// 	response.render("news-hub.hbs", {
-// 		title: 'Stock and Currency.'
-// 	})
-// });
+app.get("/news-hub", isAuthenticated, async(request, response) => {
+	if (ssn.stockDataList === undefined) {
+		var stockDataList = await marqueeStock.getMarqueeStock();
+		ssn.stockDataList = stockDataList;
+	}
+
+	if (ssn.currencyDataList === undefined) {
+		var currencyDataList = await marqueeCurrency.getMarqueeCurrency();			
+		ssn.currencyDataList = currencyDataList;
+	}
+
+
+	response.render("news-hub.hbs", {
+		title: 'Stock and Currency.',
+		currencyDataList: ssn.currencyDataList,
+		stockDataList: ssn.stockDataList
+	})
+});
 
 
 
@@ -331,7 +345,7 @@ app.get('/trading', (request, response) => {
 });
 
 app.get('/trading-success', isAuthenticated, async(request, response) => {
-	console.log("Trading Success");
+	// console.log("Trading Success");
 	try{
 		ssn = request.session;
 
@@ -389,7 +403,7 @@ app.post('/trading-success-stocks', isAuthenticated, async(request, response) =>
 
 app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 	try {
-		console.log("#---------CURRENCY NEWS POINT---------#");
+		// console.log("#---------CURRENCY NEWS POINT---------#");
 		// console.log(Object.keys(request));
 		var currency_code = request.params.id;
 		var chart_data = await currFunc.getCurrData(currency_code);
@@ -401,8 +415,9 @@ app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 			title: 'Welcome to the trading page.',
 			chart_title: `${currency_code} Price`,
 			labels: labels,
-			data: data
-		});
+			data: data,
+			display: `${currency_code} Price`
+		})
 	} 
 	catch(e) {
 		console.error(e);
@@ -411,7 +426,7 @@ app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 
 app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
 	try {
-		console.log("#---------STOCK NEWS POINT---------#");
+		// console.log("#---------STOCK NEWS POINT---------#");
 		// console.log(Object.keys(request));
 		var ticker = request.params.id;
 		var chart_data = await stockFunc.getStockData(ticker);
@@ -423,7 +438,8 @@ app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
 			title: 'Welcome to the trading page.',
 			chart_title: `${ticker} Price`,
 			labels: labels,
-			data: data
+			data: data,
+			display: `${ticker} Price`
 		});
 	} 
 	catch(e) {
@@ -456,6 +472,7 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 				message = `Sorry the stock ticker '${stock}' is invalid.`;
 			}
 		}
+
 		switch(ssn.preference) {
 			case "stock":
 				if (ssn.stockDataList === undefined) {
@@ -523,13 +540,13 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 			else {
 				cash2[0] = cash_remaining;
 				
-				console.log("cash_remaining after else, after cash=cash_remain:"+cash_remaining);
+				// console.log("cash_remaining after else, after cash=cash_remain:"+cash_remaining);
 
 
 				stocks.push(stock_holding);
 			}
-			console.log('cash_remaining before update:'+cash_remaining);
-			console.log('cash added to database' + cash);
+			// console.log('cash_remaining before update:'+cash_remaining);
+			// console.log('cash added to database' + cash);
 
 			db.collection('user_accounts').updateOne(
 				{ "_id": ObjectID(_id)},
@@ -632,7 +649,7 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 		}
 		else if ((stock_qty >= qty) && (total_sale > 0)) {
 			var db = utils.getDb();
-			console.log(stocks);
+			// console.log(stocks);
 
 			if (stock_remaining > 0) {
 				var stock_holding = {[stock]:parseFloat(stock_remaining)};
@@ -725,7 +742,7 @@ app.post('/trading-success-holdings', isAuthenticated, async(request, response) 
 			stock_keys.push(Object.keys(stocks[i]));
 			var key_value = stocks[i][stock_keys[i][0]];
 			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
-			console.log(message);
+			// console.log(message);
 		}
 	}
 	switch(ssn.preference) {
@@ -786,7 +803,7 @@ app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => 
 			stock_keys.push(Object.keys(stocks[i]));
 			var key_value = stocks[i][stock_keys[i][0]];
 			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
-			console.log(message);
+			// console.log(message);
 		}
 	}
 
@@ -849,8 +866,8 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 	var user_name_to_delete = req.body.user_id;
 	var username = req.session.passport.user.username;
 
-	console.log(user_name_to_delete)
-	console.log(username)
+	// console.log(user_name_to_delete)
+	// console.log(username)
 	if(user_name_to_delete == username){
 		res.render('admin-success-user-accounts-list.hbs', {
 			message: "Cannot delete your own account!"

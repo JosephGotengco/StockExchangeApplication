@@ -101,52 +101,52 @@ var getMarqueeCurrency = async() => {
     var currencyDataList = [
         {
             code: "CAD",
-            price: cad,
+            price: cad.toFixed(2),
             img: img0
         },
         {
             code: "BGN",
-            price: bgn,
+            price: bgn.toFixed(2),
             img: img1 
         },
         {
             code: "EUR",				
-            price: eur,
+            price: eur.toFixed(2),
             img: img2 
         },
         {
             code: "JPY",
-            price: jpy,
+            price: jpy.toFixed(2),
             img: img3 
         },
         {
             code: "AUD",
-            price: aud,
+            price: aud.toFixed(2),
             img: img4 
         },
         {
             code: "HKD",
-            price: hkd,
+            price: hkd.toFixed(2),
             img: img5 
         },
         {
             code: "GBP",
-            price: gbp,
+            price: gbp.toFixed(2),
             img: img6 
         },
         {
             code: "MXN",
-            price: mxn,
+            price: mxn.toFixed(2),
             img: img7 
         },
         {
             code: "INR",
-            price: inr,
+            price: inr.toFixed(2),
             img: img8 
         },
         {
             code: "CNY",
-            price: cny,
+            price: cny.toFixed(2),
             img: img9 
         }
     ]

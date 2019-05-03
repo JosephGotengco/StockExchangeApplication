@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --exit",
+    "test": "mocha --recursive --exit",
     "start": "node project.js"
   },
   "author": "Team Stock Name",
@@ -43,6 +43,7 @@
     "cheerio": "^1.0.0-rc.3",
     "mocha": "^6.1.4",
     "mocha-simple-html-reporter": "^1.1.0",
+    "mockgoose": "^8.0.1",
     "nock": "^10.0.6",
     "supertest": "^4.0.2"
   }
