@@ -1,4 +1,3 @@
-//#------ These lines below import modules ------#//
 const express = require('express');
 const axios = require('axios');
 const hbs = require('hbs');
@@ -17,56 +16,72 @@ var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 var moment = require('moment');
 
+// function for getting stock data for the graph
 var stockFunc = require('./feature_functions/chartStockData');
+// function for getting currency data for the graph
 var currFunc = require('./feature_functions/chartCurrData');
+// function for getting stock data for the marquee element
 var marqueeStock = require('./feature_functions/MarqueeStock');
+// function for getting the currency data for the marquee element
 var marqueeCurrency = require('./feature_functions/MarqueeCurrency');
-// vvvvvvv CONFIGURATION vvvvvv //
 
-//#------ This line makes a link (like css link) for the folder that contains placeholders for hbs files------#//
+// configure which port to use and set it as a environment variable in the process 
+const port = process.env.PORT || 8080;
+
+// set a directory to to find partials in
 hbs.registerPartials(__dirname + '/views/partials/');
 
-
+// unknown
 mongoose.Promise = global.Promise;
 
-// password login
-mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", { useNewUrlParser: true });
+// used for logging in? (unsure)
+mongoose.connect("mongodb://localhost:27017/accounts", { useNewUrlParser: true });
 
+// make the application instance
 var app = express();
+// create a global variable
 var ssn;
 
-//#------ Sets the view engine to hbs which allows the application (this file) to use hbs files instead of html files ------#//
+// set the view engine to hbs (used to read our hbs files)
 app.set('view engine', 'hbs');
 
-//#------ Lines below help parse data that comes in from users (webpages); don't need to touch these ------#//
+// set a directory to look for our hbs files, images, css, and native js files
 app.use(express.static(__dirname + '/views'));
+// set application to use json
 app.use(bodyParser.json());
+// set application to be able to access nested objects
 app.use(bodyParser.urlencoded({ extended: true }));
+// initializes passport
 app.use(passport.initialize());
+// alters request object and change the 'user' value from session id (client cookie) to the true desserialized user object
 app.use(passport.session());
+// set application to parse cookies (unsure)
 app.use(cookieParser());
 
+// register database (unsure)
 hbs.registerHelper('dbConnection', function(req,res) {
-	var url = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true";
+	var url = "mongodb://localhost:27017/accounts";
 	return url;
 })
 
-//#------ | Helps differentiate between multiple users who connect to this application (this file) vvv ------#//
-
+// cookie configuration	
 app.use(session({
 	secret: 'secretcode',
 	resave: false,
 	saveUninitialized: false
 }));
 
+// sets the session id as the cookie in user's browser
 passport.serializeUser(function(user, done) {
         done(null, user); 
     });
 
+// gets the session id as the cookie from the user's browser
 passport.deserializeUser(function(user, done) {
         done(null, user); 
     });
 
+// logs whenever a user has successfully logged in
 app.use((request, response, next) => {
 	var time = new Date().toString();
 	var log_entry = `${time}: ${request.method} ${request.url}`;
@@ -94,43 +109,28 @@ var account_schema = new mongoose.Schema({
 		maxlength: 60
 	}
 });
-// ^^^^^^^ CONFIGURATION ^^^^^^^ //
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-// vvvvvv REGISTRATION vvvvvv //
-
-// End point if user goes to registeration webpage but is already logged in
 app.get('/registration-logged-in', isAuthenticated, (request, response) => {
+	// called when user is already logged in and goes to user registration page
 	response.render('registration-logged-in.hbs', {
 		title: 'You are already logged in. Logout to make a new account.'
 	})
 });
 
 
-// End point for a new user
 app.get('/register', (request, response) => {
+	// called when user goes to user registration page
 	response.render('registration.hbs', {
 		title: 'To create an account please enter credentials.'
 	})
 });
 
-// Post end point for registering a new user
 app.post('/register', function(request, response) {
-
+	// called when user submits form data for user registration
 	var firstname = request.body.firstname;
 	var lastname = request.body.lastname;
 	var username = request.body.username;
@@ -222,7 +222,6 @@ function check_uniq (string_input) {
 	}
 	return flag;
 }
-// ^^^^^^ REGISTRATION ^^^^^^ //
 
 
 
@@ -232,13 +231,12 @@ function check_uniq (string_input) {
 
 
 
-// vvvvvv LOGIN vvvvvv //
 
 const user_account = mongoose.model("user_accounts", account_schema);
 
 
-// End point for logging in (First Page a user sees)
 app.get('/', (request, response) => {
+	// called when user connects to application
 	request.session.destroy(function(err) {
 		response.render('login.hbs', {
 			title: 'Welcome to the login page.',
@@ -247,8 +245,8 @@ app.get('/', (request, response) => {
 	});
 });
 
-// ^^^ Cannot we just redirect them to the GET root endpoint? ^^^ 
 app.get('/login', (request, response) => {
+	// called when user connects to application
 	request.session.destroy(function(err) {
 		response.render('login.hbs', {
 			title: 'Welcome to the login page.',
@@ -257,8 +255,8 @@ app.get('/login', (request, response) => {
 	});
 });
 
-// End point if user has invalid credentials
 app.get('/login-fail', (request, response) => {
+	// called when user enters invalid username and/or password
 	request.session.destroy(function(err) {
 		response.status(200);
 		response.render('login.hbs', {
@@ -268,25 +266,24 @@ app.get('/login-fail', (request, response) => {
 	});
 });
 
-// End point for logging user out of session (passport)
 app.get('/logout', function (request, response){
+	// called when user logs out
   request.session.destroy(function (err) {
   	response.redirect('/');
   });
 });
 
-// Post end point for logging in
+// called when user logs in successfully from /
 app.post('/', passport.authenticate('local', { successRedirect: '/trading-success', failureRedirect: '/login-fail' }));
 
-// Authenticates user and redirects them to /trading-success end point
+// called when user logs in successfully from /login
 app.post('/login', passport.authenticate('local', {successRedirect: '/trading-success', failureRedirect: '/login-fail' }));
 
-// Literally does same thing as above end point (Subject to fix!!!)
+// called when uesr logs in successfully from /login-fail
 app.post('/login-fail', passport.authenticate('local', {successRedirect: '/trading-success', failureRedirect: '/login-fail' }));
 
-// Specifies how we are going to authenticate the user
-// We search the database for any docuemnt that has the specified username and password	
 passport.use(new LocalStrategy(
+	// configures how we are going to authenticate the user
   function(username, password, done) {
     user_account.findOne({ username: username }, function (err, user) {
       if (err) { return done(err); }
@@ -297,7 +294,6 @@ passport.use(new LocalStrategy(
   }
 ));
 
-// ^^^^^^ LOGIN ^^^^^^ //
 
 
 
@@ -311,6 +307,7 @@ passport.use(new LocalStrategy(
 
 
 app.get("/news-hub", isAuthenticated, async(request, response) => {
+	// called when user goes to the news hub page
 	if (ssn.stockDataList === undefined) {
 		var stockDataList = await marqueeStock.getMarqueeStock();
 		ssn.stockDataList = stockDataList;
@@ -335,9 +332,9 @@ app.get("/news-hub", isAuthenticated, async(request, response) => {
 
 
 
-// Holy Moly VVVVVVVVVVVVVVVVVVVVVVV Hell nah
 
 app.get('/trading', (request, response) => {
+	// called when user goes to trading page while not logged in
 	response.render('trading.hbs', {
 		title: 'You are not logged in. You must be logged in to view this page.',
 		display: "Trading"
@@ -345,7 +342,7 @@ app.get('/trading', (request, response) => {
 });
 
 app.get('/trading-success', isAuthenticated, async(request, response) => {
-	// console.log("Trading Success");
+	// called when user logs in successfully => redicted to this page
 	try{
 		ssn = request.session;
 
@@ -402,8 +399,9 @@ app.post('/trading-success-stocks', isAuthenticated, async(request, response) =>
 
 
 app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
+	// called when user clicks on currency text in marquee element
+	// or in news hub page
 	try {
-		// console.log("#---------CURRENCY NEWS POINT---------#");
 		// console.log(Object.keys(request));
 		var currency_code = request.params.id;
 		var chart_data = await currFunc.getCurrData(currency_code);
@@ -425,8 +423,9 @@ app.get('/news/currency/:id', isAuthenticated, async(request, response) => {
 })
 
 app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
+	// called when user clicks on stock text in marquee element
+	// or in news hub page
 	try {
-		// console.log("#---------STOCK NEWS POINT---------#");
 		// console.log(Object.keys(request));
 		var ticker = request.params.id;
 		var chart_data = await stockFunc.getStockData(ticker);
@@ -449,7 +448,7 @@ app.get('/news/stock/:id', isAuthenticated, async(request, response) => {
 
 
 app.post('/trading-success-search', isAuthenticated, async(request, response) => {
-	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)
+	// called when user submits a ticker in ticker search box in trading page
 	var stock = request.body.stocksearch;
 	var cash2 = request.session.passport.user.cash2;
 
@@ -507,7 +506,7 @@ app.post('/trading-success-search', isAuthenticated, async(request, response) =>
 });
 
 app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
-
+	// called when user submits ticker in stock buy form in trading page
 	var _id = request.session.passport.user._id;
 	var cash = request.session.passport.user.cash;
 	var qty = request.body.buystockqty;
@@ -620,7 +619,7 @@ app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
 });
 
 app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
-	// console.log(request.session.passport.user._id);
+	// called when user submits ticker in stock sell form in trading page
 	// console.log();
 	var _id = request.session.passport.user._id;
 	var cash = request.session.passport.user.cash;
@@ -726,6 +725,7 @@ app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
 });
 
 app.post('/trading-success-holdings', isAuthenticated, async(request, response) => {
+	// called when user checks their stocks in portfolio page
 	var stocks = request.session.passport.user.stocks;
 	var num_stocks = stocks.length;
 	var stock_keys = [];
@@ -780,6 +780,7 @@ app.post('/trading-success-holdings', isAuthenticated, async(request, response) 
 
 
 app.get('/trading-portfolio', isAuthenticated, (request, response) => {
+	// called when user accesses portfolio page
 	response.render('trading-portfolio.hbs', {
 		title: 'Welcome to the Portfolio Page.',
 		display: "Portfolio"
@@ -787,6 +788,7 @@ app.get('/trading-portfolio', isAuthenticated, (request, response) => {
 });
 
 app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => {
+	// called when user loads their data in portfolio data
 	var stocks = request.session.passport.user.stocks;
 	var num_stocks = stocks.length;
 	var stock_keys = [];
@@ -816,25 +818,29 @@ app.post('/trading-portfolio-holdings', isAuthenticated, (request, response) => 
 
 
 app.get('/admin', (request, response) => {
+	// called when user who is not logged in tries to access the admin page
 	response.render('admin-restricted-not-logged-in.hbs', {
 		title: 'You are not authorized to view this page. Please log in with an administrator account.'
 	})
 });
 
 app.get('/admin-restricted', isAuthenticated, (request, response) => {
+	// called when user is logged in and tries to access the admin page
 	response.render('admin-restricted.hbs', {
 		title: 'You are not authorized to view this page. Go back to the Trading page.'
 	})
 });
 
 app.get('/admin-success', isAdmin, (request, response) => {
-    response.render('admin-success', {
-    	title: 'Welcome to the Admin Page'
-    });
- });
+	// called when user is admin and is logged in
+	response.render('admin-success', {
+		title: 'Welcome to the Admin Page'
+	});
+});
 
 app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
-	mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
+	// called when admin user loads all user accounts from database
+	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
 		assert.equal(null, err);
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if (err) {
@@ -849,7 +855,8 @@ app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
 });
 
 app.post('/admin-success-delete-user', isAdmin, function(req, res, next) {
-	mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
+	// called when admin user submits a username to delete from admin page
+	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
 		assert.equal(null, err);
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if(err) {
@@ -863,6 +870,7 @@ app.post('/admin-success-delete-user', isAdmin, function(req, res, next) {
 	})});
 
 app.post('/admin-success-delete-user-success', function(req, res, next) {
+	// I think this does the same thing as POST /admin-success-delete-user
 	var user_name_to_delete = req.body.user_id;
 	var username = req.session.passport.user.username;
 
@@ -882,7 +890,7 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 			// try {
 				// console.log(user_id_to_delete);
 				message = '';
-				mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
+				mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
 					assert.equal(null, err);
 
 					var query = { username: user_name_to_delete }
@@ -923,12 +931,14 @@ app.post('/admin-success-delete-user-success', function(req, res, next) {
 });
 
 app.get('/admin-success-update-balances', isAdmin, function(req, res, next) {
+	// called when admin user accesses update user balance page
 	res.render('admin-success-update-balances.hbs', {
 		message: 'Enter the user ID and cash you would like to change to.'
 	});
 });
 
 app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
+	// called when admin user submits information to update a user account's balance
 	var user_id = req.body.user_id;
 	var new_balance = req.body.user_balance;
 	var balance_to_list = [new_balance];
@@ -966,7 +976,8 @@ app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
 })
 
 app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
-	mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
+	// unknown
+	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
 		assert.equal(null, err);
 		db.collection('user_accounts').find().toArray(function(err, result) {
 			if (err) {
@@ -981,6 +992,7 @@ app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
 });
 
 app.post('/admin-success-update-balances-success', isAdmin, function(req, res, next){
+	// unknown
 	var user_id_to_update = req.body.user_id
 	var user_balance = parseFloat(req.body.user_balance)
 	console.log(user_balance);
@@ -994,7 +1006,7 @@ app.post('/admin-success-update-balances-success', isAdmin, function(req, res, n
 	}else{
 	console.log(user_id_to_update);
 		message = '';
-		mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/test?retryWrites=true", function(err, db) {
+		mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
 			assert.equal(null, err);
 			var query = { _id: ObjectID(user_id_to_update) }
 			//console.log(query)
@@ -1030,6 +1042,7 @@ app.post('/admin-success-update-balances-success', isAdmin, function(req, res, n
 
 
 app.get('*', errorPage, (request, response) => {
+	// called when request page cannot be found
 	response.status(400)
 	response.render('404.hbs', {
 		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
@@ -1067,10 +1080,11 @@ function isAdmin(request, response, next) {
 	}
 }
 
-// listen to port 8080
-app.listen(8080, () => {
-	console.log('Server is up on port 8080');
+app.listen(port, () => {
+	// application listens on port specified at top of file
+	console.log(`Server is up on port ${port}`);
 	utils.init();
 });
 
+// export application to be used for testing purposes
 module.exports = app;
