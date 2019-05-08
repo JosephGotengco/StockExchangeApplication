@@ -35,8 +35,6 @@ var getStockData = async(stock) => {
 
 }
 
-// getStockData("FB")
-
 module.exports = {
     getStockData
 }

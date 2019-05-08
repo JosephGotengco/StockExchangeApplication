@@ -1,6 +1,7 @@
 var axios = require("axios");
 var moment = require("moment");
 var formatDate = require("./formatDate");
+
 var getCurrData = async(curr) => {
     try {
         if (typeof curr != "string") {
@@ -46,13 +47,17 @@ var getCurrData = async(curr) => {
         return result
     } catch(e) {
         if (e instanceof TypeError && e.message === "wrong type") {
+            // console.log("hit 1")
             return false
         }
         if (e.response === undefined) {
+            // console.log("hit 2")
             return false
-        } if (e.response.data["error"] === `Symbols \'${curr}'\ are invalid.` || e.response.status === 400) {
+        } if (e.response.data["error"] === `Symbols \'${curr}'\ are invalid.` && e.response.status === 400) {
+            // console.log("hit 3")
             return false
         } else {
+            // console.log("hit 4")
             console.error(e);
         }
     }
@@ -60,14 +65,6 @@ var getCurrData = async(curr) => {
 
 
 
-
-// getCurrData("CAD")
-// var main = async() => {
-//     var response = await getCurrData("CAD");
-//     console.log(response);
-// }
-
-// main()
 
 module.exports = {
     getCurrData

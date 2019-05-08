@@ -55,17 +55,20 @@ describe('chartCurrData function tests', function () {
 
     beforeEach(() => {
         nock('https://api.exchangeratesapi.io')
-        .get('/history?start_at=2019-04-01&end_at=2019-05-01&symbols=UNKNOWN-CURRENCY&base=USD')
-        .reply(400, {
-            "error": "Symbols 'UNKNOWN' are invalid."
-          });
+        .get(`/history?start_at=${formatted_lastDay}&end_at=${formatted_firstDay}&symbols=UNKNOWN-CURRENCY&base=USD`)
+        .reply(400, {"error":"Symbols 'UNKNOWN-CURRENCY' are invalid."});
+    });
+
+    beforeEach(() => {
+      nock('https://api.exchangeratesapi.io')
+      .get(`/history?start_at=${formatted_lastDay}&end_at=${formatted_firstDay}&symbols=BGN&base=USD`)
+      // no reply 
     });
 
     it("should return false", function (done) {
         var callFunc = async() => {
             var currency_code = "unknown-currency";
             var response = await chartCurrData.getCurrData(currency_code);
-            // console.log(response)
             assert.equal(response, false);
             done();
         }
@@ -111,6 +114,17 @@ describe('chartCurrData function tests', function () {
       }
       callFunc();
     })
+
+    it("should return false", function (done) {
+      var callFunc = async() => {
+        var currency_code = "BGN";
+        var response = await chartCurrData.getCurrData(currency_code);
+        assert.equal(response, false);
+        done();
+      }
+      callFunc();
+    })
+
   });
 
 

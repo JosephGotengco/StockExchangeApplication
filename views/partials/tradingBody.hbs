@@ -1,0 +1,72 @@
+
+  
+  <br><br>
+  <!-- Check Stock Price -->
+  <div class="container">
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4">Check Stock Price</h1>
+        <p class="lead">Please note all prices are in USD.</p>
+      </div>
+      <div class='chfont container'>
+        <p class="font-weight-bold">{{head}}</p>
+        <br>
+        <div class="input-group btn-group">
+          <form action="/trading-success-search" method="POST">
+            <label for="stocksearch">Stock Search Price</label>
+            <input type="text" class="form-control border border-right-0" name="stocksearch" id="stocksearch"
+              placeholder="Stock Ticker e.g. TSLA">
+            <br><br>
+            <div class="alert alert-info font-weight-bold" role="alert">{{title}}</div>
+            <br><br>
+            <input type="submit" class="btn btn-info" value="Search">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buy & Sell Stock -->
+  <div class="container">
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4">Buy & Sell Stocks</h1>
+        <p class="lead">Please note all prices are in USD.</p>
+      </div>
+      <div class='chfont container'>
+        <form action="/trading-success-buy" method="POST">
+          <div class="row">
+            <div class="col">
+              <label for="stocksearch">Buy Stock</label>
+              <input type="text" class="form-control border border-right-0" name="buystockticker" id="buystockticker"
+                placeholder="Enter Stock Ticker e.g FB">
+            </div>
+            <div class="col">
+              <label for="stocksearch">Quantity</label>
+              <input type="number" class="form-control border border-right-0" name="buystockqty" id="buystockqty"
+                placeholder="Enter Quantity">
+            </div>
+          </div>
+          <br>
+          <input type="submit" class="btn btn-info" value="Buy">
+        </form>
+        <br><br>
+        <form action="/trading-success-sell" method="POST">
+          <div class="row">
+            <div class="col">
+              <label for="stocksearch">Sell Stock</label>
+              <input type="text" class="form-control" name="sellstockticker" id="sellstockticker"
+                placeholder="Enter Stock Ticker e.g FB">
+            </div>
+            <div class="col">
+              <label for="stocksearch">Quantity</label>
+              <input type="number" class="form-control" name="sellstockqty" id="sellstockqty"
+                placeholder="Enter Quantity">
+            </div>
+          </div>
+          <br>
+          <input type="submit" class="btn btn-info" value="Sell">
+        </form>
+      </div>
+    </div>
+  </div>

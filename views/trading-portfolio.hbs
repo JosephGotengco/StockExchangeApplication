@@ -1,60 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <title>{{display}}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel='stylesheet' href='./css/style.css'>
-</head>
+{{>head }}
+<style>
+	.metric .fa {
+		font-size: 1.2rem;
+	}
+
+	.metric .display-4 {
+		padding-right: 1rem;
+	}
+
+	.metric p small {
+		padding: 0 1rem;
+	}
+
+	.badge {
+		margin-right: .6rem;
+	}
+</style>
 
 <body>
 
 
-  <!-- NAV BAR -->
-  {{> loggedInNavbar}}
+	<!-- NAV BAR -->
+	{{> loggedInNavbar}}
 
-  <!-- Portfolio -->
-  <div class="container">
-    <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-        <h1 class="display-4">Your Portfolio</h1>
-        <p class="lead">Please note all prices are in USD.</p>
-      </div>
-      <div class='chfont container'>
-        <p class="font-weight-bold">{{title}}</p>
-        <p class="font-weight-bold">{{head}}</p>
-        <br>
-        <form action="/trading-portfolio-holdings" method="POST">
-          <input type="submit" class="btn btn-info" id="loadport" value="Load Portfolio">
-        </form>
+	<!-- Portfolio -->
+	<div class="container">
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1 class="display-4">Your Portfolio</h1>
+				<p class="lead">Please note all prices are in USD.</p>
+			</div>
+			<div class='chfont container'>
+				<p class="font-weight-bold">{{title}}</p>
+				<p class="font-weight-bold">{{head}}</p>
+				<br>
+				<form action="/trading-portfolio-holdings" method="POST">
+					<input type="submit" class="btn btn-info" id="loadport" value="Load Portfolio">
+				</form>
 
-      </div>
-    </div>
-  </div>
+			</div>
+		</div>
+	</div>
 
-  <!-- Footer -->
- {{> footer}}
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
+
+
+	<div class="container">
+		<div class="jumbotron jumbotron-fluid" style="padding: 20px 40px;">
+			<h2 class="display-4">TRANSACTIONS</h2>
+			<div class="table-responsive">
+				<table name="mytable" class="table">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Company</th>
+							<th>Quantity</th>
+							<th>Amount</th>
+							<th>Balance</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each displayTransactions}}
+						<tr>
+							<td>{{this.year}}, {{this.month}} {{this.day}}</td>
+							<td>{{this.stock_name}}</td>
+							<td>{{this.qty}}</td>
+							{{#ifEquals this.type "S"}}
+							<td>{{this.price}}</td>
+							{{else}}
+							<td>-{{this.price}}</td>
+							{{/ifEquals}}
+							<td>{{this.balance}}</td>
+						</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+
+	<!-- Footer -->
+	{{> footer}}
+
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.22/vue.min.js'></script>
+	<script>
+		const userStocks = {{{json stocks}}}
+	</script>
 
 </body>
 

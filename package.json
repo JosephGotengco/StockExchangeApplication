@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=text mocha --recursive --exit",
+    "test": "nyc --reporter=html mocha --timeout 10000 --recursive --exit",
     "start": "node project.js"
   },
   "author": "Team Stock Name",
@@ -29,7 +29,6 @@
     "hbs": "^4.0.3",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
-    "mongoose": "^5.4.20",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
@@ -44,7 +43,9 @@
     "mocha": "^6.1.4",
     "mocha-simple-html-reporter": "^1.1.0",
     "mockgoose": "^8.0.1",
+    "mongoose": "^5.5.5",
     "nock": "^10.0.6",
+    "node-mongodb-fixtures": "^3.0.5",
     "nyc": "^14.1.0",
     "supertest": "^4.0.2"
   }

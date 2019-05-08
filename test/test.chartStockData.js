@@ -18,6 +18,32 @@ describe('Test chart stock data function (chartStockData) ', function () {
         .reply(200, mock_data);
     });
 
+    beforeEach(() => {
+        // Put the base of the url in nock
+        nock('https://ws-api.iextrading.com')
+        // Put the end point in the .get()
+        .get('/1.0/stock/market/batch?symbols=invalidCode&types=chart&range=1m')
+
+        // You basically split up the URL so if you combine them it would like look:
+        // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
+
+        // first arg is the status code u return and the second arg is the data 
+        .reply(200, {});
+    });
+
+    beforeEach(() => {
+        // Put the base of the url in nock
+        nock('https://ws-api.iextrading.com')
+        // Put the end point in the .get()
+        .get('/1.0/stock/market/batch?symbols=SNAP&types=chart&range=1m')
+
+        // You basically split up the URL so if you combine them it would like look:
+        // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
+
+        // first arg is the status code u return and the second arg is the data 
+    });
+
+
 
     //TESTS
 
@@ -40,7 +66,7 @@ describe('Test chart stock data function (chartStockData) ', function () {
 
   it("should return false", function (done) {
     var callFunc = async() => {
-        var currency_code = "Invalid Currency Code"
+        var currency_code = "invalidCode"
         var response = await chartStockData.getStockData(currency_code);
         assert.equal(response, false);
         done()
@@ -87,6 +113,17 @@ describe('Test chart stock data function (chartStockData) ', function () {
     }
     callFunc()
     });
+
+    it("should return false", function (done) {
+        var callFunc = async() => {
+            var currency_code = "SNAP"
+            var response = await chartStockData.getStockData(currency_code);
+            assert.equal(response, false);
+            done()
+        }
+        callFunc()
+        });
+
 });
 
 

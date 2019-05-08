@@ -1,155 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <title>{{display}}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel='stylesheet' href='./css/style.css'>
-</head>
+{{> head}}
 
 <body>
-
-
   <!-- NAV BAR -->
   {{> loggedInNavbar}}
 
 
-
-  {{!-- <marquee behaviour="scroll"; bgcolor="black"; scrollamount=10; onmouseover="this.stop();" onmouseleave="this.start();">
-    <a href="/news/currency/CAD"><span style="color: red"><b>CAD:</b></span> <span style="color: white"><b>{{cad}}</b></span>{{{HTMLforImage}}}{{{img0}}}{{{alt}}}</a>,
-    <a href="/news/currency/BGN"><span style="color: red"><b>BGN:</b></span> <span style="color: white"><b>{{bgn}}</b></span>{{{HTMLforImage}}}{{{img1}}}{{{alt}}}</a>, 
-    <a href="/news/currency/EUR"><span style="color: red"><b>EUR:</b></span> <span style="color: white"><b>{{eur}}</b></span>{{{HTMLforImage}}}{{{img2}}}{{{alt}}}</a>, 
-    <a href="/news/currency/JPY"><span style="color: red"><b>JPY:</b></span> <span style="color: white"><b>{{jpy}}</b></span>{{{HTMLforImage}}}{{{img3}}}{{{alt}}}</a>, 
-    <a href="/news/currency/AUD"><span style="color: red"><b>AUD:</b></span> <span style="color: white"><b>{{aud}}</b></span>{{{HTMLforImage}}}{{{img4}}}{{{alt}}}</a>,
-    <a href="/news/currency/HKD"><span style="color: red"><b>HKD:</b></span> <span style="color: white"><b>{{hkd}}</b></span>{{{HTMLforImage}}}{{{img5}}}{{{alt}}}</a>, 
-    <a href="/news/currency/GBP"><span style="color: red"><b>GBP:</b></span> <span style="color: white"><b>{{gbp}}</b></span>{{{HTMLforImage}}}{{{img6}}}{{{alt}}}</a>, 
-    <a href="/news/currency/MXN"><span style="color: red"><b>MXN:</b></span> <span style="color: white"><b>{{mxn}}</b></span>{{{HTMLforImage}}}{{{img7}}}{{{alt}}}</a>, 
-    <a href="/news/currency/INR"><span style="color: red"><b>INR:</b></span> <span style="color: white"><b>{{inr}}</b></span>{{{HTMLforImage}}}{{{img8}}}{{{alt}}}</a>, 
-    <a href="/news/currency/CNY"><span style="color: red"><b>CNY:</b></span> <span style="color: white"><b>{{cny}}</b></span>{{{HTMLforImage}}}{{{img9}}}{{{alt}}}</a>
-  </marquee> --}}
-  
-  <marquee behaviour="scroll"; bgcolor="black"; scrollamount=10; onmouseover="this.stop();" onmouseleave="this.start();">
+  {{#ifEquals preference "currency"}}
+  <marquee behaviour="scroll" ; bgcolor="black" ; scrollamount=10; onmouseover="this.stop();"
+    onmouseleave="this.start();">
     {{#each marqueeData}}
-      <a href="/news/currency/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px; hspace=2; padding=2px;></a>,
+    <a href="/news/currency/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span
+        style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px; hspace=2;
+        padding=2px;></a>,
     {{/each}}
-  </marquee>
-
-  <form action='/trading-success-stocks' method="POST">
+    </marquee>
+    <form action='/trading-success-stocks' method="POST">
       <input type="hidden" id="pref" name="pref" value="stock">
       <button type="submit" class="btn btn-primary">Stocks</button>
-  </form>
+    </form>
+    {{else}}
+    <marquee behaviour="scroll" ; bgcolor="black" ; scrollamount=10; onmouseover="this.stop();"
+      onmouseleave="this.start();">
+      {{#each marqueeData}}
+      <a href="/news/stock/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span
+          style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
+          hspace=2; padding=2px;></a>,
+      {{/each}}
+    </marquee>
+    <form action='/trading-success' method="GET">
+      <input type="hidden" id="pref" name="pref" value="currency">
+      <button type="submit" class="btn btn-primary">Currencies</button>
+    </form>
+    {{/ifEquals}}
 
-  
-  <br><br>
-  <!-- Check Stock Price -->
-  <div class="container">
-    <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-        <h1 class="display-4">Check Stock Price</h1>
-        <p class="lead">Please note all prices are in USD.</p>
-      </div>
-      <div class='chfont container'>
-        <p class="font-weight-bold">{{head}}</p>
-        <br>
-        <div class="input-group btn-group">
-          <form action="/trading-success-search" method="POST">
-            <label for="stocksearch">Stock Search Price</label>
-            <input type="text" class="form-control border border-right-0" name="stocksearch" id="stocksearch"
-              placeholder="Stock Ticker e.g. TSLA">
-            <br><br>
-            <div class="alert alert-info font-weight-bold" role="alert">{{title}}</div>
-            <br><br>
-            <input type="submit" class="btn btn-info" value="Search">
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+    {{> tradingBody}}
 
-  <!-- Buy & Sell Stock -->
-  <div class="container">
-    <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-        <h1 class="display-4">Buy & Sell Stocks</h1>
-        <p class="lead">Please note all prices are in USD.</p>
-      </div>
-      <div class='chfont container'>
-        <form action="/trading-success-buy" method="POST">
-          <div class="row">
-            <div class="col">
-              <label for="stocksearch">Buy Stock</label>
-              <input type="text" class="form-control border border-right-0" name="buystockticker" id="buystockticker"
-                placeholder="Enter Stock Ticker e.g FB">
-            </div>
-            <div class="col">
-              <label for="stocksearch">Quantity</label>
-              <input type="number" class="form-control border border-right-0" name="buystockqty" id="buystockqty"
-                placeholder="Enter Quantity">
-            </div>
-          </div>
-          <br>
-          <input type="submit" class="btn btn-info" value="Buy">
-        </form>
-        <br><br>
-        <form action="/trading-success-sell" method="POST">
-          <div class="row">
-            <div class="col">
-              <label for="stocksearch">Sell Stock</label>
-              <input type="text" class="form-control" name="sellstockticker" id="sellstockticker"
-                placeholder="Enter Stock Ticker e.g FB">
-            </div>
-            <div class="col">
-              <label for="stocksearch">Quantity</label>
-              <input type="number" class="form-control" name="sellstockqty" id="sellstockqty"
-                placeholder="Enter Quantity">
-            </div>
-          </div>
-          <br>
-          <input type="submit" class="btn btn-info" value="Sell">
-        </form>
-      </div>
-    </div>
-  </div>
+    <!-- Footer -->
+    {{> footer}}
 
 
-  <!-- Footer -->
- {{> footer}}
-
-
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </body>
-<script>
-  {{!-- console.log({{{HTMLforImage}}}); --}}
-</script>
-
-
-<script>
-
-  {{#each currencyDataList}}
-      console.log("{{{HTMLforImage}}}");
-      console.log(["{{this.code}}",{{ this.price }},"{{this.img}}"])
-  {{/each}}
-
-</script>
 
 </html>
