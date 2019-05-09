@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Stock Name</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+    <!-- Nav Bar -->
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+    <h5 class="my-0 mr-md-auto font-weight-normal"><img src="images/logo.png" alt="logo" width="115" height="20">
+                <nav style="float: right; margin-left: 9px;">
+              <div class="dropdown">
+                  <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Ticker
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="#">Stocks</a>
+                      <a class="dropdown-item" href="/news/currency/{{this.code}}">Currency</a>
+                  </div>
+              </div>
+          </nav>
+    </h5>
+
+    <nav class="my-2 my-md-0 mr-md-3 nav-pills">
+      <a class="p-2 text-dark" href="#">Trading</a>
+      <a class="p-2 text-dark" href="#">Portfolio</a>
+    </nav>
+    <a class="btn btn-outline-danger" href="logout" style="margin-right: 7px;">Sign Out</a>
+    <a class="btn btn-outline-info" href="admin-sucess" style="margin-right: 7px;">Admin</a>
+  </div>
+
+
+
+  <!-- Website Content -->
+
+<div class="row p-5">
+<div class="col-6">
+<h2 class="sub-header">Stocks</h2>
+  <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="col-md-1">#</th>
+                  <th class="col-md-2">Header</th>
+                  <th class="col-md-3">Header</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-md-1">1,001</td>
+                  <td class="col-md-2">1,001</td>
+                  <td class="col-md-3">1,001</td>
+                </tr>
+                <tr>
+                  <td class="col-md-1">1,001</td>
+                  <td class="col-md-2">1,001</td>
+                  <td class="col-md-3">1,001</td>
+                </tr>
+                 <tr>
+                  <td class="col-md-1">1,001</td>
+                  <td class="col-md-2">1,001</td>
+                  <td class="col-md-3">1,001</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+</div>
+<div class="col-6">
+          <h2 class="sub-header">Currencies</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="col-md-1">#</th>
+                  <th class="col-md-2">Header</th>
+                  <th class="col-md-3">Header</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-md-1">1,001</td>
+                  <td class="col-md-2">1,001</td>
+                  <td class="col-md-3">1,001</td>
+                </tr>
+                <tr>
+                  <td class="col-md-1">1,001</td>
+                  <td class="col-md-2">1,001</td>
+                  <td class="col-md-3">1,001</td>
+                </tr>
+                 <tr>
+                  <td class="col-md-1">1,001</td>
+                  <td class="col-md-2">1,001</td>
+                  <td class="col-md-3">1,001</td>
+                </tr>
+              </tbody>
+            </table></div>
+</div>
+</div>
+</div>
