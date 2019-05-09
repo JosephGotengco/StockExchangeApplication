@@ -1,14 +1,16 @@
 <!DOCTYPE html>
     
 <head>
-    <title>Registration Page</title>
+    <title>{{display}}</title>
     <meta charset="utf-8">
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel='stylesheet' href='./css/style.css'>
 </head>
     
 <body>
@@ -18,51 +20,87 @@
 
         </div>
         
-        <div class="defmenu">
-            <div class='list-group'>
-                <a href="login" class="list-group-item">Logout</a>
-                <a href="registration-logged-in" class="list-group-item">Registration</a>
-                <a href="trading-success" class="list-group-item">Trading</a>
-                <a href="admin-success" class="list-group-item list-group-item-info">Admin Panel</a>
-            </div>
-        </div>
+        {{> loggedInNavbar}}
         
-        <div class="defcontent">
-            <br>
-            <div class='chfont container'>
 
-                <table name="mytable">
-                    <tr style="background: linear-gradient(to top, white, lightblue); border-padding:20px;">
-                        <th style= "padding:20px" name="id">ID</th>
-                        <th style= "padding:20px" name="username">Username</th>
-                        <th style= "padding:20px" name="firstname">First name</th>
-                        <th style= "padding:20px" name="lastname">Last Name</th>
-                        <th style= "padding:20px" name="balance">Balance</th>
-                        <th style= "padding:20px" name="balance">Type</th>
-
-                    </tr>
-                    
-                    <p>{{#each result}}
-                            <tr>
-                                <td style= "padding:20px">{{this._id}}</td>
-                                <td style= "padding:20px">{{this.username}}</td>
-                                <td style= "padding:20px">{{this.firstname}}</td>
-                                <td style= "padding:20px">{{this.lastname}}</td>
-                                <td style= "padding:20px">{{this.cash2}}</td>
-                                <td style= "padding:20px">{{this.type}}</td>
-                            </tr>
-                    {{/each}}</p>
-
-                </table>
-
+        <!-- Admin Panel -->
+        <div class="container">
+            <div class="jumbotron jumbotron-fluid">
+                <div class='container'>
+                        <h1>Welcome to the Admin Page</h1>
+                        <br>
+                        </p>
+                        <div>
+                                <div>
+                                    <table name="mytable">
+                                        <tr style="background-color: white; border-padding:20px;">
+                                            <th style= "padding:20px" name="id">ID</th>
+                                            <th style= "padding:20px" name="username">Username</th>
+                                            <th style= "padding:20px" name="firstname">First name</th>
+                                            <th style= "padding:20px" name="lastname">Last Name</th>
+                                            <th style= "padding:20px" name="balance">Balance</th>
+                                            <th style= "padding:20px" name="balance">Type</th>
+                                        </tr>
+                                        <p>
+                                        {{#each result}}
+                                                <tr style="background-color: white;">
+                                                    <td style= "padding:20px">{{this._id}}</td>
+                                                    <td style= "padding:20px">{{this.username}}</td>
+                                                    <td style= "padding:20px">{{this.firstname}}</td>
+                                                    <td style= "padding:20px">{{this.lastname}}</td>
+                                                    <td style= "padding:20px">{{this.cash2}}</td>
+                                                    <td style= "padding:20px">{{this.type}}</td>
+                                                </tr>
+                                        {{/each}}
+                                        </p>
+                                        </table>
+                                </div>
+                          </div>
+                          <br>
+                          <div class="form-group">
+                             <form action="/admin-success-user-accounts" method="POST">
+                                <input type="submit" class="btn btn-info" id="loadport" value="Load Users">
+                             </form> 
+                          </div>
+                        </div>
+                        <br>
+                        <div class='container'>
+                            <p><i>{{message}}</i></p>
+                            <div class="row">
+                                <div class="col">
+                                    <form  id="deleteuser" action='/admin-success-delete-user-success', method='POST'>
+                                        <label for="stocksearch">Enter Username to Delete</label>
+                                        <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
+                                        <br>
+                                            <p align="left">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </p>
+                                        <br>
+                                    </form>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                    <form  id="updateuser" action='/admin-success-change-user-type', method='POST'>
+                                        <label for="stocksearch">Enter Username to Change Type to Admin</label>
+                                        <input type="text" class="form-control" name="user_id" id="user_to_admin" placeholder="Username">
+                                        <br>
+                                            <p align="left">
+                                                <button type="submit" class="btn btn-danger">Update</button>
+                                            </p>
+                                        <br>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
             </div>
-
         </div>
-                <footer class="chfont page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-            <a href="">Stock Trader</a>  All Rights Reserved
 
-        </footer>
+
+        {{> footer}}
+
     </div> 
 
 
