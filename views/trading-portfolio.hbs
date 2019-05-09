@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>{{display}}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel='stylesheet' href='./css/style.css'>
+</head>
+
+<body>
+<style>
+    .header1{
+        margin-left: 43%;
+        padding-top:30px;
+        padding-bottom:40px;
+    }
+    .button2:hover {
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+    .button3{
+        float:left;
+    }
+    .button4{
+        color:white;
+        background-color: #119EBB;
+        border-radius: 5px;
+        padding-top:8px;
+        padding-right: 10px;
+        padding-left: 10px;
+        padding-bottom: 8px;
+    }
+    .profile{
+        float: left;
+        padding-right: 20px;
+    }
+</style>
+
+
+  <!-- NAV BAR -->
+  {{> loggedInNavbar}}
+
+  <!-- Portfolio -->
+  <div class="header1">
+      <h1>Portfolio</h1>
+  </div>
+  <div class="container">
+      <div class="jumbotron jumbotron-fluid">
+          <div class="container">
+              <div>
+                  <h3 class="lead">Your Profile</h3>
+              </div>
+              <br>
+          </div>
+          <div class='chfont container'>
+              <label class="lead">FirstName:</label>
+              <input type="text">
+              <br>
+              <br>
+              <label class="lead">LastName:</label>
+              <input type="text">
+              <br>
+              <br>
+              <label class="lead">UserName:</label>
+              <input type="text">
+              <br>
+              <br>
+              <div class="button3">
+                <button type="button" onclick="" class="button2 button4">Edit Profile</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="container">
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h3>Your Transaction History</h3>
+        <p class="lead">Please note all prices are in USD.</p>
+      </div>
+      <div class='chfont container'>
+        <p class="font-weight-bold">{{title}}</p>
+        <p class="font-weight-bold">{{head}}</p>
+        <br>
+        <form action="/trading-portfolio-holdings" method="POST">
+          <input type="submit" class="btn btn-info" id="loadport" value="Load Transactions">
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+ {{> footer}}
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

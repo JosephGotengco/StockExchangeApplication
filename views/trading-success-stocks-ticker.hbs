@@ -24,31 +24,32 @@
 
 
 
-  {{!-- <marquee behaviour="scroll"; bgcolor="black"; scrollamount=10; onmouseover="this.stop();" onmouseleave="this.start();">
-    <a href="/news/currency/CAD"><span style="color: red"><b>CAD:</b></span> <span style="color: white"><b>{{cad}}</b></span>{{{HTMLforImage}}}{{{img0}}}{{{alt}}}</a>,
-    <a href="/news/currency/BGN"><span style="color: red"><b>BGN:</b></span> <span style="color: white"><b>{{bgn}}</b></span>{{{HTMLforImage}}}{{{img1}}}{{{alt}}}</a>, 
-    <a href="/news/currency/EUR"><span style="color: red"><b>EUR:</b></span> <span style="color: white"><b>{{eur}}</b></span>{{{HTMLforImage}}}{{{img2}}}{{{alt}}}</a>, 
-    <a href="/news/currency/JPY"><span style="color: red"><b>JPY:</b></span> <span style="color: white"><b>{{jpy}}</b></span>{{{HTMLforImage}}}{{{img3}}}{{{alt}}}</a>, 
-    <a href="/news/currency/AUD"><span style="color: red"><b>AUD:</b></span> <span style="color: white"><b>{{aud}}</b></span>{{{HTMLforImage}}}{{{img4}}}{{{alt}}}</a>,
-    <a href="/news/currency/HKD"><span style="color: red"><b>HKD:</b></span> <span style="color: white"><b>{{hkd}}</b></span>{{{HTMLforImage}}}{{{img5}}}{{{alt}}}</a>, 
-    <a href="/news/currency/GBP"><span style="color: red"><b>GBP:</b></span> <span style="color: white"><b>{{gbp}}</b></span>{{{HTMLforImage}}}{{{img6}}}{{{alt}}}</a>, 
-    <a href="/news/currency/MXN"><span style="color: red"><b>MXN:</b></span> <span style="color: white"><b>{{mxn}}</b></span>{{{HTMLforImage}}}{{{img7}}}{{{alt}}}</a>, 
-    <a href="/news/currency/INR"><span style="color: red"><b>INR:</b></span> <span style="color: white"><b>{{inr}}</b></span>{{{HTMLforImage}}}{{{img8}}}{{{alt}}}</a>, 
-    <a href="/news/currency/CNY"><span style="color: red"><b>CNY:</b></span> <span style="color: white"><b>{{cny}}</b></span>{{{HTMLforImage}}}{{{img9}}}{{{alt}}}</a>
-  </marquee> --}}
-  
+    {{!-- <marquee behaviour="scroll" scrollamount=10; bgcolor="black";  onmouseover="this.stop();" onmouseleave="this.start();">
+        <a href="/news/stock/NFLX"> <span style="color: red"><b>NFLX:</b></span><span style="color: white">{{nflx_info}}</span>{{{HTMLforImage}}}{{{img0}}}{{{alt}}}</a>,
+        <a href="/news/stock/AAPL"> <span style="color: red"><b>AAPL:</b></span> <span style="color: white">{{aapl_info}}</span>{{{HTMLforImage}}}{{{img1}}}{{{alt}}}</a>, 
+        <a href="/news/stock/TSLA"> <span style="color: red"><b>TSLA:</b></span> <span style="color: white">{{tsla_info}}</span>{{{HTMLforImage}}}{{{img2}}}{{{alt}}}</a>, 
+        <a href="/news/stock/GOOG"> <span style="color: red"><b>GOOG:</b></span> <span style="color: white">{{goog_info}}</span>{{{HTMLforImage}}}{{{img3}}}{{{alt}}}</a>, 
+        <a href="/news/stock/SBUX"> <span style="color: red"><b>SBUX:</b></span> <span style="color: white">{{sbux_info}}</span>{{{HTMLforImage}}}{{{img4}}}{{{alt}}}</a>,
+        <a href="/news/stock/FB">   <span style="color: red"><b>FB:</b></span> <span style="color: white">{{fb_info}}</span>{{{HTMLforImage}}}{{{img5}}}{{{alt}}}</a>, 
+        <a href="/news/stock/BA">   <span style="color: red"><b>BA:</b></span> <span style="color: white">{{ba_info}}</span>{{{HTMLforImage}}}{{{img6}}}{{{alt}}}</a>, 
+        <a href="/news/stock/BABA"> <span style="color: red"><b>BABA:</b></span> <span style="color: white">{{baba_info}}</span>{{{HTMLforImage}}}{{{img7}}}{{{alt}}}</a>, 
+        <a href="/news/stock/NKE">  <span style="color: red"><b>NKE:</b></span> <span style="color: white">{{nke_info}}</span>{{{HTMLforImage}}}{{{img8}}}{{{alt}}}</a>, 
+        <a href="/news/stock/AMZN"> <span style="color: red"><b>AMZN:</b></span> <span style="color: white">{{amzn_info}}</span>{{{HTMLforImage}}}{{{img9}}}{{{alt}}}</a>
+    </marquee> --}}
+    
+    
   <marquee behaviour="scroll"; bgcolor="black"; scrollamount=10; onmouseover="this.stop();" onmouseleave="this.start();">
     {{#each marqueeData}}
-      <a href="/news/currency/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px; hspace=2; padding=2px;></a>,
+      <a href="/news/stock/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px; hspace=2; padding=2px;></a>,
     {{/each}}
   </marquee>
 
-  <form action='/trading-success-stocks' method="POST">
-      <input type="hidden" id="pref" name="pref" value="stock">
-      <button type="submit" class="btn btn-primary">Stocks</button>
-  </form>
 
-  
+    <form action='/trading-success' method="GET">
+        <input type="hidden" id="pref" name="pref" value="currency">
+        <button type="submit" class="btn btn-primary">Currencies</button>
+    </form>
+
   <br><br>
   <!-- Check Stock Price -->
   <div class="container">
@@ -66,7 +67,9 @@
             <input type="text" class="form-control border border-right-0" name="stocksearch" id="stocksearch"
               placeholder="Stock Ticker e.g. TSLA">
             <br><br>
-            <div class="alert alert-info font-weight-bold" role="alert">{{title}}</div>
+            <div class="alert alert-info font-weight-bold" role="alert">
+              {{title}}
+            </div>
             <br><br>
             <input type="submit" class="btn btn-info" value="Search">
           </form>
@@ -121,35 +124,21 @@
   </div>
 
 
+
+
+ 
+ 
+ 
   <!-- Footer -->
  {{> footer}}
 
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </body>
-<script>
-  {{!-- console.log({{{HTMLforImage}}}); --}}
-</script>
-
-
-<script>
-
-  {{#each currencyDataList}}
-      console.log("{{{HTMLforImage}}}");
-      console.log(["{{this.code}}",{{ this.price }},"{{this.img}}"])
-  {{/each}}
-
-</script>
 
 </html>

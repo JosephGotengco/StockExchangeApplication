@@ -1,63 +1,76 @@
 <!DOCTYPE html>
-    
+
 <head>
-    <title>Registration Page</title>
+    <title>{{display}}</title>
     <meta charset="utf-8">
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-    <!-- <script src="project.js"></script> -->
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel='stylesheet' href='./css/style.css'>
 </head>
-    
+
 <body>
 
-    <div class="defcontainer">
-        <div class="defheader">
-
+    <!-- NAV BAR -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+            STOCK NAME
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item ">
+                    <a class="nav-link" href="logout">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="registration-logged-in">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="trading-success">Trading</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="trading-portfolio">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href=" admin-restricted">Admin<span class="sr-only">(current)</span></a>
+                </li>
+            </ul>
         </div>
-        
-        <div class="defmenu">
-            <div class='list-group'>
-                <a href="logout" class="list-group-item">Logout</a>
-                <a href="registration-logged-in" class="list-group-item">Registration</a>
-                <a href="trading-success" class="list-group-item">Trading</a>
-                <a href="admin-restricted" class="list-group-item list-group-item-info">Admin Panel</a>
+    </nav>
+
+    <!-- content -->
+    <form action="/insert" method="POST">
+        <div class="content">
+            <div class="alert alert-danger not-login-msg" role="alert">
+                {{title}}
             </div>
         </div>
-        
-        <div class="defcontent">
-            <br>
-            <div class='chfont container'>
-
-                <form action ="/insert" method="POST">
-                <p>{{title}}</p>
-
-                    <br>
+    </form>
+    <div id='submission'></div>
+    <!-- Footer -->
+{{> footer}}
 
 
-                <br><br>
-
-                </form>
-
-                <div id='submission'></div>
-                
-            </div>
-
-        </div>
-                <footer class="chfont page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-            <a href="">Stock Trader</a>  All Rights Reserved
-
-        </footer>
-    </div> 
-
-
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
     <script type='text/javascript' src='bundle_1.js'></script>
-    </body>
+</body>
+
 </html>
