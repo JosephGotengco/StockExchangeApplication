@@ -18,15 +18,14 @@ function formatDate(date) {
     } catch(e) {
         if (e instanceof TypeError && e.message === "wrong type") {
             return false
-        }
-        if (e instanceof TypeError && e.message === "invalid date") {
+        } if (e instanceof TypeError && e.message === "invalid date") {
             return false
         } else {
-            console.log(e);
             return false
         }
     }
 }
+
 
 
 module.exports = {

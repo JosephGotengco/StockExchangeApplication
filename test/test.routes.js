@@ -1,147 +1,2154 @@
-// const request = require('supertest');
-// const assert = require('chai').assert;
-// var cheerio = require('cheerio');
+process.env.NODE_ENV = "test";
 
-// const app = require('../project');
-
-// describe('GET /', function () {
-//   it("should return webpage with title of 'Welcome to the login page.' ", function (done) {
-//       request(app)
-//           // put the end point you want to testin the .get('') method 
-//           .get('/')
-//           // I got no idea what the .set() method does
-//           .set('Accept', 'application/json')
-//           // this .expect() means you are expecting the response to be a html file!
-//           .expect('Content-Type', "text/html; charset=utf-8")
-//           // this .expect() means you are expecting a 200 status code
-//           .expect(200)
-//           // Only way to see what was returned (as far as I know) is to use .end and a callback
-//           .end(function(err, res) {
-//             // res is the app's response for the end point (whatever page gave for response.render() or response.send())
-//             // Console.log(res) 
-//             var $ = cheerio.load(res.text);
-//             // console.log(res.text);
-//             var title = $('form > p').text();
-//             assert.equal(title, 'Welcome to the login page.')
-//             done()
-//           })
-//   });
-// });
-
-
-// describe('GET /unknown-endpoint', function () {
-//   it("should return webpage with title of 'Sorry the URL \'localhost:8080/unknown-endpoint\' does not exist.' ", function (done) {
-//       request(app)
-//           .get('/unknown-endpoint')
-//           .set('Accept', 'application/json')
-//           .expect('Content-Type', "text/html; charset=utf-8")
-//           .expect(200)
-//           .end(function(err, res) {
-//             var $ = cheerio.load(res.text);
-//             var title = $('form > p').text();
-//             assert.equal(title, 'Sorry the URL \'localhost:8080/unknown-endpoint\' does not exist.')
-//             done()
-//           })
-//   });
-// });
+const request = require("supertest");
+const assert = require("chai").assert;
+const expect = require("chai").expect;
+var should = require("chai").should;
+var cheerio = require("cheerio");
+const nock = require("nock");
+var moment = require("moment");
+const mongoose = require("mongoose");
 
 
 
-// describe('GET /login-fail', function () {
-//     it("should return webpage with title of 'You have entered an invalid username or password. Please try again or create a new account.'' ", function (done) {
-//         request(app)
-//             .get('/login-fail')
-//             .set('Accept', 'application/json')
-//             .expect('Content-Type', "text/html; charset=utf-8")
-//             .expect(200)
-//             .end(function(err, res) {
-//               var $ = cheerio.load(res.text);
-//               var title = $('form > p').text();
-//               assert.equal(title, 'You have entered an invalid username or password. Please try again or create a new account.')
-//               done()
-//             })
-//     });
-//   });
+var chai = require("chai"),
+    chaiHttp = require("chai-http");
 
-// describe('GET /logout', function () {
-//   it("should return no webpage", function (done) {
-//       request(app)
-//           .get('/logout')
-//           .set('Accept', 'application/json')
-//           .expect('Content-Type', "text/html; charset=utf-8")
-//           .expect(200)
-//           .end(function(err, res) {
-//             assert.equal(res.text, '')
-//             done()
-//           })
-//   });
-// });
+chai.use(chaiHttp);
 
-// describe('GET /register', function () {
-//   it("should return webpage with title of 'To create an account please enter credentials.' ", function (done) {
-//       request(app)
-//           .get('/register')
-//           .set('Accept', 'application/json')
-//           .expect('Content-Type', "text/html; charset=utf-8")
-//           .expect(200)
-//           .end(function(err, res) {
-//             var $ = cheerio.load(res.text);
-//             var title = $('form > p').text();
-//             assert.equal(title, "To create an account please enter credentials.")
-//             done()
-//           })
-//   });
-// });
+const app = require("../project");
+const utils = require("../utils");
 
-// describe('GET /trading', function () {
-//   it("should return webpage with title of 'You are not logged in. You must be logged in to view this page.' ", function (done) {
-//       request(app)
-//           .post('/trading')
-//           .set('Accept', 'application/json')
-//           .expect('Content-Type', "text/html; charset=utf-8")
-//           .expect(200)
-//           .end(function(err, res) {
-//             var $ = cheerio.load(res.text);
-//             var title = $('div > p').text();
-//             assert.equal(title, "You are not logged in. You must be logged in to view this page.")
-//             done()
-//           })
-//   });
-// });
+beforeEach(() => {
+    nock("https://ws-api.iextrading.com")
+        .get(
+            "/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m"
+        )
+        .reply(200, reg_mock_data);
+});
+
+beforeEach(() => {
+    nock("https://api.exchangeratesapi.io")
+        .get("/latest?base=USD")
+        .reply(200, exchange_rate_mock_data);
+});
+
+var yesterday = moment().subtract(2, "days");
+var date = yesterday.format("YYYY-MM-DD");
+
+beforeEach(() => {
+    nock("https://api.exchangeratesapi.io")
+        .get(`/${date}?base=USD`)
+        .reply(200, yest_exchange_rate_mock_data);
+});
+
+beforeEach(() => {
+    nock("https://cloud.iexapis.com")
+        .get(`/beta/stock/FB/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`)
+        .reply(200, fb_mock_data);
+});
+
+beforeEach(() => {
+    nock("https://cloud.iexapis.com")
+        .get(`/beta/stock/RANDOM TICKER/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`)
+        .reply(200, "Unknown symbol");
+});
 
 
-// describe('GET /trading', function () {
-//   it("should return webpage with title of 'You are not logged in. You must be logged in to view this page.' ", function (done) {
-//       request(app)
-//           .post('/trading')
-//           .set('Accept', 'application/json')
-//           .expect('Content-Type', "text/html; charset=utf-8")
-//           .expect(200)
-//           .end(function(err, res) {
-//             var $ = cheerio.load(res.text);
-//             var title = $('div > p').text();
-//             assert.equal(title, "You are not logged in. You must be logged in to view this page.")
-//             done()
-//           })
-//   });
-// });
+const Fixtures = require("node-mongodb-fixtures");
+const uri = "mongodb://localhost:27017/accounts";
+const options = null;
 
-// // describe('GET /trading', function () {
-// //     it("should return webpage with title of 'You are not logged in. You must be logged in to view this page.' ", function (done) {
-// //         request(app)
-// //             .post('/register')
-// //             .set('Accept', 'application/json')
-// //             .send({
-// //                   "username": "JoeySalads",
-// //                   "password": "Castle12345"
-// //                 })
-// //             .expect('Content-Type', "text/html; charset=utf-8")
-// //             .expect(200)
-// //             .end(function(err, res) {
-// //               var $ = cheerio.load(res.text);
-// //               var title = $('form > p').text();
-// //               assert.equal(title, "You are not logged in. You must be logged in to view this page.")
-// //               done()
-// //             })
-// //     });
-// //   });
+const fixtures = new Fixtures({
+    dir: "test/fixtures",
+    filter: ".*"
+});
+
+
+fixtures
+    .connect("mongodb://localhost:27017/accounts")
+    .then(() => fixtures.unload())
+    .then(() => fixtures.load())
+    .catch(e => console.error(e))
+    .finally(() => fixtures.disconnect());
+
+var agent = chai.request.agent(app);
+describe("GET /unknown-endpoint", function () {
+    it("should return webpage with title of 'Sorry the URL 'localhost:8080/unknown-endpoint' does not exist.' ", function (done) {
+        request(app)
+            .get("/unknown-endpoint")
+            .end(function (err, res) {
+                expect(res).to.have.status(400);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("form > p").text();
+                assert.equal(
+                    title,
+                    "Sorry the URL 'localhost:8080/unknown-endpoint' does not exist."
+                );
+                done();
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/unknown-endpoint").then(function (res) {
+                    expect(res).to.have.status(400);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("form > p").text();
+                    assert.equal(
+                        title,
+                        "Sorry the URL 'localhost:8080/unknown-endpoint' does not exist."
+                    );
+                    done();
+                });
+            });
+    });
+});
+
+describe('/registration-logged-in', () => {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/registration-logged-in").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("div[role=alert]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "You are already logged in. Logout to make a new account.");
+                    assert.equal(display, "Register");
+                    done();
+                });
+            });
+    });
+});
+
+
+describe("GET/POST /register", function () {
+
+    it("should return webpage with title of 'To create an account please enter credentials.' ", function (done) {
+        request(app)
+            .get("/register")
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("div > h1").text();
+                assert.equal(title, "To create an account please enter credentials.");
+                done();
+            });
+    });
+
+    it("Invalid firstname", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "",
+                lastname: "validLastname",
+                username: "validUsername",
+                password: "validPassword",
+                confirm_password: "validPassword"
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "First name must be 3-30 characters long and must only contain letters."
+                );
+                done();
+            });
+    });
+
+    it("Invalid lastname", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "validFirstname",
+                lastname: "",
+                username: "validUsername",
+                password: "validPassword",
+                confirm_password: "validPassword"
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "Last name must be 3-30 characters long and must only contain letters."
+                );
+                done();
+            });
+    });
+
+    it("Invalid username", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "validFirstname",
+                lastname: "validLastname",
+                username: "",
+                password: "validPassword",
+                confirm_password: "validPassword"
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "Username must have 5-15 characters and may only be alphanumeric."
+                );
+                done();
+            });
+    });
+
+    it("Invalid password", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "validFirstname",
+                lastname: "validLastname",
+                username: "validUsername",
+                password: "",
+                confirm_password: "validPassword"
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "Password must have 5-15 characters and may only be alphanumeric."
+                );
+                done();
+            });
+    });
+
+    it("Passwords do not match", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "validFirstname",
+                lastname: "validLastname",
+                username: "validUsername",
+                password: "validPassword",
+                confirm_password: ""
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(title, "Passwords do not match. Please try again.");
+                done();
+            });
+    });
+
+    it("Successful creation", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "validFirstname",
+                lastname: "validLastname",
+                username: "validUsername",
+                password: "validPassword",
+                confirm_password: "validPassword"
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "You have successfully created an account with the username 'validUsername' and have been granted $10,000 USD. Head over to the login page."
+                );
+                done();
+            });
+    });
+
+    it("Successful creation", function (done) {
+        request(app)
+            .post("/register")
+            .send({
+                _method: "post",
+                firstname: "validFirstname",
+                lastname: "validLastname",
+                username: "validUsername",
+                password: "validPassword",
+                confirm_password: "validPassword"
+            })
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "The username 'validUsername' already exists within the system."
+                );
+                done();
+            });
+    });
+});
+
+
+
+describe("GET/POST /", function () {
+    it("should return webpage with title of 'Welcome to the login page.' ", function (done) {
+        request(app)
+            .get("/")
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("div > h1").text();
+                assert.equal(title, "Welcome to the login page.");
+                done();
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("div[role=alert]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the trading page.");
+                    assert.equal(display, "Trading");
+                    done();
+                });
+            });
+    });
+
+    it("Invalid username", function (done) {
+        agent
+            .post("/")
+            .send({
+                _method: "post",
+                username: "Invalid Username",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.redirect;
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the login page.");
+                    assert.equal(display, "Login");
+                    done();
+                });
+            });
+    });
+
+});
+
+
+var agent = chai.request.agent(app);
+describe("POST /login", function () {
+    it("Should log me in.' ", function (done) {
+        request(app)
+            .get("/login")
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("h1[class=title]").text();
+                assert.equal(
+                    title,
+                    "Welcome to the login page."
+                );
+                done();
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("div[role=alert]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the trading page.");
+                    assert.equal(display, "Trading");
+                    done();
+                });
+            });
+    });
+
+    it("Invalid username", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "Invalid Username",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.redirect;
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the login page.");
+                    assert.equal(display, "Login");
+                    done();
+                });
+            });
+    });
+
+    it("Invalid password", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Invalid password"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.redirect;
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the login page.");
+                    assert.equal(display, "Login");
+                    done();
+                });
+            });
+    });
+});
+
+
+
+var agent = chai.request.agent(app);
+describe("GET/POST /login", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login-fail")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("div[role=alert]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the trading page.");
+                    assert.equal(display, "Trading");
+                    done();
+                });
+            });
+    });
+
+    it("Invalid username", function (done) {
+        agent
+            .post("/login-fail")
+            .send({
+                _method: "post",
+                username: "Invalid Username",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.redirect;
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the login page.");
+                    assert.equal(display, "Login");
+                    done();
+                });
+            });
+    });
+
+    it("Invalid password", function (done) {
+        agent
+            .post("/login-fail")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Invalid password"
+            })
+            .then(function (res) {
+                return agent.get("/trading-success").then(function (res) {
+                    expect(res).to.redirect;
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the login page.");
+                    assert.equal(display, "Login");
+                    done();
+                });
+            });
+    });
+});
+
+
+describe("GET /logout", function () {
+    it("should return no webpage", function (done) {
+        request(app)
+            .get("/logout")
+            .set("Accept", "application/json")
+            .end(function (err, res) {
+                expect(res).to.redirect;
+                expect(res).to.have.status(302);
+                expect(res).to.redirectTo('/');
+                assert.equal(res.text, "");
+                done();
+            });
+    });
+});
+
+
+
+
+
+
+
+
+
+describe("GET /news-hub", function () {
+    it("Check stock data was received", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/news-hub").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var nflx_patt = /NFLX/;
+                    assert.isTrue(nflx_patt.test(res.text));
+                    var aapl_patt = /AAPL/;
+                    assert.isTrue(aapl_patt.test(res.text));
+                    var tsla_patt = /TSLA/;
+                    assert.isTrue(tsla_patt.test(res.text));
+                    var goog_patt = /GOOG/;
+                    assert.isTrue(goog_patt.test(res.text));
+                    var sbux_patt = /SBUX/;
+                    assert.isTrue(sbux_patt.test(res.text));
+                    var fb_patt = /FB/;
+                    assert.isTrue(fb_patt.test(res.text));
+                    var ba_patt = /BA/;
+                    assert.isTrue(ba_patt.test(res.text));
+                    var baba_patt = /BABA/;
+                    assert.isTrue(baba_patt.test(res.text));
+                    var nke_patt = /NKE/;
+                    assert.isTrue(nke_patt.test(res.text));
+                    var amzn_patt = /AMZN/;
+                    assert.isTrue(amzn_patt.test(res.text));
+                    done();
+                });
+            });
+    });
+
+    it("Check currency data was received", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/news-hub").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var cad_patt = /CAD/;
+                    assert.isTrue(cad_patt.test(res.text));
+                    var bgn_patt = /BGN/;
+                    assert.isTrue(bgn_patt.test(res.text));
+                    var eur_patt = /EUR/;
+                    assert.isTrue(eur_patt.test(res.text));
+                    var jpy_patt = /JPY/;
+                    assert.isTrue(jpy_patt.test(res.text));
+                    var aud_patt = /AUD/;
+                    assert.isTrue(aud_patt.test(res.text));
+                    var hkd_patt = /HKD/;
+                    assert.isTrue(hkd_patt.test(res.text));
+                    var gbp_patt = /GBP/;
+                    assert.isTrue(gbp_patt.test(res.text));
+                    var mxn_patt = /MXN/;
+                    assert.isTrue(mxn_patt.test(res.text));
+                    var inr_patt = /INR/;
+                    assert.isTrue(inr_patt.test(res.text));
+                    var cny_patt = /CNY/;
+                    assert.isTrue(cny_patt.test(res.text));
+                    done();
+                });
+            });
+    });
+});
+
+
+
+describe("GET /trading", function () {
+    it("should return webpage with title of 'You are not logged in. You must be logged in to view this page.' ", function (done) {
+        request(app)
+            .get("/trading")
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("div[role=alert]").text();
+                assert.equal(
+                    title,
+                    "You are not logged in. You must be logged in to view this page."
+                );
+                done();
+            });
+    });
+});
+
+
+var agent = chai.request.agent(app);
+describe("POST /login", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-stocks").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("div[role=alert]").text();
+                    var display = $("title").text();
+                    assert.equal(title, "Welcome to the trading page.");
+                    assert.equal(display, "Trading");
+                    done();
+                });
+            });
+    });
+});
+
+
+var agent = chai.request.agent(app);
+describe("GET /news/currency/:id", function () {
+    it("Check if graph was generated", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/news/currency/CAD").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var display = $("title").text();
+                    assert.equal(display, "CAD Price");
+                    var patt = /compared to USD/;
+                    assert.isTrue(patt.test(res.text));
+                    done();
+                });
+            });
+    });
+});
+
+describe("GET /news/stock/:id", function () {
+    it("Check if graph was generated", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.get("/news/stock/FB").then(function (res) {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var display = $("title").text();
+                    assert.equal(display, "FB Price");
+                    var patt = /compared to USD/;
+                    assert.isTrue(patt.test(res.text));
+                    done();
+                });
+            });
+    });
+});
+
+var agent = chai.request.agent(app);
+describe("POST /trading-success-search", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/trading-success-stocks")
+                .then(function (res) {
+                    return agent.post("/trading-success-search")
+                    .send({
+                        _method: "post",
+                        stocksearch: "FB"
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "The price of the selected ticker \'FB\' which belongs to \'Facebook, Inc.\' is currently: $195.47 USD.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+                })
+
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-search")
+                    .send({
+                        _method: "post",
+                        stocksearch: ""
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Please enter a stock ticker i.e. TSLA, MSFT");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-search")
+                    .send({
+                        _method: "post",
+                        stocksearch: "Random Ticker"
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Sorry the stock ticker \'RANDOM TICKER\' is invalid.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/trading-success-stocks")
+                    .then(function (res) {
+                        return agent.post("/trading-success-search")
+                            .send({
+                                _method: "post",
+                                stocksearch: "FB"
+                            })
+                            .then(function (res) {
+                                expect(res).to.have.status(200);
+                                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                                var $ = cheerio.load(res.text);
+                                var title = $("div[role=alert]").text();
+                                var display = $("title").text();
+                                assert.equal(title, "The price of the selected ticker \'FB\' which belongs to \'Facebook, Inc.\' is currently: $195.47 USD.");
+                                assert.equal(display, "Trading");
+                                done();
+                            });
+                    });
+            });
+    });
+});
+
+
+
+
+var agent = chai.request.agent(app);
+describe("POST /trading-success-buy", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-buy")
+                    .send({
+                        _method: "post",
+                        buystockticker: "FB",
+                        buystockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You successfully purchased 1 shares of Facebook, Inc. (FB) at $195.47/share for $195.47.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-buy")
+                    .send({
+                        _method: "post",
+                        buystockticker: "FB",
+                        buystockqty: 0
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Sorry you need to purchase at least 1 stock. Change your quantity to 1 or more.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-buy")
+                    .send({
+                        _method: "post",
+                        buystockticker: "FB",
+                        buystockqty: -1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You cannot buy negative shares.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JimmyT",
+                password: "Claire"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-buy")
+                    .send({
+                        _method: "post",
+                        buystockticker: "FB",
+                        buystockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Sorry you only have $0. The purchase did not go through. The total cost was $195.47.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JimmyT",
+                password: "Claire"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-buy")
+                    .send({
+                        _method: "post",
+                        buystockticker: "",
+                        buystockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Sorry, you must input a stock to buy.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JimmyT",
+                password: "Claire"
+            })
+            .then(function (res) {
+                agent.post("/trading-success-stocks")
+                    .then(function (res) {
+                        return agent.post("/trading-success-buy")
+                            .send({
+                                _method: "post",
+                                buystockticker: "Random Ticker",
+                                buystockqty: 1
+                            })
+                            .then(function (res) {
+                                expect(res).to.have.status(200);
+                                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                                var $ = cheerio.load(res.text);
+                                var title = $("div[role=alert]").text();
+                                var display = $("title").text();
+                                assert.equal(title, "Sorry the stock ticker \'Random Ticker\' is invalid.");
+                                assert.equal(display, "Trading");
+                                done();
+                            });
+                    });
+            });
+    });
+});
+
+
+
+
+
+var agent = chai.request.agent(app);
+describe("POST /trading-success-buy", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "FB",
+                        sellstockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You successfully sold 1 shares of Facebook, Inc. (FB) at $195.47/share for $195.47.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "FB",
+                        sellstockqty: 0
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You need to sell at least 1 share of FB.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "FB",
+                        sellstockqty: 100
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You are trying to sell 100 shares of FB when you only have 4 shares.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "SNAP",
+                        sellstockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You do not own any shares with the ticker \'SNAP\'.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                agent.post("/trading-success-stocks")
+                    .then(function (res) {
+                        return agent.post("/trading-success-sell")
+                            .send({
+                                _method: "post",
+                                sellstockticker: "",
+                                sellstockqty: 1
+                            })
+                            .then(function (res) {
+                                expect(res).to.have.status(200);
+                                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                                var $ = cheerio.load(res.text);
+                                var title = $("div[role=alert]").text();
+                                var display = $("title").text();
+                                assert.equal(title, "You cannot leave the sell input blank. Please input a stock ticker");
+                                assert.equal(display, "Trading");
+                                done();
+                            });
+                    });
+            });
+    });
+});
+
+
+
+
+var agent = chai.request.agent(app);
+describe("POST /trading-success-buy", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "FB",
+                        sellstockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You successfully sold 1 shares of Facebook, Inc. (FB) at $195.47/share for $195.47.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "FB",
+                        sellstockqty: 0
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You need to sell at least 1 share of FB.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                return agent.post("/trading-success-sell")
+                    .send({
+                        _method: "post",
+                        sellstockticker: "SNAP",
+                        sellstockqty: 1
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "You do not own any shares with the ticker \'SNAP\'.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+            });
+    });
+
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                agent.post("/trading-success-stocks")
+                    .then(function (res) {
+                        return agent.post("/trading-success-sell")
+                            .send({
+                                _method: "post",
+                                sellstockticker: "",
+                                sellstockqty: 1
+                            })
+                            .then(function (res) {
+                                expect(res).to.have.status(200);
+                                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                                var $ = cheerio.load(res.text);
+                                var title = $("div[role=alert]").text();
+                                var display = $("title").text();
+                                assert.equal(title, "You cannot leave the sell input blank. Please input a stock ticker");
+                                assert.equal(display, "Trading");
+                                done();
+                            });
+                    });
+            });
+    });
+});
+
+
+var agent = chai.request.agent(app);
+describe("POST /trading-portfolio", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                agent.get("/trading-portfolio")
+                    .then(function (res) {
+                        agent.post("/trading-portfolio-holdings")
+                            .then(function (res) {
+                                expect(res).to.have.status(200);
+                                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                                var $ = cheerio.load(res.text);
+                                var title = $("h1[class=display-4]").text();
+                                var display = $("title").text();
+                                assert.equal(title, "Your Portfolio");
+                                assert.equal(display, "Portfolio");
+                                done();
+                            });
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JimmyT",
+                password: "Claire"
+            })
+            .then(function (res) {
+                agent.get("/trading-portfolio")
+                    .then(function (res) {
+                        agent.post("/trading-portfolio-holdings")
+                            .then(function (res) {
+                                expect(res).to.have.status(200);
+                                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                                var $ = cheerio.load(res.text);
+                                var title = $("h1[class=display-4]").text();
+                                var display = $("title").text();
+                                assert.equal(title, "Your Portfolio");
+                                assert.equal(display, "Portfolio");
+                                done();
+                            });
+                    });
+            });
+    });
+});
+
+describe("GET /admin", function () {
+    it("should return webpage with title of 'Sorry the URL 'localhost:8080/unknown-endpoint' does not exist.' ", function (done) {
+        request(app)
+            .get("/admin")
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                var $ = cheerio.load(res.text);
+                var title = $("div[role=alert]").text();
+                assert.equal(
+                    title,
+                    "You are not authorized to view this page. Please log in with an administrator account."
+                );
+                done();
+            });
+    });
+});
+
+var agent = chai.request.agent(app);
+describe("GET /admin-restricted", function () {
+    it("should return webpage with title of 'Sorry the URL 'localhost:8080/unknown-endpoint' does not exist.' ", function (done) {
+        request(app)
+            .get("/admin-success")
+            .end(function (err, res) {
+                expect(res).to.have.status(302);
+                expect(res).to.have.header('content-type', 'text/plain; charset=utf-8');
+                expect(res).to.redirectTo('/admin-restricted');
+                done();
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "AlexC",
+                password: "LeagueOfLegends"
+            })
+            .then(function (res) {
+                agent.get("/admin-restricted")
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        assert.equal(
+                            title,
+                            "You are not authorized to view this page. Go back to the Trading page."
+                        );
+                        done();
+                    });
+            });
+    });
+});
+
+var agent = chai.request.agent(app);
+describe("POST /admin-success", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.get("/admin-success")
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+});
+
+var agent = chai.request.agent(app);
+describe("POST /admin-success-user-accounts", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-success-user-accounts")
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+});
+
+var agent = chai.request.agent(app);
+describe("POST /admin-success-user-accounts", function () {
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-success-delete-user-success")
+                    .send({
+                        _method: "post",
+                        user_id: "invalid username"
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-success-delete-user-success")
+                    .send({
+                        _method: "post",
+                        user_id: "JoeySalads"
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-success-delete-user-success")
+                    .send({
+                        _method: "post",
+                        user_id: "JimmyT"
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-success-delete-user-success")
+                    .send({
+                        _method: "post",
+                        user_id: "JimmyT"
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-update")
+                    .send({
+                        _method: "post",
+                        user_id: "JimmyT",
+                        newBal: 50000
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-update")
+                    .send({
+                        _method: "post",
+                        user_id: "JoeySalads",
+                        newBal: 500000
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-update")
+                    .send({
+                        _method: "post",
+                        user_id: "JoeySalads",
+                        newBal: -1
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+
+    it("Successful log in", function (done) {
+        agent
+            .post("/login")
+            .send({
+                _method: "post",
+                username: "JoeySalads",
+                password: "Castle12345"
+            })
+            .then(function (res) {
+                agent.post("/admin-update")
+                    .send({
+                        _method: "post",
+                        user_id: "",
+                        newBal: 100
+                    })
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div > h1").text();
+                        assert.equal(
+                            title,
+                            "Welcome to the Admin Page"
+                        );
+                        done();
+                    });
+            });
+    });
+});
+
+
+var reg_mock_data = {
+    NFLX: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 374,
+                high: 385.99,
+                low: 373.1746,
+                close: 378.81,
+                volume: 9257284,
+                unadjustedVolume: 9257284,
+                change: 8.27,
+                changePercent: 2.232,
+                vwap: 381.3765,
+                label: "May 1",
+                changeOverTime: 0.06240183980255777
+            },
+            {
+                date: "2019-05-02",
+                open: 378,
+                high: 383.5,
+                low: 374.51,
+                close: 379.06,
+                volume: 5398167,
+                unadjustedVolume: 5398167,
+                change: 0.25,
+                changePercent: 0.066,
+                vwap: 378.6371,
+                label: "May 2",
+                changeOverTime: 0.06310298407000224
+            }
+        ]
+    },
+    AAPL: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 209.88,
+                high: 215.31,
+                low: 209.23,
+                close: 210.52,
+                volume: 64827328,
+                unadjustedVolume: 64827328,
+                change: 9.85,
+                changePercent: 4.909,
+                vwap: 212.7216,
+                label: "May 1",
+                changeOverTime: 0.10829165569886824
+            },
+            {
+                date: "2019-05-02",
+                open: 209.84,
+                high: 212.65,
+                low: 208.13,
+                close: 209.15,
+                volume: 31996324,
+                unadjustedVolume: 31996324,
+                change: -1.37,
+                changePercent: -0.651,
+                vwap: 210.2061,
+                label: "May 2",
+                changeOverTime: 0.10107923137667817
+            }
+        ]
+    },
+    TSLA: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 238.85,
+                high: 240,
+                low: 231.5,
+                close: 234.01,
+                volume: 10704354,
+                unadjustedVolume: 10704354,
+                change: -4.68,
+                changePercent: -1.961,
+                vwap: 234.5726,
+                label: "May 1",
+                changeOverTime: -0.16383191595797905
+            },
+            {
+                date: "2019-05-02",
+                open: 245.52,
+                high: 247.13,
+                low: 237.72,
+                close: 244.1,
+                volume: 18159339,
+                unadjustedVolume: 18159339,
+                change: 10.09,
+                changePercent: 4.312,
+                vwap: 242.4752,
+                label: "May 2",
+                changeOverTime: -0.12777817480168663
+            }
+        ]
+    },
+    GOOG: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 1188.05,
+                high: 1188.05,
+                low: 1167.18,
+                close: 1168.08,
+                volume: 2642983,
+                unadjustedVolume: 2642983,
+                change: -20.4,
+                changePercent: -1.716,
+                vwap: 1175.04,
+                label: "May 1",
+                changeOverTime: -0.00445747500660526
+            },
+            {
+                date: "2019-05-02",
+                open: 1167.76,
+                high: 1174.19,
+                low: 1155,
+                close: 1162.61,
+                volume: 1944817,
+                unadjustedVolume: 1944817,
+                change: -5.47,
+                changePercent: -0.468,
+                vwap: 1162.6,
+                label: "May 2",
+                changeOverTime: -0.009119499535502165
+            }
+        ]
+    },
+    SBUX: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 77.67,
+                high: 78.15,
+                low: 77.37,
+                close: 77.52,
+                volume: 6678194,
+                unadjustedVolume: 6678194,
+                change: -0.16,
+                changePercent: -0.206,
+                vwap: 77.6881,
+                label: "May 1",
+                changeOverTime: 0.04277643260694098
+            },
+            {
+                date: "2019-05-02",
+                open: 77.66,
+                high: 77.76,
+                low: 76.75,
+                close: 77.47,
+                volume: 6247550,
+                unadjustedVolume: 6247550,
+                change: -0.05,
+                changePercent: -0.064,
+                vwap: 77.2603,
+                label: "May 2",
+                changeOverTime: 0.04210384718859289
+            }
+        ]
+    },
+    FB: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 194.78,
+                high: 196.1769,
+                low: 193.01,
+                close: 193.03,
+                volume: 15996646,
+                unadjustedVolume: 15996646,
+                change: -0.37,
+                changePercent: -0.191,
+                vwap: 194.5946,
+                label: "May 1",
+                changeOverTime: 0.15801787749715043
+            },
+            {
+                date: "2019-05-02",
+                open: 193,
+                high: 194,
+                low: 189.75,
+                close: 192.53,
+                volume: 13209452,
+                unadjustedVolume: 13209452,
+                change: -0.5,
+                changePercent: -0.259,
+                vwap: 191.9705,
+                label: "May 2",
+                changeOverTime: 0.15501829743835865
+            }
+        ]
+    },
+    BA: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 378.53,
+                high: 381.1951,
+                low: 376.38,
+                close: 376.8,
+                volume: 2765572,
+                unadjustedVolume: 2765572,
+                change: -0.89,
+                changePercent: -0.236,
+                vwap: 379.0197,
+                label: "May 1",
+                changeOverTime: -0.012112631744533597
+            },
+            {
+                date: "2019-05-02",
+                open: 375.5,
+                high: 377.65,
+                low: 373.25,
+                close: 375.8,
+                volume: 2438759,
+                unadjustedVolume: 2438759,
+                change: -1,
+                changePercent: -0.265,
+                vwap: 375.1206,
+                label: "May 2",
+                changeOverTime: -0.014734413507419653
+            }
+        ]
+    },
+    BABA: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 186.75,
+                high: 193.195,
+                low: 185.88,
+                close: 189.31,
+                volume: 17405482,
+                unadjustedVolume: 17405482,
+                change: 3.74,
+                changePercent: 2.015,
+                vwap: 190.1792,
+                label: "May 1",
+                changeOverTime: 0.037599342285557766
+            },
+            {
+                date: "2019-05-02",
+                open: 189.42,
+                high: 192.7,
+                low: 186.65,
+                close: 190.39,
+                volume: 11468106,
+                unadjustedVolume: 11468106,
+                change: 1.08,
+                changePercent: 0.57,
+                vwap: 189.9392,
+                label: "May 2",
+                changeOverTime: 0.043518772266374336
+            }
+        ]
+    },
+    NKE: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 87.73,
+                high: 87.95,
+                low: 85.87,
+                close: 85.9,
+                volume: 6524576,
+                unadjustedVolume: 6524576,
+                change: -1.93,
+                changePercent: -2.197,
+                vwap: 86.7088,
+                label: "May 1",
+                changeOverTime: 0.020068875430471585
+            },
+            {
+                date: "2019-05-02",
+                open: 86.21,
+                high: 86.28,
+                low: 84.985,
+                close: 85.27,
+                volume: 6813740,
+                unadjustedVolume: 6813740,
+                change: -0.63,
+                changePercent: -0.733,
+                vwap: 85.3986,
+                label: "May 2",
+                changeOverTime: 0.01258757867236673
+            }
+        ]
+    },
+    AMZN: {
+        chart: [
+            {
+                date: "2019-05-01",
+                open: 1933.09,
+                high: 1943.64,
+                low: 1910.55,
+                close: 1911.52,
+                volume: 3116964,
+                unadjustedVolume: 3116964,
+                change: -15,
+                changePercent: -0.779,
+                vwap: 1931.58,
+                label: "May 1",
+                changeOverTime: 0.07343535027376105
+            },
+            {
+                date: "2019-05-02",
+                open: 1913.33,
+                high: 1921.55,
+                low: 1881.87,
+                close: 1900.82,
+                volume: 3962915,
+                unadjustedVolume: 3962915,
+                change: -10.7,
+                changePercent: -0.56,
+                vwap: 1899.98,
+                label: "May 2",
+                changeOverTime: 0.0674266460760915
+            }
+        ]
+    }
+};
+
+var yest_exchange_rate_mock_data = {
+    base: "USD",
+    rates: {
+        BGN: 1.74344803,
+        NZD: 1.4980388661,
+        ILS: 3.6056338028,
+        RUB: 64.3696737386,
+        CAD: 1.3438224282,
+        USD: 1.0,
+        PHP: 51.8140488501,
+        CHF: 1.0195221965,
+        AUD: 1.4183455161,
+        JPY: 111.3656623284,
+        TRY: 5.9647887324,
+        HKD: 7.845159565,
+        MYR: 4.1285434124,
+        HRK: 6.6081297914,
+        CZK: 22.8730611517,
+        IDR: 14221.5011588518,
+        DKK: 6.6541272954,
+        NOK: 8.6181137458,
+        HUF: 287.9033695846,
+        GBP: 0.7688357996,
+        MXN: 18.9720984133,
+        THB: 31.9147798181,
+        ISK: 121.4120164022,
+        ZAR: 14.2827598502,
+        BRL: 3.9267249064,
+        SGD: 1.3605812088,
+        PLN: 3.8213585309,
+        INR: 69.5859333214,
+        KRW: 1165.9921554644,
+        RON: 4.2428240328,
+        CNY: 6.7339097878,
+        SEK: 9.4802995186,
+        EUR: 0.8914244963
+    },
+    date: "2019-04-30"
+};
+
+var exchange_rate_mock_data = {
+    base: "USD",
+    rates: {
+        BGN: 1.7443810203,
+        NZD: 1.508740635,
+        ILS: 3.5975740278,
+        RUB: 65.334909026,
+        CAD: 1.3435604709,
+        USD: 1.0,
+        PHP: 51.7508027114,
+        CHF: 1.0184623618,
+        AUD: 1.4243667499,
+        JPY: 111.4966107742,
+        TRY: 5.9643239386,
+        HKD: 7.8449875134,
+        MYR: 4.1369960756,
+        HRK: 6.6128255441,
+        CZK: 22.8754905458,
+        IDR: 14250.0,
+        DKK: 6.6584909026,
+        NOK: 8.6915804495,
+        HUF: 288.9760970389,
+        GBP: 0.7664109882,
+        MXN: 18.9499643239,
+        THB: 32.0246164823,
+        ISK: 122.5472707813,
+        ZAR: 14.4646806993,
+        BRL: 3.9328398145,
+        SGD: 1.3609525508,
+        PLN: 3.8173385658,
+        INR: 69.3738851231,
+        KRW: 1163.1733856582,
+        RON: 4.2439350696,
+        CNY: 6.7345701035,
+        SEK: 9.5299678915,
+        EUR: 0.8919015341
+    },
+    date: "2019-05-02"
+};
+
+var fb_mock_data = {
+    "symbol": "FB",
+    "companyName": "Facebook, Inc.",
+    "calculationPrice": "close",
+    "open": null,
+    "openTime": null,
+    "close": 195.47,
+    "closeTime": 1556913600183,
+    "high": 196.16,
+    "low": 193.71,
+    "latestPrice": 195.47,
+    "latestSource": "Close",
+    "latestTime": "May 3, 2019",
+    "latestUpdate": 1556913600183,
+    "latestVolume": 14553073,
+    "iexRealtimePrice": null,
+    "iexRealtimeSize": null,
+    "iexLastUpdated": null,
+    "delayedPrice": 195.47,
+    "delayedPriceTime": 1556913600183,
+    "extendedPrice": 195.69,
+    "extendedChange": 0.22,
+    "extendedChangePercent": 0.00113,
+    "extendedPriceTime": 1557100780038,
+    "previousClose": 192.53,
+    "change": 2.94,
+    "changePercent": 0.01527,
+    "iexMarketPercent": null,
+    "iexVolume": null,
+    "avgTotalVolume": 16839635,
+    "iexBidPrice": null,
+    "iexBidSize": null,
+    "iexAskPrice": null,
+    "iexAskSize": null,
+    "marketCap": 557976933800,
+    "peRatio": 28.8,
+    "week52High": 218.62,
+    "week52Low": 123.02,
+    "ytdChange": 0.455939
+}
