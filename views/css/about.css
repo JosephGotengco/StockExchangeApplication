@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css?family=Quantico');
+
+* {
+    box-sizing: border-box;
+
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    height: 100%;
+    color: black;
+    font-family: 'Quantico', sans-serif;
+}
+
+.container {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.row{
+    height: 100vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.row:nth-child(1) {
+    background-image: url("../images/about-hero-img.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+p {
+    font-size: 30px;
+}
