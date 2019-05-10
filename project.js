@@ -341,7 +341,8 @@ app.get("/news-hub", isAuthenticated, async (request, response) => {
 	response.render("news-hub.hbs", {
 		title: "Stock and Currency.",
 		currencyDataList: ssn.currencyDataList,
-		stockDataList: ssn.stockDataList
+		stockDataList: ssn.stockDataList,
+		display: "Ranking"
 	});
 });
 
@@ -1022,7 +1023,8 @@ app.get("/admin", (request, response) => {
 	// called when user who is not logged in tries to access the admin page
 	response.render("admin-restricted-not-logged-in.hbs", {
 		title:
-			"You are not authorized to view this page. Please log in with an administrator account."
+			"You are not authorized to view this page. Please log in with an administrator account.",
+			display: "Admin"
 	});
 });
 
@@ -1030,7 +1032,8 @@ app.get("/admin-restricted", isAuthenticated, (request, response) => {
 	// called when user is logged in and tries to access the admin page
 	response.render("admin-restricted.hbs", {
 		title:
-			"You are not authorized to view this page. Go back to the Trading page."
+			"You are not authorized to view this page. Go back to the Trading page.",
+			display: "Admin"
 	});
 });
 
@@ -1047,7 +1050,8 @@ app.get("/admin-success", isAdmin, (request, response) => {
 				}
 				response.render("admin-success.hbs", {
 					title: "Welcome to the Admin page",
-					result: result
+					result: result,
+					display: "Admin"
 				});
 			});
 		db.close;
@@ -1069,7 +1073,8 @@ app.post("/admin-success-user-accounts", isAdmin, function (
 					response.send("Unable to fetch Accounts");
 				}
 				response.render("admin-success-user-accounts-list.hbs", {
-					result: result
+					result: result,
+					display: "Admin"
 				});
 			});
 		db.close;
@@ -1108,13 +1113,15 @@ app.post("/admin-success-delete-user-success", isAdmin, function (
 						if (err) {
 							message = "Unable to Delete Account";
 							response.render("admin-success-user-accounts-list.hbs", {
-								message: message
+								message: message,
+								display: "Admin"
 							});
 						}
 						if (result === undefined || result.length == 0) {
 							message = "No user exists with that username";
 							response.render("admin-success-user-accounts-list.hbs", {
-								message: message
+								message: message,
+								display: "Admin"
 							});
 						} else {
 							db.collection("user_accounts").deleteOne(query, function (
@@ -1124,7 +1131,8 @@ app.post("/admin-success-delete-user-success", isAdmin, function (
 								if (err) throw err;
 								message = "User is Deleted";
 								response.render("admin-success-user-accounts-list.hbs", {
-									message: message
+									message: message,
+									display: "Admin"
 								});
 								db.close;
 							});
@@ -1153,21 +1161,25 @@ app.post("/admin-update", isAdmin, (request, response) => {
 		if (check_str(newFN) === false) {
 			message = `First name must be 3-30 characters long and must only contain letters.`;
 			response.render("admin-success-user-accounts-list.hbs", {
-				message: message
+				message: message,
+				display: "Admin"
 			});
 		} else if (check_str(newLN) === false) {
 			message = `Last name must be 3-30 characters long and must only contain letters.`;
 			response.render("admin-success-user-accounts-list.hbs", {
-				message: message
+				message: message,
+				display: "Admin"
 			});
 		} else if (username === "" || username === undefined) {
 			response.render("admin-success-user-accounts-list.hbs", {
-				message: "Cannot be empty"
+				message: "Cannot be empty",
+				display: "Admin"
 			});
 		} else if (newBal < 0 || newBal === undefined) {
 			message = `You cannot set the user, ${username}, to below $0.`;
 			response.render("admin-success-user-accounts-list.hbs", {
-				message: message
+				message: message,
+				display: "Admin"
 			});
 		} else {
 			mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
@@ -1196,7 +1208,8 @@ app.post("/admin-update", isAdmin, (request, response) => {
 									request.session.passport.user.cash2[0] = newBal;
 									message = `The user, ${username}, now has the balance of $${newBal}`;
 									response.render("admin-success-user-accounts-list.hbs", {
-										message: message
+										message: message,
+										display: "Admin"
 									});
 	
 									db.close;
@@ -1212,11 +1225,79 @@ app.post("/admin-update", isAdmin, (request, response) => {
 	}
 });
 
+// app.post('/admin-success-change-user-type', isAdmin, function(req, res, next) {
+// 	// IN PROGRESS 
+// 	// IN PROGRESS 
+// 	// IN PROGRESS 
+// 	// IN PROGRESS 
+// 	// IN PROGRESS 
+// 	// IN PROGRESS 
+// 	var userToAdmin = req.body.user_to_admin;
+// 	var username = req.session.passport.user.username
+// 	var type = "admin";
+// 	console.log(userToAdmin);
+// 	console.log(req.body.user_to_admin);
+// 	if(userToAdmin == username){
+// 		res.render('admin-success-change-user-type.hbs', {
+// 			message1: "You are already an admin."
+// 		});
+// 		return;
+// 	}else{
+// 		if(userToAdmin == '') {
+// 			res.render('admin-success-change-user-type.hbs', {
+// 				message1: "Cannot be empty",
+// 			});
+// 		}else{
+// 			message1 = '';
+// 			mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+// 				assert.equal(null, err);
+
+// 				var query = { username: userToAdmin }
+
+// 				console.log(query)
+// 				db.collection('user_accounts').find(query).toArray(function(err, result) {
+// 					if(err) {
+// 						message = 'Unable to Update Account';
+// 						console.log(message)
+// 						// console.log(err);
+// 						res.render('admin-success-change-user-type.hbs', {
+// 							message1: message
+// 						});
+// 					};
+// 					console.log(result);
+// 					if(result === undefined || result.length == 0) {
+// 						message = 'No user exists with that username';
+// 						console.log(message)
+// 						res.render('admin-success-change-user-type.hbs', {
+// 							message1: message
+// 						});
+// 					}
+// 					else if(result[0].type == type){
+// 						message = 'User is already an admin';
+// 						res.render('admin-success-change-user-type.hbs', {
+// 							message1: message
+// 						})
+// 					}else {
+// 						db.collection('user_accounts').updateOne(
+// 							{ "username": userToAdmin},
+// 							{ $set: { "type": type }
+// 						});
+// 						res.render('admin-success-change-user-type.hbs', {
+// 							message1: 'Updated Successfully'
+// 						});
+// 					};
+// 				});
+// 			});
+// 		};
+// 	};
+// });
+
 app.get("*", errorPage, (request, response) => {
 	// called when request page cannot be found
 	response.status(400);
 	response.render("404.hbs", {
-		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
+		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`,
+		display: "Error"
 	});
 });
 
@@ -1260,7 +1341,8 @@ function errorPage(request, response, next) {
 	} else {
 		response.status(400);
 		response.render("404x.hbs", {
-			title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
+			title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`,
+			display: "Error"
 		});
 	}
 }

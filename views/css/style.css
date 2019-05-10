@@ -66,3 +66,6 @@ body {
     margin-bottom: 200px;
 }
 
+.tabulator .tabulator-tableHolder{
+    overflow: hidden !important;
+}
