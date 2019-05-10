@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{{>head }}
+{{> head }}
 <style>
 	.metric .fa {
 		font-size: 1.2rem;
@@ -34,8 +34,13 @@
 				<p class="lead">Please note all prices are in USD.</p>
 			</div>
 			<div class='chfont container'>
-				<p class="font-weight-bold">{{title}}</p>
-				<p class="font-weight-bold">Balance: ${{userCash}}</p>
+				<p class="font-weight-bold">
+					Stocks:
+					{{#each title}}
+					{{this.stock_name}} ({{this.amount}}),
+					{{/each}}
+				</p>
+				<p class="font-weight-bold">Balance: ${{head}}</p>
 				<br>
 				<form action="/trading-portfolio-holdings" method="POST">
 					<input type="submit" class="btn btn-info" id="loadport" value="Load Portfolio">
@@ -47,7 +52,7 @@
 
 
 
-	<div class="container">
+	<div class="container footer-spacer">
 		<div class="jumbotron jumbotron-fluid" style="padding: 20px 40px;">
 			<h2 class="display-4">TRANSACTIONS</h2>
 			<div class="table-responsive">

@@ -23,6 +23,7 @@ var getBatchClosePrice = async(stock) => {
 
             return false
         } else if (e.response === undefined) {
+            console.log(e)
             console.log("hit3")
             return false
         } else {

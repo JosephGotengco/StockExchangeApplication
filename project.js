@@ -67,13 +67,13 @@ hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
 	return arg1 == arg2 ? options.fn(this) : options.inverse(this);
 });
 
-hbs.registerHelper('json', function (context) {
+hbs.registerHelper("json", function (context) {
 	return JSON.stringify(context);
 });
 
-hbs.registerHelper('roundToTwo', function(num) {
+hbs.registerHelper("roundToTwo", function (num) {
 	return num.toFixed(2);
-  });
+});
 
 // cookie configuration
 app.use(
@@ -216,7 +216,6 @@ app.post("/register", function (request, response) {
 function check_str(string_input) {
 	// checks if string value is between 3 and 12 characters, uses RegEx to confirm only alphabetical characters
 	var valid_chars = /^[a-zA-Z ]{3,30}$/;
-	var string_length = string_input.length;
 
 	if (valid_chars.test(string_input)) {
 		flag = true;
@@ -237,7 +236,6 @@ function check_uniq(string_input) {
 	}
 	return flag;
 }
-
 
 const user_account = mongoose.model("user_accounts", account_schema);
 
@@ -307,24 +305,32 @@ app.post(
 	})
 );
 
-passport.use(new LocalStrategy(function (username, password, done) {
-	user_account.findOne({ username: username }, function (err, user) {
-		if (err) { return done(err); }
-		if (!user) { return done(null, false); }
-		bcrypt.compare(password, user.password, function (err, result) {
-			console.log(result)
+passport.use(
+	new LocalStrategy(function (username, password, done) {
+		user_account.findOne({ username: username }, function (err, user) {
 			if (err) {
+				return done(err);
+			}
+			if (!user) {
 				return done(null, false);
 			}
-			if (result) {
-				return done(null, user);
-			} else {
-				return done(null, false)
-			}
+			bcrypt.compare(password, user.password, function (err, result) {
+				if (err) {
+					return done(null, false);
+				}
+				if (result) {
+					return done(null, user);
+				} else {
+					return done(null, false);
+				}
+			});
 		});
-	});
-}
-));
+	})
+);
+
+app.get("/about", isAuthenticated, (request, response) => {
+	response.render("about.hbs");
+});
 
 app.get("/news-hub", isAuthenticated, async (request, response) => {
 	// called when user goes to the news hub page
@@ -332,7 +338,6 @@ app.get("/news-hub", isAuthenticated, async (request, response) => {
 		var stockDataList = await marqueeStock.getMarqueeStock();
 		ssn.stockDataList = stockDataList;
 	}
-
 	response.render("news-hub.hbs", {
 		title: "Stock and Currency.",
 		currencyDataList: ssn.currencyDataList,
@@ -355,7 +360,7 @@ app.get("/trading-success", isAuthenticated, async (request, response) => {
 		var cash2 = request.session.passport.user.cash2;
 		var stocks = request.session.passport.user.stocks;
 		var num_stocks = request.session.passport.user.stocks.length;
-		var transactions = request.session.passport.user.transactions
+		var transactions = request.session.passport.user.transactions;
 		var num_transactions = transactions.length;
 		var earnings = cash2 - 10000;
 
@@ -364,6 +369,15 @@ app.get("/trading-success", isAuthenticated, async (request, response) => {
 		var amountSold = countStocksSold(transactions);
 
 		var uniqueTransactions = getUniqueTransactions(transactions);
+
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
 		var defaultPreference = "currency";
 		if (ssn.preference === undefined) {
 			ssn.preference = defaultPreference;
@@ -377,29 +391,30 @@ app.get("/trading-success", isAuthenticated, async (request, response) => {
 		var stock_names = [];
 		var displayStocks = [];
 		var stock_tickers = "";
-		
 
-		for (i = 0; i < stocks.length; i++) {
-			stock_tickers += `${stocks[i].stock_name},`; 
-			stock_names.push(stocks[i].stock_name)
+		if (stocks.length > 0) {
+			for (i = 0; i < stocks.length; i++) {
+				stock_tickers += `${stocks[i].stock_name},`;
+				stock_names.push(stocks[i].stock_name);
+			}
+			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+			ssn.closing_price = closing_price;
+			for (i = 0; i < stocks.length; i++) {
+				displayStocks[i] = stocks[i];
+				var today_price = closing_price[stock_names[i]];
+				displayStocks[i].profit = (
+					displayStocks[i].total_cost -
+					today_price * displayStocks[i].amount
+				).toFixed(2);
+				displayStocks[i].today_rate = today_price;
+			}
+			ssn.userStockData = {
+				displayStocks: displayStocks
+			};
+		} else {
+			ssn.userStockData = { displayStocks: displayStocks };
 		}
-		var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
-		ssn.closing_price = closing_price;
-		for (i = 0; i < stocks.length; i++) {
-			displayStocks[i] = stocks[i];
-			var today_price = closing_price[stock_names[i]];
-			displayStocks[i].profit = (displayStocks[i].total_cost - today_price * displayStocks[i].amount).toFixed(2);
-			displayStocks[i].today_rate = today_price;
-		}
-		ssn.userData = {
-			num_stocks: num_stocks,
-			num_transactions: num_transactions,
-			earnings: earnings,
-			amountBought: amountBought,
-			amountSold: amountSold,
-			displayStocks: displayStocks,
-			uniqueTransactions: uniqueTransactions
-		}
+
 		// Updated cookies @ every endpoint
 		response.render("trading-success.hbs", {
 			title: "Welcome to the trading page.",
@@ -413,7 +428,10 @@ app.get("/trading-success", isAuthenticated, async (request, response) => {
 			amountBought: amountBought,
 			amountSold: amountSold,
 			stocks: displayStocks,
-			uniqueTransactions: uniqueTransactions.slice(-5,ssn.userData.uniqueTransactions.length)
+			uniqueTransactions: uniqueTransactions.slice(
+				-5,
+				uniqueTransactions.length
+			)
 		});
 	} catch (err) {
 		console.log(err);
@@ -438,20 +456,22 @@ app.post(
 				display: "Trading",
 				preference: ssn.preference,
 				userCash: cash2[0],
-				num_stocks: ssn.userData.num_stocks,
-				num_transactions: ssn.userData.num_transactions,
-				earnings: ssn.userData.earnings,
-				amountBought: ssn.userData.amountBought,
-				amountSold: ssn.userData.amountSold,
-				stocks: ssn.userData.displayStocks,
-				uniqueTransactions: ssn.userData.uniqueTransactions.slice(-5,ssn.userData.uniqueTransactions.length)
+				num_stocks: ssn.userStatsData.num_stocks,
+				num_transactions: ssn.userStatsData.num_transactions,
+				earnings: ssn.userStatsData.earnings,
+				amountBought: ssn.userStatsData.amountBought,
+				amountSold: ssn.userStatsData.amountSold,
+				stocks: ssn.userStockData.displayStocks,
+				uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+					-5,
+					ssn.userStatsData.uniqueTransactions.length
+				)
 			});
 		} catch (err) {
 			console.log(err);
 		}
 	}
 );
-
 
 app.post(
 	"/trading-success-search",
@@ -493,19 +513,23 @@ app.post(
 			display: "Trading",
 			preference: ssn.preference,
 			userCash: cash2[0],
-			num_stocks: ssn.userData.num_stocks,
-			num_transactions: ssn.userData.num_transactions,
-			earnings: ssn.userData.earnings,
-			amountBought: ssn.userData.amountBought,
-			amountSold: ssn.userData.amountSold,
-			stocks: ssn.userData.displayStocks,
-			uniqueTransactions: ssn.userData.uniqueTransactions.slice(-5,ssn.userData.uniqueTransactions.length)
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: ssn.userStockData.displayStocks,
+			uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+				-5,
+				ssn.userStatsData.uniqueTransactions.length
+			)
 		});
 	}
 );
 
 app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 	// called when user submits ticker in stock buy form in trading page
+	// FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX
 	var _id = request.session.passport.user._id;
 	var cash = request.session.passport.user.cash;
 	var qty = parseFloat(request.body.buystockqty);
@@ -513,9 +537,10 @@ app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 	var stocks = request.session.passport.user.stocks;
 	var cash2 = request.session.passport.user.cash2;
 	var num_stocks = request.session.passport.user.stocks.length;
-	var transactions = request.session.passport.user.transactions
+	var transactions = request.session.passport.user.transactions;
 	var num_transactions = transactions.length;
 	var earnings = cash2 - 10000;
+
 
 	var index = check_existence(stock);
 	var message;
@@ -529,11 +554,28 @@ app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 		var total_cost = Math.round(stock_price * qty * 100) / 100;
 		var cash_remaining = Math.round((cash2 - total_cost) * 100) / 100;
 
+		var amountBought = countStocksBought(transactions);
+
+		var amountSold = countStocksSold(transactions);
+
+		var uniqueTransactions = getUniqueTransactions(transactions);
+
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
+
 		if (cash_remaining >= 0 && total_cost !== 0 && qty > 0) {
 			var db = utils.getDb();
+
 			if (index >= 0) {
 				var stock_qty = request.session.passport.user.stocks[index].amount;
-				var current_cost = request.session.passport.user.stocks[index].total_cost;
+				var current_cost =
+					request.session.passport.user.stocks[index].total_cost;
 				var stock_remaining = parseFloat(qty) + parseFloat(stock_qty);
 				stock_holding = {
 					stock_name: stock,
@@ -551,6 +593,7 @@ app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 				cash2[0] = cash_remaining;
 				stocks.push(stock_holding);
 			}
+
 			var log = {
 				datetime: new Date().toString(),
 				stock: stock,
@@ -598,37 +641,28 @@ app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 	var displayStocks = [];
 	var stock_tickers = "";
 
-	for (i = 0; i < stocks.length; i++) {
-		stock_tickers += `${stocks[i].stock_name},`; 
-		stock_names.push(stocks[i].stock_name)
+	if (stocks.length > 0) {
+		for (i = 0; i < stocks.length; i++) {
+			stock_tickers += `${stocks[i].stock_name},`;
+			stock_names.push(stocks[i].stock_name);
+		}
+		var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+		ssn.closing_price = closing_price;
+		for (i = 0; i < stocks.length; i++) {
+			displayStocks[i] = stocks[i];
+			var today_price = closing_price[stock_names[i]];
+			displayStocks[i].profit = (
+				displayStocks[i].total_cost -
+				today_price * displayStocks[i].amount
+			).toFixed(2);
+			displayStocks[i].today_rate = today_price;
+		}
+		ssn.userStockData = {
+			displayStocks: displayStocks
+		};
+	} else {
+		ssn.userStockData = { displayStocks: displayStocks };
 	}
-	var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
-	for (i = 0; i < stocks.length; i++) {
-		displayStocks[i] = stocks[i];
-		var today_price = closing_price[stock_names[i]];
-		displayStocks[i].profit = (displayStocks[i].total_cost - today_price * displayStocks[i].amount).toFixed(2);
-		displayStocks[i].today_rate = today_price;
-	}
-
-	var amountBought = countStocksBought(transactions);
-
-	var amountSold = countStocksSold(transactions);
-
-	var uniqueTransactions = getUniqueTransactions(transactions)
-
-	ssn.userData = {
-		num_stocks: num_stocks,
-		num_transactions: num_transactions,
-		earnings: earnings,
-		amountBought: amountBought,
-		amountSold: amountSold,
-		displayStocks: displayStocks,
-		uniqueTransactions: uniqueTransactions
-	}
-	// ssn.userData.num_stocks = num_stocks;
-	// ssn.userData.num_transactions = num_transactions;
-	// ssn.userData.earnings = earnings;
-	// ssn.userData.getUniqueTransactions = getUniqueTransactions(transactions);
 
 	response.render("trading-success.hbs", {
 		title: message,
@@ -637,13 +671,16 @@ app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 		display: "Trading",
 		preference: ssn.preference,
 		userCash: cash2[0],
-		num_stocks: ssn.userData.num_stocks,
-		num_transactions: ssn.userData.num_transactions,
-		earnings: ssn.userData.earnings,
-		amountBought: ssn.userData.amountBought,
-		amountSold: ssn.userData.amountSold,
-		stocks: ssn.userData.displayStocks,
-		uniqueTransactions: ssn.userData.uniqueTransactions.slice(-5,ssn.userData.uniqueTransactions.length)
+		num_stocks: ssn.userStatsData.num_stocks,
+		num_transactions: ssn.userStatsData.num_transactions,
+		earnings: ssn.userStatsData.earnings,
+		amountBought: ssn.userStatsData.amountBought,
+		amountSold: ssn.userStatsData.amountSold,
+		stocks: ssn.userStockData.displayStocks,
+		uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+			-5,
+			ssn.userStatsData.uniqueTransactions.length
+		)
 	});
 
 	function check_existence(stock) {
@@ -671,10 +708,9 @@ app.post(
 		var stock = request.body.sellstockticker.toUpperCase();
 		var stocks = request.session.passport.user.stocks;
 		var num_stocks = request.session.passport.user.stocks.length;
-		var transactions = request.session.passport.user.transactions
+		var transactions = request.session.passport.user.transactions;
 		var num_transactions = transactions.length;
 		var earnings = cash2 - 10000;
-
 
 		var index = check_existence(stock);
 		var message;
@@ -688,10 +724,27 @@ app.post(
 			var stock_price = stock_info.data.close;
 			var total_sale = Math.round(stock_price * qty * 100) / 100;
 			var cash_remaining = Math.round((cash2[0] + total_sale) * 100) / 100;
-			var stock_qty = request.session.passport.user.stocks[index].amount;
-			var current_cost = request.session.passport.user.stocks[index].total_cost;
+			if (request.session.passport.user.stocks[index] !== undefined) {
+				var stock_qty = request.session.passport.user.stocks[index].amount;
+				var current_cost = request.session.passport.user.stocks[index].total_cost;
+			} else {
+				throw "you don't have this stock (abritrary error msg LOL)";
+			}
 			var stock_remaining = stock_qty - qty;
 
+			var amountBought = countStocksBought(transactions);
+
+			var amountSold = countStocksSold(transactions);
+
+			var uniqueTransactions = getUniqueTransactions(transactions);
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
 			if (stock_qty < qty) {
 				message = `You are trying to sell ${qty} shares of ${stock} when you only have ${stock_qty} shares.`;
 			} else if (stock_qty >= qty && total_sale > 0) {
@@ -731,7 +784,6 @@ app.post(
 			if (stock === "") {
 				message = `You cannot leave the sell input blank. Please input a stock ticker`;
 			} else {
-				console.log(err)
 				message = `You do not own any shares with the ticker '${stock}'.`;
 			}
 		}
@@ -748,33 +800,30 @@ app.post(
 		var displayStocks = [];
 		var stock_tickers = "";
 
-		for (i = 0; i < stocks.length; i++) {
-			stock_tickers += `${stocks[i].stock_name},`; 
-			stock_names.push(stocks[i].stock_name)
-		}
-		var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
-		for (i = 0; i < stocks.length; i++) {
-			displayStocks[i] = stocks[i];
-			var today_price = closing_price[stock_names[i]];
-			displayStocks[i].profit = (displayStocks[i].total_cost - today_price * displayStocks[i].amount).toFixed(2);
-			displayStocks[i].today_rate = today_price;
+		if (stocks.length > 0) {
+			for (i = 0; i < stocks.length; i++) {
+				stock_tickers += `${stocks[i].stock_name},`;
+				stock_names.push(stocks[i].stock_name);
+			}
+			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+			ssn.closing_price = closing_price;
+			for (i = 0; i < stocks.length; i++) {
+				displayStocks[i] = stocks[i];
+				var today_price = closing_price[stock_names[i]];
+				displayStocks[i].profit = (
+					displayStocks[i].total_cost -
+					today_price * displayStocks[i].amount
+				).toFixed(2);
+
+				displayStocks[i].today_rate = today_price;
+			}
+			ssn.userStockData = {
+				displayStocks: displayStocks
+			};
+		} else {
+			ssn.userStockData = { displayStocks: displayStocks };
 		}
 
-		var amountBought = countStocksBought(transactions);
-
-		var amountSold = countStocksSold(transactions);
-	
-		var uniqueTransactions = getUniqueTransactions(transactions)	
-
-		ssn.userData = {
-			num_stocks: num_stocks,
-			num_transactions: num_transactions,
-			earnings: earnings,
-			amountBought: amountBought,
-			amountSold: amountSold,
-			displayStocks: displayStocks,
-			uniqueTransactions: uniqueTransactions
-		}
 		response.render("trading-success.hbs", {
 			title: message,
 			head: `Cash balance: $${cash2[0]}`,
@@ -782,13 +831,16 @@ app.post(
 			display: "Trading",
 			preference: ssn.preference,
 			userCash: cash2[0],
-			num_stocks: ssn.userData.num_stocks,
-			num_transactions: ssn.userData.num_transactions,
-			earnings: ssn.userData.earnings,
-			amountBought: ssn.userData.amountBought,
-			amountSold: ssn.userData.amountSold,
-			stocks: ssn.userData.displayStocks,
-			uniqueTransactions: ssn.userData.uniqueTransactions.slice(-5,ssn.userData.uniqueTransactions.length)
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: ssn.userStockData.displayStocks,
+			uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+				-5,
+				ssn.userStatsData.uniqueTransactions.length
+			)
 		});
 
 		function check_existence(stock) {
@@ -802,7 +854,6 @@ app.post(
 		}
 	}
 );
-
 
 app.get("/news/currency/:id", isAuthenticated, async (request, response) => {
 	// called when user clicks on currency text in marquee element
@@ -847,62 +898,61 @@ app.get("/news/stock/:id", isAuthenticated, async (request, response) => {
 });
 
 app.get("/trading-portfolio", isAuthenticated, (request, response) => {
-		// called when user loads their data in portfolio data
-		var stocks = request.session.passport.user.stocks;
-		var num_stocks = stocks.length;
-		var stock_keys = [];
-		var cash = request.session.passport.user.cash;
-		var message = "Shares: \n";
-		var cash2 = request.session.passport.user.cash2;
-		var transactions = request.session.passport.user.transactions;
-		var num_transactions = transactions.length;
+	// called when user loads their data in portfolio data
+	var stocks = request.session.passport.user.stocks;
+	var num_stocks = stocks.length;
+	var stock_keys = [];
+	var cash = request.session.passport.user.cash;
+	var message = "Shares: \n";
+	var cash2 = request.session.passport.user.cash2;
+	var transactions = request.session.passport.user.transactions;
+	var num_transactions = transactions.length;
 
-		if (num_stocks === 0) {
-			message = "You currently do not have any stocks.";
-		} else {
-			console.log(stocks)
-		}
-		if (num_transactions === 0) {
-			transact_message = "You currently do not have any transactions";
-		} else {
-			var displayTransactions = [];
-			for (i = 0; i < num_transactions; i++) {
-				var log = transactions[i];
-				var datetimeArr = log.datetime.split(" ");
-				var month = datetimeArr[1];
-				var day = datetimeArr[2];
-				var year = datetimeArr[3];
-				var stock_name = log.stock_name;
-				var qty = log.qty;
-				var type = log.type;
-				var balance = log.balance;
-				if (type === "B") {
-					var price = log.total_cost;
-				} else {
-					var price = log.total_sale;
-				}
-
-				displayLog = {
-					year: year,
-					month: month,
-					day: day,
-					stock_name: stock_name,
-					qty: qty,
-					type: type,
-					price: price,
-					balance: balance
-				};
-
-				displayTransactions.push(displayLog);
+	if (num_stocks === 0) {
+		message = "You currently do not have any stocks.";
+	} else {
+	}
+	if (num_transactions === 0) {
+		transact_message = "You currently do not have any transactions";
+	} else {
+		var displayTransactions = [];
+		for (i = 0; i < num_transactions; i++) {
+			var log = transactions[i];
+			var datetimeArr = log.datetime.split(" ");
+			var month = datetimeArr[1];
+			var day = datetimeArr[2];
+			var year = datetimeArr[3];
+			var stock_name = log.stock_name;
+			var qty = log.qty;
+			var type = log.type;
+			var balance = log.balance;
+			if (type === "B") {
+				var price = log.total_cost;
+			} else {
+				var price = log.total_sale;
 			}
+
+			displayLog = {
+				year: year,
+				month: month,
+				day: day,
+				stock_name: stock_name,
+				qty: qty,
+				type: type,
+				price: price,
+				balance: balance
+			};
+
+			displayTransactions.push(displayLog);
 		}
-		response.render("trading-portfolio.hbs", {
-			title: `Welcome to your portfolio`,
-			display: "Portfolio",
-			displayTransactions: displayTransactions,
-			userCash: cash2[0],
-			userStocks: stocks
-		});
+	}
+	response.render("trading-portfolio.hbs", {
+		title: `Welcome to your portfolio`,
+		display: "Portfolio",
+		displayTransactions: displayTransactions,
+		userCash: cash2[0],
+		userStocks: stocks
+	});
 });
 
 app.post(
@@ -922,12 +972,7 @@ app.post(
 		if (num_stocks === 0) {
 			message = "You currently do not have any stocks.";
 		} else {
-			var i;
-			for (i = 0; i < num_stocks; i++) {
-				stock_keys.push(Object.keys(stocks[i]));
-				var key_value = stocks[i][stock_keys[i][0]];
-				message += stock_keys[i][0] + ": " + key_value + " shares." + "\n";
-			}
+			message = stocks;
 		}
 		if (num_transactions === 0) {
 			transact_message = "You currently do not have any transactions";
@@ -965,7 +1010,7 @@ app.post(
 		}
 		response.render("trading-portfolio.hbs", {
 			title: message,
-			head: `Cash: $${cash2[0]}`,
+			head: cash2[0],
 			display: "Portfolio",
 			displayTransactions: displayTransactions,
 			userStocks: stocks
@@ -1091,78 +1136,81 @@ app.post("/admin-success-delete-user-success", isAdmin, function (
 });
 
 app.post("/admin-update", isAdmin, (request, response) => {
-	var username = request.body.user_id;
-	// Need to apply argument checks to these guys
-	var newBal = parseFloat(request.body.newBalance);
-	var newFN = request.body.firstName;
-	var newLN = request.body.lastName;
-	// var newPass = request.body.password;
-	var newType = request.body.type;
-	var findQuery = { username: username };
-	var updateQuery = {
-		$set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
-	};
-	var message;
+	try {
+		var username = request.body.user_id;
+		// Need to apply argument checks to these guys
+		var newBal = parseFloat(request.body.newBal);
+		var newFN = request.body.firstName;
+		var newLN = request.body.lastName;
+		// var newPass = request.body.password;
+		var findQuery = { username: username };
+		var updateQuery = {
+			$set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
+		};
 
-	if (check_str(newFN) === false) {
-		message = `First name must be 3-30 characters long and must only contain letters.`;
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: message
-		});
-	} else if (check_str(newLN) === false) {
-		message = `Last name must be 3-30 characters long and must only contain letters.`;
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: message
-		});
-	} else if (username === "") {
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: "Cannot be empty"
-		});
-	} else if (newBal < 0) {
-		message = `You cannot set the user, ${username}, to below $0.`;
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: message
-		});
-	} else {
-		mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
-			assert.equal(null, err);
-			db.collection("user_accounts")
-				.find(findQuery)
-				.toArray(function (err, result) {
-					if (err) {
-						message = "Unable to Update Account";
-						response.render("admin-success-user-accounts-list.hbs", {
-							message: message
-						});
-					}
-					if (result === undefined || result.length == 0) {
-						message = "No user exists with that username";
-						response.render("admin-success-user-accounts-list.hbs", {
-							message: message
-						});
-					} else {
-						db.collection("user_accounts").updateOne(
-							findQuery,
-							updateQuery,
-							{ upsert: false },
-							function (err, result) {
-								if (err) throw err;
-								request.session.passport.user.cash2[0] = newBal;
-								message = `The user, ${username}, now has the balance of $${newBal}`;
-								response.render("admin-success-user-accounts-list.hbs", {
-									message: message
-								});
-
-								db.close;
-							}
-						);
-					}
-				});
-		});
+		var message;
+	
+		if (check_str(newFN) === false) {
+			message = `First name must be 3-30 characters long and must only contain letters.`;
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: message
+			});
+		} else if (check_str(newLN) === false) {
+			message = `Last name must be 3-30 characters long and must only contain letters.`;
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: message
+			});
+		} else if (username === "" || username === undefined) {
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: "Cannot be empty"
+			});
+		} else if (newBal < 0 || newBal === undefined) {
+			message = `You cannot set the user, ${username}, to below $0.`;
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: message
+			});
+		} else {
+			mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
+				assert.equal(null, err);
+				db.collection("user_accounts")
+					.find(findQuery)
+					.toArray(function (err, result) {
+						if (err) {
+							message = "Unable to Update Account";
+							response.render("admin-success-user-accounts-list.hbs", {
+								message: message
+							});
+						}
+						if (result === undefined || result.length == 0) {
+							message = "No user exists with that username";
+							response.render("admin-success-user-accounts-list.hbs", {
+								message: message
+							});
+						} else {
+							db.collection("user_accounts").updateOne(
+								findQuery,
+								updateQuery,
+								{ upsert: false },
+								function (err, result) {
+									if (err) throw err;
+									request.session.passport.user.cash2[0] = newBal;
+									message = `The user, ${username}, now has the balance of $${newBal}`;
+									response.render("admin-success-user-accounts-list.hbs", {
+										message: message
+									});
+	
+									db.close;
+								}
+							);
+						}
+					});
+			});
+		}
+	} catch (e) {
+		console.log(e);
+		response.render("admin-success-user-accounts-list.hbs")
 	}
 });
-
-
 
 app.get("*", errorPage, (request, response) => {
 	// called when request page cannot be found
@@ -1175,21 +1223,21 @@ app.get("*", errorPage, (request, response) => {
 function countStocksSold(transactionArray) {
 	var amountSold = 0;
 	for (i = 0; i < transactionArray.length; i++) {
-		if(transactionArray[i].type === "S") {
+		if (transactionArray[i].type === "S") {
 			amountSold += transactionArray[i].qty;
 		}
 	}
-	return amountSold
+	return amountSold;
 }
 
 function countStocksBought(transactionArray) {
 	var amountBought = 0;
 	for (i = 0; i < transactionArray.length; i++) {
-		if(transactionArray[i].type === "B") {
+		if (transactionArray[i].type === "B") {
 			amountBought += transactionArray[i].qty;
 		}
 	}
-	return amountBought
+	return amountBought;
 }
 
 function getUniqueTransactions(transactionArray) {
@@ -1197,14 +1245,13 @@ function getUniqueTransactions(transactionArray) {
 	var uniqueTransactions = [];
 	for (i = 0; i < transactionArray.length; i++) {
 		var currentStock = transactionArray[i].stock;
-		if(uniqueTicker.includes(currentStock)) {
-			
+		if (uniqueTicker.includes(currentStock)) {
 		} else {
-			uniqueTicker.push(currentStock)
+			uniqueTicker.push(currentStock);
 			uniqueTransactions.push(transactionArray[i]);
 		}
 	}
-	return uniqueTransactions
+	return uniqueTransactions;
 }
 
 function errorPage(request, response, next) {

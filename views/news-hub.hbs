@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
     <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
-    {{!-- <link rel='stylesheet' href='testcss.css'> --}}
+    <link rel='stylesheet' href="./css/style.css">
     <style>
         * {
             box-sizing: border-box;
@@ -63,7 +63,7 @@
 
         img {
             width: 100%;
-            height: 100px;
+            height: 30px;
         }
 
         .card-body {
@@ -78,71 +78,66 @@
 
 <body>
 
-    {{> loggedInNavbar}}z
-    <div class="container bottom-space">
-        <div class="row">
-            <div class="col-sm-6 side1">
-                <div class="container">
+    {{> loggedInNavbar}}
 
 
-                    <div class="row">
-                        <div class="col-md-12 column-header">
-                            <h1 class="thinner">STOCKS</h1>
-                        </div>
-                    </div>
 
-                    <div class="row">
+    <div class="row p-5 footer-spacer">
+        <div class="col-6">
+            <h2 class="sub-header">Stocks</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">Ticker</th>
+                            <th class="col-md-2">Price</th>
+                            <th class="col-md-3">Trend</th>
+                            <th class="col-md-4">Stats</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {{#each stockDataList}}
-                        <div class="card">
-                            <a href="/news/stock/{{{this.code}}}">
-                                <img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{{this.code}}}</h5>
-                                    <p class="card-text">Price: {{{this.price}}}</p>
-                                </div>
-                            </a>
-                        </div>
+                        <tr>
+                            <td class="col-md-1">{{this.code}}</td>
+                            <td class="col-md-2">{{this.this.price}}</td>
+                            <td class="col-md-3"><img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            </td>
+                            <td class="col-md-4"><a href="/news/currency/{{this.code}}">Stats</a></td>
+
+                        </tr>
                         {{/each}}
-                    </div>
-
-
-                </div>
+                    </tbody>
+                </table>
             </div>
-
-
-
-
-            <div class="col-sm-6 side2">
-                <div class="container">
-
-                    <div class="row">
-                        <div class="col-md-12 column-header">
-                            <h1 class="thinner">CURRENCY</h1>
-                        </div>
-                    </div>
-
-                    <div class="row">
-
+        </div>
+        <div class="col-6">
+            <h2 class="sub-header">Currencies</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">Code</th>
+                            <th class="col-md-2">Price</th>
+                            <th class="col-md-3">Trend</th>
+                            <th class="col-md-4">Stats</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {{#each currencyDataList}}
-                        <div class="card">
-                            <a href="/news/currency/{{{this.code}}}" target="_blank">
-                                <img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{{this.code}}}</h5>
-                                    <p class="card-text">Price: {{{this.price}}}</p>
-                                </div>
-                            </a>
-                        </div>
+                        <tr>
+                            <td class="col-md-1">{{this.code}}</td>
+                            <td class="col-md-2">{{this.this.price}}</td>
+                            <td class="col-md-3"><img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            </td>
+                            <td class="col-md-4"><a href="/news/currency/{{this.code}}">Stats</a></td>
+
+                        </tr>
                         {{/each}}
-                    </div>
-                </div>
-
-
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    </div>
-    
     {{> footer}}
 
 
