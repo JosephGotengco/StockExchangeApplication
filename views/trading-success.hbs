@@ -2,154 +2,245 @@
 <html lang="en">
 
 <head>
-  <title>{{display}}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel='stylesheet' href='./css/style.css'>
+	<title>{{display}}</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel='stylesheet' href='./css/style.css'>
+	<link rel='stylesheet' href='./css/trading-success.css'>
 </head>
 
 <body>
+	<!-- NAV BAR -->
+	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-0 border-bottom shadow-sm nav-color">
+		<h5 class="my-0 mr-md-auto font-weight-normal">
+			<a class="navbar-brand" href="/trading-success">
+				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+				STOCK NAME
+			</a>
+		</h5>
+		{{#ifEquals preference "currency"}}
+		<form action='/trading-success-stocks' method="POST" class="mr-3">
+			<input type="hidden" id="pref" name="pref" value="stock">
+			<button type="submit" class="btn btn-primary">Stocks</button>
+		</form>
+		{{else}}
+		<form action='/trading-success' method="GET" class="mr-3">
+			<input type="hidden" id="pref" name="pref" value="currency">
+			<button type="submit" class="btn btn-primary">Currencies</button>
+		</form>
+		{{/ifEquals}}
+		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
+			<a class="p-2 text-light" href="/trading-success">Trading</a>
+			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+			<a class="p-2 text-light" href="/news-hub">Rankings</a>
+		</nav>
+		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+	</div>
 
 
-  <!-- NAV BAR -->
-  {{> loggedInNavbar}}
+
+	<div class="jumbotron my-0 py-2">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm text-center">
+					<p class="font-weight-light mb-0 text-muted">PORTFOLIO EARNINGS</p>
+					<big class="font-weight-light mb-0 text-primary">${{{roundToTwo earnings }}}<small><i
+								class="fa fa-arrow-alt-circle-up"></i></small> </big>
+				</div>
+				<div class="col-sm text-center left-line">
+					<p class="font-weight-light mb-0 text-muted">ACCOUNT BALANCE</p>
+					<big class="font-weight-light mb-0 text-primary">${{{userCash}}}</big>
+				</div>
+				<div class="col-sm text-center left-line">
+					<p class="font-weight-light mb-0 text-muted">STOCKS BOUGHT</p>
+					<big class="font-weight-light mb-0 text-primary">{{{amountBought}}} Stocks</big>
+				</div>
+				<div class="col-sm text-center left-line">
+					<p class="font-weight-light mb-0 text-muted">STOCKS SOLD</p>
+					<big class="font-weight-light mb-0 text-primary">{{{amountSold}}} Stocks</big>
+				</div>
+				<div class="col-sm text-center left-line no-border-bottom">
+					<p class="font-weight-light mb-0 text-muted">TOTAL TRANSACTIONS</p>
+					<big class="font-weight-light mb-0 text-primary">{{{num_transactions}}} Transactions</big>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{#ifEquals preference "currency"}}
+	<marquee class="border-bottom py-2 remove-on-small-screen" behaviour="scroll" ; bgcolor="white" ; scrollamount=10;
+		onmouseover="this.stop();" onmouseleave="this.start();">
+		{{#each marqueeData}}
+		<a href="/news/currency/{{this.code}}" target="_blank" class="mx-3"><span
+				style="color: #0984e3"><b>{{{this.code}}}:</b></span><span
+				style="color: #0984e3"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
+				hspace=2; padding=2px;></a>
+		{{/each}}
+	</marquee>
+
+	{{else}}
+	<marquee class="border-bottom py-2 remove-on-small-screen" behaviour="scroll" ; bgcolor="white" ; scrollamount=10;
+		onmouseover="this.stop();" onmouseleave="this.start();">
+		{{#each marqueeData}}
+		<a href="/news/stock/{{this.code}}" target="_blank" class="mx-3"><span
+				style="color: #0984e3"><b>{{{this.code}}}:</b></span><span
+				style="color: #0984e3"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
+				hspace=2; padding=2px;></a>
+		{{/each}}
+	</marquee>
+
+	{{/ifEquals}}
+
+
+	<div class="container mt-5">
+		<h1 class="border-bottom pb-3 mb-4">Stock Trading</h1>
+		<div class="alert alert-info font-weight-bold" role="alert">{{title}}</div>
+		<div class="row border-bottom pb-3">
+			<div class="col-sm-4">
+				<div class="card bg-light" id="addStockForm">
+					<form class="p-4" action="/trading-success-buy" method="POST">
+						<h3>Buy Stocks</h3>
+						<div class="form-row">
+							<div class="col-md mb-3">
+								<label for="buystockticker">Ticker</label>
+								<input type="text" class="form-control form-control-sm" id="buystockticker"
+									placeholder="Enter Stock Ticker e.g FB" name="buystockticker">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col-md mb-2">
+								<label for="buystockticker">Quantity</label>
+								<input type="number" class="form-control form-control-sm" id="buystockqty"
+									placeholder="Enter Quantity" name="buystockqty">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col-md-4">
+								<br>
+								<input type="submit" class="btn btn-primary pl-auto" value="Buy">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="card bg-light" id="sellStockForm">
+					<form class="p-4" action="/trading-success-sell" method="POST">
+						<h3>Sell Stocks</h3>
+						<div class="form-row">
+							<div class="col-md mb-3">
+								<label for="sellstockticker">Ticker</label>
+								<input type="text" class="form-control form-control-sm" id="sellstockticker"
+									placeholder="Enter Stock Ticker e.g FB" name="sellstockticker">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col-md mb-2">
+								<label for="sellstockticker">Quantity</label>
+								<input type="number" class="form-control form-control-sm" id="sellstockqty"
+									placeholder="Enter Quantity" name="sellstockqty">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col-md-4">
+								<br>
+								<input type="submit" class="btn btn-primary pl-auto" value="Sell">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="card bg-light" id="addStockForm">
+					<form class="p-4" action="/trading-success-search" method="POST">
+						<h3>Check Price</h3>
+						<div class="form-row">
+							<div class="col-md mb-3">
+								<label for="buystockticker">Ticker</label>
+								<input type="text" class="form-control form-control-sm" id="buystockticker"
+									placeholder="Enter Stock Ticker e.g FB" name="stocksearch">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col-md mb-2">
+								{{!-- <label for="buystockticker">Quantity</label> --}}
+								<input type="hidden" class="form-control form-control-sm" id="buystockqty"
+									placeholder="Enter Quantity">
+							</div>
+						</div>
+						<div class="form-row mt-5">
+							<div class="col-md-4">
+								<br>
+								<input type="submit" class="btn btn-primary mt-3 pl-auto" value="Calculate">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="row px-3 pt-2 pb-3 remove-on-small-screen">
+			<small class="mr-3">Recent Stocks</small>
+			{{#each uniqueTransactions}}
+			<span class="badge btn-primary mx-1 pointer">{{{ this.stock }}}</span>
+			{{/each}}
+		</div>
+	</div>
+
+	<div class="container mt-2 footer-spacer">
+		<h1 class="pb-3 mb-4">Your Stocks</h1>
+		<div class="row">
+			{{#each stocks}}
+			<div class="col-sm-3">
+				<div class="card mb-3 ">
+					<div class="card-body">
+						<h5 class="card-title">{{{this.stock_name}}}</h5>
+						<p class="d-flex justify-content-between"><small>AMOUNT:</small> <small>{{{this.amount}}}<i
+									class="far fa-clone ml-1"></i></small></p>
+						<p class="d-flex justify-content-between"><small>PROFIT:</small> <small>{{{this.profit}}}<i
+									class="far fa-money-bill-alt ml-1"></i></small></p>
+						{{!-- Don't think total spent is good if we don't have total gained we should probably move that to the portfolio page
+						because it's more statistics that don't help with trading --}}
+						{{!-- <p class="d-flex justify-content-between"><small>TOTAL SPENT:</small>
+							<small>{{{roundToTwo this.total_cost}}}<i class="far fa-money-bill-alt ml-1"></i></small></p> --}}
+						<p class="d-flex justify-content-between"><small>PRICE/STOCK:</small>
+							<small>{{{roundToTwo this.today_rate}}}<i class="far fa-money-bill-alt ml-1"></i></small>
+						</p>
+						<p class="d-flex justify-content-between"><small><a target="_blank"
+									href="/news/stock/{{{this.stock_name}}}">Show me some stats!</a></small></p>
+					</div>
+				</div>
+			</div>
+			{{/each}}
+		</div>
+	</div>
 
 
 
-  {{!-- <marquee behaviour="scroll"; bgcolor="black"; scrollamount=10; onmouseover="this.stop();" onmouseleave="this.start();">
-    <a href="/news/currency/CAD"><span style="color: red"><b>CAD:</b></span> <span style="color: white"><b>{{cad}}</b></span>{{{HTMLforImage}}}{{{img0}}}{{{alt}}}</a>,
-    <a href="/news/currency/BGN"><span style="color: red"><b>BGN:</b></span> <span style="color: white"><b>{{bgn}}</b></span>{{{HTMLforImage}}}{{{img1}}}{{{alt}}}</a>, 
-    <a href="/news/currency/EUR"><span style="color: red"><b>EUR:</b></span> <span style="color: white"><b>{{eur}}</b></span>{{{HTMLforImage}}}{{{img2}}}{{{alt}}}</a>, 
-    <a href="/news/currency/JPY"><span style="color: red"><b>JPY:</b></span> <span style="color: white"><b>{{jpy}}</b></span>{{{HTMLforImage}}}{{{img3}}}{{{alt}}}</a>, 
-    <a href="/news/currency/AUD"><span style="color: red"><b>AUD:</b></span> <span style="color: white"><b>{{aud}}</b></span>{{{HTMLforImage}}}{{{img4}}}{{{alt}}}</a>,
-    <a href="/news/currency/HKD"><span style="color: red"><b>HKD:</b></span> <span style="color: white"><b>{{hkd}}</b></span>{{{HTMLforImage}}}{{{img5}}}{{{alt}}}</a>, 
-    <a href="/news/currency/GBP"><span style="color: red"><b>GBP:</b></span> <span style="color: white"><b>{{gbp}}</b></span>{{{HTMLforImage}}}{{{img6}}}{{{alt}}}</a>, 
-    <a href="/news/currency/MXN"><span style="color: red"><b>MXN:</b></span> <span style="color: white"><b>{{mxn}}</b></span>{{{HTMLforImage}}}{{{img7}}}{{{alt}}}</a>, 
-    <a href="/news/currency/INR"><span style="color: red"><b>INR:</b></span> <span style="color: white"><b>{{inr}}</b></span>{{{HTMLforImage}}}{{{img8}}}{{{alt}}}</a>, 
-    <a href="/news/currency/CNY"><span style="color: red"><b>CNY:</b></span> <span style="color: white"><b>{{cny}}</b></span>{{{HTMLforImage}}}{{{img9}}}{{{alt}}}</a>
-  </marquee> --}}
-  
-  <marquee behaviour="scroll"; bgcolor="black"; scrollamount=10; onmouseover="this.stop();" onmouseleave="this.start();">
-    {{#each marqueeData}}
-      <a href="/news/currency/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px; hspace=2; padding=2px;></a>,
-    {{/each}}
-  </marquee>
-
-  <form action='/trading-success-stocks' method="POST">
-      <input type="hidden" id="pref" name="pref" value="stock">
-      <button type="submit" class="btn btn-primary">Stocks</button>
-  </form>
-
-  
-  <br><br>
-  <!-- Check Stock Price -->
-  <div class="container">
-    <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-        <h1 class="display-4">Check Stock Price</h1>
-        <p class="lead">Please note all prices are in USD.</p>
-      </div>
-      <div class='chfont container'>
-        <p class="font-weight-bold">{{head}}</p>
-        <br>
-        <div class="input-group btn-group">
-          <form action="/trading-success-search" method="POST">
-            <label for="stocksearch">Stock Search Price</label>
-            <input type="text" class="form-control border border-right-0" name="stocksearch" id="stocksearch"
-              placeholder="Stock Ticker e.g. TSLA">
-            <br><br>
-            <div class="alert alert-info font-weight-bold" role="alert">{{title}}</div>
-            <br><br>
-            <input type="submit" class="btn btn-info" value="Search">
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Buy & Sell Stock -->
-  <div class="container">
-    <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-        <h1 class="display-4">Buy & Sell Stocks</h1>
-        <p class="lead">Please note all prices are in USD.</p>
-      </div>
-      <div class='chfont container'>
-        <form action="/trading-success-buy" method="POST">
-          <div class="row">
-            <div class="col">
-              <label for="stocksearch">Buy Stock</label>
-              <input type="text" class="form-control border border-right-0" name="buystockticker" id="buystockticker"
-                placeholder="Enter Stock Ticker e.g FB">
-            </div>
-            <div class="col">
-              <label for="stocksearch">Quantity</label>
-              <input type="number" class="form-control border border-right-0" name="buystockqty" id="buystockqty"
-                placeholder="Enter Quantity">
-            </div>
-          </div>
-          <br>
-          <input type="submit" class="btn btn-info" value="Buy">
-        </form>
-        <br><br>
-        <form action="/trading-success-sell" method="POST">
-          <div class="row">
-            <div class="col">
-              <label for="stocksearch">Sell Stock</label>
-              <input type="text" class="form-control" name="sellstockticker" id="sellstockticker"
-                placeholder="Enter Stock Ticker e.g FB">
-            </div>
-            <div class="col">
-              <label for="stocksearch">Quantity</label>
-              <input type="number" class="form-control" name="sellstockqty" id="sellstockqty"
-                placeholder="Enter Quantity">
-            </div>
-          </div>
-          <br>
-          <input type="submit" class="btn btn-info" value="Sell">
-        </form>
-      </div>
-    </div>
-  </div>
+	<!-- Footer -->
+	{{> footer}}
 
 
-  <!-- Footer -->
- {{> footer}}
-
-
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </body>
-<script>
-  {{!-- console.log({{{HTMLforImage}}}); --}}
-</script>
-
-
-<script>
-
-  {{#each currencyDataList}}
-      console.log("{{{HTMLforImage}}}");
-      console.log(["{{this.code}}",{{ this.price }},"{{this.img}}"])
-  {{/each}}
-
-</script>
 
 </html>

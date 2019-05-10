@@ -1,96 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
     <title>{{display}}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel='stylesheet' href='./css/style.css'>
 </head>
-    
+
 <body>
-        
-        <!-- NAV BAR -->
-        {{> loggedInNavbar}}
+
+    <!-- NAV BAR -->
+    {{> loggedInNavbar}}
 
 
-        <!-- Admin Panel -->
-        <div class="container">
-            <div class="jumbotron jumbotron-fluid">
-                <div class='container'>
-                        <h1>Welcome to the Admin Page</h1>
-                        <br>
-                        </p>
-                        <div>
-                                <div>
-                                    <table name="mytable">
-                                        <tr style="background-color: white; border-padding:20px;">
-                                            <th style= "padding:20px" name="id">ID</th>
-                                            <th style= "padding:20px" name="username">Username</th>
-                                            <th style= "padding:20px" name="firstname">First name</th>
-                                            <th style= "padding:20px" name="lastname">Last Name</th>
-                                            <th style= "padding:20px" name="balance">Balance</th>
-                                            <th style= "padding:20px" name="balance">Type</th>
-                                        </tr>
-                                        <p>
-                                        {{#each result}}
-                                                <tr style="background-color: white;">
-                                                    <td style= "padding:20px">{{this._id}}</td>
-                                                    <td style= "padding:20px">{{this.username}}</td>
-                                                    <td style= "padding:20px">{{this.firstname}}</td>
-                                                    <td style= "padding:20px">{{this.lastname}}</td>
-                                                    <td style= "padding:20px">{{this.cash2}}</td>
-                                                    <td style= "padding:20px">{{this.type}}</td>
-                                                </tr>
-                                        {{/each}}
-                                        </p>
-                                        </table>
-                                </div>
-                          </div>
-                          <br>
-                          <div class="form-group">
-                             <form action="/admin-success-user-accounts" method="POST">
-                                <input type="submit" class="btn btn-info" id="loadport" value="Load Users">
-                             </form> 
-                          </div>
-                        </div>
-                        <br>
-                        <div class='container'>
-                            <p><i>{{message}}</i></p>
-                            <div class="row">
-                                <div class="col">
-                                    <form  id="deleteuser" action='/admin-success-delete-user-success', method='POST'>
-                                        <label for="stocksearch">Enter Username to Delete</label>
-                                        <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
-                                        <br>
-                                            <p align="left">
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </p>
-                                        <br>
-                                    </form>
+    <!-- Admin Panel -->
+    <div class="container">
+        <div class="jumbotron jumbotron-fluid">
+            <div class='container'>
+                <h1>Welcome to the Admin Page</h1>
+                <br>
+                </p>
+                <div>
+                    <div class="table-responsive">
+                            <h2 class="display-4">Users</h2>
 
-                                </div>
-                              </div>
-                        </div>
+                        <table name="mytable">
+                            <tr style="background-color: white; border-padding:20px;">
+                                <th style="padding:20px" name="id">ID</th>
+                                <th style="padding:20px" name="username">Username</th>
+                                <th style="padding:20px" name="firstname">First name</th>
+                                <th style="padding:20px" name="lastname">Last Name</th>
+                                <th style="padding:20px" name="balance">Balance</th>
+                                <th style="padding:20px" name="balance">Type</th>
+                            </tr>
+                            <p>
+                                {{#each result}}
+                                <tr style="background-color: white;">
+                                    <td style="padding:20px">{{this._id}}</td>
+                                    <td style="padding:20px">{{this.username}}</td>
+                                    <td style="padding:20px">{{this.firstname}}</td>
+                                    <td style="padding:20px">{{this.lastname}}</td>
+                                    <td style="padding:20px">{{this.cash2}}</td>
+                                    <td style="padding:20px">{{this.type}}</td>
+                                </tr>
+                                {{/each}}
+                            </p>
+                        </table>
                     </div>
-                  </div>
+                </div>
+                <br>
+                <div class="form-group">
+                    <form action="/admin-success-user-accounts" method="POST">
+                        <input type="submit" class="btn btn-info" id="loadport" value="Load Users">
+                    </form>
+                </div>
+            </div>
+            <br>
+            <div class='container'>
+                <p><i>{{message}}</i></p>
+                <div class="row">
+                    <div class="col">
+                        <form id="deleteuser" action='/admin-success-delete-user-success' , method='POST'>
+                            <label for="stocksearch">Enter Username to Delete</label>
+                            <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
+                            <br>
+                            <p align="left">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </p>
+                            <br>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class='container'>
+                <p><i>{{message}}</i></p>
+                <div class="row">
+                    <div class="col">
+                        <form id="update" action='/admin-update' , method='POST'>
+                            <label for="stocksearch">Enter Username to Update</label>
+                            <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
+                            <label for="stocksearch">Enter the new first name for this user</label>
+                            <input type="text" class="form-control" name="firstName" id="first_name"
+                                placeholder="New First Name">
+                            <label for="stocksearch">Enter the new last name for this user</label>
+                            <input type="text" class="form-control" name="lastName" id="last_name"
+                                placeholder="New Last Name">
+
+                            <label for="stocksearch">Enter the new balance for this user</label>
+                            <input type="number" class="form-control" name="newBalance" id="new_balance"
+                                placeholder="New Balance">
+
+
+                            <br>
+                            <p align="left">
+                                <button type="submit" class="btn btn-danger">Update</button>
+                            </p>
+                            <br>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+    </div>
+    </div>
 
     <!-- Footer -->
     {{> footer}}
 
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
     <script type='text/javascript' src='bundle_1.js'></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    </body>
+</body>
+
 </html>

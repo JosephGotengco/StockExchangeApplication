@@ -30,18 +30,6 @@ var getMarqueeStock = async() => {
     array2 = [yest_nflx_info, yest_aapl_info, yest_tsla_info, yest_goog_info, yest_sbux_info, yest_fb_info, yest_ba_info, yest_baba_info, yest_nke_info, yest_amzn_info];
 
 
-    // console.log(parseFloat(array1[0]) >= parseFloat(array2[0]))
-    // console.log(parseFloat(array1[1]) >= parseFloat(array2[1]))
-    // console.log(parseFloat(array1[2]) >= parseFloat(array2[2]))
-    // console.log(parseFloat(array1[3]) >= parseFloat(array2[3]))
-    // console.log(parseFloat(array1[4]) >= parseFloat(array2[4]))
-    // console.log(parseFloat(array1[5]) >= parseFloat(array2[5]))
-    // console.log(parseFloat(array1[6]) >= parseFloat(array2[6]))
-    // console.log(parseFloat(array1[7]) >= parseFloat(array2[7]))
-    // console.log(parseFloat(array1[8]) >= parseFloat(array2[8]))
-    // console.log(parseFloat(array1[9]) >= parseFloat(array2[9]))
-    
-
 
     if(parseFloat(array1[0]) >= parseFloat(array2[0])){
         img0 ="../images/greentriangle.png";
