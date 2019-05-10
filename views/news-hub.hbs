@@ -7,20 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     {{!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
                 integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> --}}
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
     <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
-    {{!-- <link rel='stylesheet' href='testcss.css'> --}}
+    <link rel='stylesheet' href="./css/style.css">
     <style>
         * {
             box-sizing: border-box;
         }
+
         html,
         body {
             margin: 0;
@@ -30,14 +31,21 @@
             height: 100%;
         }
 
-        {{!-- .side1 {
-            background-color: #55efc4;
-        }
-        .side2 {
-            background-color: #fd79a8;
-        } --}}
+            {
+                {
+                 !-- .side1 {
+                    background-color: #55efc4;
+                }
 
-        .card{
+                .side2 {
+                    background-color: #fd79a8;
+                }
+
+                --
+            }
+        }
+
+        .card {
             width: 45%;
             max-height: 250px;
             margin: 5px auto;
@@ -50,12 +58,12 @@
         }
 
         .thinner {
-            font-weight:400;
+            font-weight: 400;
         }
 
         img {
             width: 100%;
-            height: 100px;
+            height: 30px;
         }
 
         .card-body {
@@ -65,83 +73,81 @@
         .bottom-space {
             padding-bottom: 100px;
         }
-
     </style>
 </head>
 
 <body>
 
-{{> loggedInNavbar}}
-<div class="container bottom-space">
-  <div class="row">
-    <div class="col-sm-6 side1">
-        <div class="container">
+    {{> loggedInNavbar}}
 
 
-            <div class="row">
-                    <div class="col-md-12 column-header"><h1 class="thinner">STOCKS</h1></div>
+
+    <div class="row p-5 footer-spacer">
+        <div class="col-6">
+            <h2 class="sub-header">Stocks</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">Ticker</th>
+                            <th class="col-md-2">Price</th>
+                            <th class="col-md-3">Trend</th>
+                            <th class="col-md-4">Stats</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each stockDataList}}
+                        <tr>
+                            <td class="col-md-1">{{this.code}}</td>
+                            <td class="col-md-2">{{this.this.price}}</td>
+                            <td class="col-md-3"><img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            </td>
+                            <td class="col-md-4"><a href="/news/currency/{{this.code}}">Stats</a></td>
+
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
             </div>
+        </div>
+        <div class="col-6">
+            <h2 class="sub-header">Currencies</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">Code</th>
+                            <th class="col-md-2">Price</th>
+                            <th class="col-md-3">Trend</th>
+                            <th class="col-md-4">Stats</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each currencyDataList}}
+                        <tr>
+                            <td class="col-md-1">{{this.code}}</td>
+                            <td class="col-md-2">{{this.this.price}}</td>
+                            <td class="col-md-3"><img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            </td>
+                            <td class="col-md-4"><a href="/news/currency/{{this.code}}">Stats</a></td>
 
-            <div class="row">
-                {{#each stockDataList}}
-                    <div class="card">
-                        <a href="/news/stock/{{{this.code}}}">
-                            <img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
-                            <div class="card-body">
-                                <h5 class="card-title">{{{this.code}}}</h5>
-                                <p class="card-text">Price: {{{this.price}}}</p>
-                            </div>
-                        </a>
-                    </div>
-                {{/each}}
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
             </div>
-
-
         </div>
     </div>
-
-
-
-
-    <div class="col-sm-6 side2">
-        <div class="container">
-
-            <div class="row">
-                    <div class="col-md-12 column-header"><h1 class="thinner">CURRENCY</h1></div>
-            </div>
-
-            <div class="row">
-
-                {{#each currencyDataList}}
-                    <div class="card">
-                        <a href="/news/currency/{{{this.code}}}" target="_blank">
-                            <img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
-                            <div class="card-body">
-                                <h5 class="card-title">{{{this.code}}}</h5>
-                                <p class="card-text">Price: {{{this.price}}}</p>
-                            </div>
-                        </a>
-                    </div>
-                {{/each}}
-            </div>
-            </div>
-
-
-        </div>
-    </div>
-  </div>
-</div>
-
     {{> footer}}
 
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 </body>

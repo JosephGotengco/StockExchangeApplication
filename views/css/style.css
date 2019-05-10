@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Quantico');
 * {
     box-sizing: border-box;
 }
@@ -9,13 +10,13 @@ body {
     font-size: 1rem;
     line-height: 1.5;
     height: 100%;
-    font-family: 'Roboto Slab', serif;
+    font-family: 'Quantico', sans-serif;
+    overflow-x: hidden;
 }
 
 .content-margin {
     margin-top: 75px;
 }
-
 
 .nav-margin {
     margin-bottom: 75px;
@@ -53,5 +54,15 @@ body {
 
 .not-login-msg {
     width: 50%;
+}
+
+.nav-color, .footer {
+    background-color: #272727;
+}
+
+
+
+.footer-spacer {
+    margin-bottom: 200px;
 }
 

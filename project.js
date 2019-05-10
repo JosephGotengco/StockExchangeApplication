@@ -14,7 +14,9 @@ var cookieParser = require("cookie-parser");
 var ObjectID = require("mongodb").ObjectID;
 var assert = require("assert");
 var moment = require("moment");
+var bcrypt = require("bcrypt");
 
+var saltRounds = 10;
 // function for getting stock data for the graph
 var stockFunc = require("./feature_functions/chartStockData");
 // function for getting currency data for the graph
@@ -23,6 +25,8 @@ var currFunc = require("./feature_functions/chartCurrData");
 var marqueeStock = require("./feature_functions/MarqueeStock");
 // function for getting the currency data for the marquee element
 var marqueeCurrency = require("./feature_functions/MarqueeCurrency");
+// function for getting a single stock's price
+var getBatch = require("./feature_functions/getBatchPrice");
 
 // configure which port to use and set it as a environment variable in the process
 const port = process.env.PORT || 8080;
@@ -63,8 +67,12 @@ hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
 	return arg1 == arg2 ? options.fn(this) : options.inverse(this);
 });
 
-hbs.registerHelper('json', function(context) {
-    return JSON.stringify(context);
+hbs.registerHelper("json", function (context) {
+	return JSON.stringify(context);
+});
+
+hbs.registerHelper("roundToTwo", function (num) {
+	return num.toFixed(2);
 });
 
 // cookie configuration
@@ -161,37 +169,44 @@ app.post("/register", function (request, response) {
 	}
 
 	if (check) {
-		db.collection("user_accounts").findOne({ username: username }, function (
-			err,
-			result
-		) {
-			if (result === null) {
-				db.collection("user_accounts").insertOne(
-					{
-						firstname: firstname,
-						lastname: lastname,
-						username: username,
-						password: password,
-						type: "standard",
-						cash2: [10000],
-						stocks: [],
-						transactions: []
-					},
-					(err, result) => {
-						if (err) {
-							messsage = `There was an error in creating your account. Please try again.`;
-							response.render("registration.hbs", {
-								title: `There was an error in creating your account. Please try again.`
-							});
-						}
-						message = `You have successfully created an account with the username '${username}' and have been granted $10,000 USD. Head over to the login page.`;
-						response.render("registration.hbs", { title: message });
-					}
-				);
+		bcrypt.hash(password, saltRounds, (err, hash) => {
+			if (err) {
+				console.error(err);
 			} else {
-				message = `The username '${username}' already exists within the system.`;
-				response.render("registration.hbs", {
-					title: `The username '${username}' already exists within the system.`
+				db.collection("user_accounts").findOne({ username: username }, function (
+					err,
+					result
+				) {
+					if (result === null) {
+						db.collection("user_accounts").insertOne(
+							{
+								firstname: firstname,
+								lastname: lastname,
+								username: username,
+								password: hash,
+								type: "standard",
+								cash2: [10000],
+								stocks: [],
+								creation_date: new Date().toString(),
+								transactions: []
+							},
+							(err, result) => {
+								if (err) {
+									messsage = `There was an error in creating your account. Please try again.`;
+									response.render("registration.hbs", {
+										title: `There was an error in creating your account. Please try again.`
+									});
+								}
+								message = `You have successfully created an account with the username '${username}' and have been granted $10,000 USD. Head over to the login page.`;
+								response.render("registration.hbs", { title: message });
+							}
+						);
+					} else {
+						message = `The username '${username}' already exists within the system.`;
+						response.render("registration.hbs", {
+							title: `The username '${username}' already exists within the system.`
+						});
+					}
 				});
 			}
 		});
@@ -201,7 +216,6 @@ app.post("/register", function (request, response) {
 function check_str(string_input) {
 	// checks if string value is between 3 and 12 characters, uses RegEx to confirm only alphabetical characters
 	var valid_chars = /^[a-zA-Z ]{3,30}$/;
-	var string_length = string_input.length;
 
 	if (valid_chars.test(string_input)) {
 		flag = true;
@@ -292,24 +306,31 @@ app.post(
 );
 
 passport.use(
-	new LocalStrategy(
-		// configures how we are going to authenticate the user
-		function (username, password, done) {
-			user_account.findOne({ username: username }, function (err, user) {
+	new LocalStrategy(function (username, password, done) {
+		user_account.findOne({ username: username }, function (err, user) {
+			if (err) {
+				return done(err);
+			}
+			if (!user) {
+				return done(null, false);
+			}
+			bcrypt.compare(password, user.password, function (err, result) {
 				if (err) {
-					return done(err);
-				}
-				if (!user) {
 					return done(null, false);
 				}
-				if (user.password != password) {
+				if (result) {
+					return done(null, user);
+				} else {
 					return done(null, false);
 				}
-				return done(null, user);
 			});
-		}
-	)
+		});
+	})
 );
+
+app.get("/about", isAuthenticated, (request, response) => {
+	response.render("about.hbs");
+});
 
 app.get("/news-hub", isAuthenticated, async (request, response) => {
 	// called when user goes to the news hub page
@@ -317,7 +338,6 @@ app.get("/news-hub", isAuthenticated, async (request, response) => {
 		var stockDataList = await marqueeStock.getMarqueeStock();
 		ssn.stockDataList = stockDataList;
 	}
-
 	response.render("news-hub.hbs", {
 		title: "Stock and Currency.",
 		currencyDataList: ssn.currencyDataList,
@@ -337,7 +357,27 @@ app.get("/trading-success", isAuthenticated, async (request, response) => {
 	// called when user logs in successfully => redicted to this page
 	try {
 		ssn = request.session;
+		var cash2 = request.session.passport.user.cash2;
+		var stocks = request.session.passport.user.stocks;
+		var num_stocks = request.session.passport.user.stocks.length;
+		var transactions = request.session.passport.user.transactions;
+		var num_transactions = transactions.length;
+		var earnings = cash2 - 10000;
 
+		var amountBought = countStocksBought(transactions);
+
+		var amountSold = countStocksSold(transactions);
+
+		var uniqueTransactions = getUniqueTransactions(transactions);
+
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
 		var defaultPreference = "currency";
 		if (ssn.preference === undefined) {
 			ssn.preference = defaultPreference;
@@ -348,11 +388,50 @@ app.get("/trading-success", isAuthenticated, async (request, response) => {
 			ssn.currencyDataList = currencyDataList;
 		}
 
+		var stock_names = [];
+		var displayStocks = [];
+		var stock_tickers = "";
+
+		if (stocks.length > 0) {
+			for (i = 0; i < stocks.length; i++) {
+				stock_tickers += `${stocks[i].stock_name},`;
+				stock_names.push(stocks[i].stock_name);
+			}
+			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+			ssn.closing_price = closing_price;
+			for (i = 0; i < stocks.length; i++) {
+				displayStocks[i] = stocks[i];
+				var today_price = closing_price[stock_names[i]];
+				displayStocks[i].profit = (
+					displayStocks[i].total_cost -
+					today_price * displayStocks[i].amount
+				).toFixed(2);
+				displayStocks[i].today_rate = today_price;
+			}
+			ssn.userStockData = {
+				displayStocks: displayStocks
+			};
+		} else {
+			ssn.userStockData = { displayStocks: displayStocks };
+		}
+
+		// Updated cookies @ every endpoint
 		response.render("trading-success.hbs", {
 			title: "Welcome to the trading page.",
 			marqueeData: ssn.currencyDataList,
 			display: "Trading",
-			preference: ssn.preference
+			preference: ssn.preference,
+			userCash: cash2[0],
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			stocks: displayStocks,
+			uniqueTransactions: uniqueTransactions.slice(
+				-5,
+				uniqueTransactions.length
+			)
 		});
 	} catch (err) {
 		console.log(err);
@@ -364,6 +443,7 @@ app.post(
 	isAuthenticated,
 	async (request, response) => {
 		try {
+			var cash2 = request.session.passport.user.cash2;
 			ssn.preference = "stock";
 			if (ssn.stockDataList === undefined) {
 				var stockDataList = await marqueeStock.getMarqueeStock();
@@ -374,10 +454,403 @@ app.post(
 				title: "Welcome to the trading page.",
 				marqueeData: ssn.stockDataList,
 				display: "Trading",
-				preference: ssn.preference
+				preference: ssn.preference,
+				userCash: cash2[0],
+				num_stocks: ssn.userStatsData.num_stocks,
+				num_transactions: ssn.userStatsData.num_transactions,
+				earnings: ssn.userStatsData.earnings,
+				amountBought: ssn.userStatsData.amountBought,
+				amountSold: ssn.userStatsData.amountSold,
+				stocks: ssn.userStockData.displayStocks,
+				uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+					-5,
+					ssn.userStatsData.uniqueTransactions.length
+				)
 			});
 		} catch (err) {
 			console.log(err);
+		}
+	}
+);
+
+app.post(
+	"/trading-success-search",
+	isAuthenticated,
+	async (request, response) => {
+		// called when user submits a ticker in ticker search box in trading page
+		var stock = request.body.stocksearch.toUpperCase();
+		var cash2 = request.session.passport.user.cash2;
+		var message;
+
+		try {
+			const stock_info = await axios.get(
+				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
+			);
+			var stock_name = stock_info.data.companyName;
+			var stock_price = stock_info.data.close;
+
+			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: $${stock_price} USD.`;
+		} catch (err) {
+			if (stock === "") {
+				message = "Please enter a stock ticker i.e. TSLA, MSFT";
+			} else {
+				message = `Sorry the stock ticker '${stock}' is invalid.`;
+			}
+		}
+
+		switch (ssn.preference) {
+			case "stock":
+				var marqueeData = ssn.stockDataList;
+				break;
+			case "currency":
+				var marqueeData = ssn.currencyDataList;
+				break;
+		}
+		response.render("trading-success.hbs", {
+			title: message,
+			head: `Cash balance: $${cash2[0]}`,
+			marqueeData: marqueeData,
+			display: "Trading",
+			preference: ssn.preference,
+			userCash: cash2[0],
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: ssn.userStockData.displayStocks,
+			uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+				-5,
+				ssn.userStatsData.uniqueTransactions.length
+			)
+		});
+	}
+);
+
+app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
+	// called when user submits ticker in stock buy form in trading page
+	// FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX
+	var _id = request.session.passport.user._id;
+	var cash = request.session.passport.user.cash;
+	var qty = parseFloat(request.body.buystockqty);
+	var stock = request.body.buystockticker.toUpperCase();
+	var stocks = request.session.passport.user.stocks;
+	var cash2 = request.session.passport.user.cash2;
+	var num_stocks = request.session.passport.user.stocks.length;
+	var transactions = request.session.passport.user.transactions;
+	var num_transactions = transactions.length;
+	var earnings = cash2 - 10000;
+
+
+	var index = check_existence(stock);
+	var message;
+
+	try {
+		const stock_info = await axios.get(
+			`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
+		);
+		var stock_name = stock_info.data.companyName;
+		var stock_price = stock_info.data.close;
+		var total_cost = Math.round(stock_price * qty * 100) / 100;
+		var cash_remaining = Math.round((cash2 - total_cost) * 100) / 100;
+
+		var amountBought = countStocksBought(transactions);
+
+		var amountSold = countStocksSold(transactions);
+
+		var uniqueTransactions = getUniqueTransactions(transactions);
+
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
+
+		if (cash_remaining >= 0 && total_cost !== 0 && qty > 0) {
+			var db = utils.getDb();
+
+			if (index >= 0) {
+				var stock_qty = request.session.passport.user.stocks[index].amount;
+				var current_cost =
+					request.session.passport.user.stocks[index].total_cost;
+				var stock_remaining = parseFloat(qty) + parseFloat(stock_qty);
+				stock_holding = {
+					stock_name: stock,
+					amount: parseFloat(stock_remaining),
+					total_cost: current_cost + total_cost
+				};
+				stocks[index] = stock_holding;
+				cash2[0] = cash_remaining;
+			} else {
+				stock_holding = {
+					stock_name: stock,
+					amount: parseFloat(qty),
+					total_cost: total_cost
+				};
+				cash2[0] = cash_remaining;
+				stocks.push(stock_holding);
+			}
+
+			var log = {
+				datetime: new Date().toString(),
+				stock: stock,
+				stock_name: stock_name,
+				qty: qty,
+				total_cost: total_cost,
+				type: "B",
+				balance: cash_remaining
+			};
+			transactions.push(log);
+			db.collection("user_accounts").updateOne(
+				{ _id: ObjectID(_id) },
+				{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
+			);
+
+			message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_cost}.`;
+		} else if (total_cost === 0) {
+			message = `Sorry you need to purchase at least 1 stock. Change your quantity to 1 or more.`;
+		} else if (qty < 0) {
+			message = `You cannot buy negative shares.`;
+		} else {
+			message = `Sorry you only have $${
+				cash2[0]
+				}. The purchase did not go through. The total cost was $${total_cost}.`;
+		}
+	} catch (err) {
+		if (stock === "") {
+			message = `Sorry, you must input a stock to buy.`;
+		} else {
+			message = `Sorry the stock ticker '${
+				request.body.buystockticker
+				}' is invalid.`;
+		}
+	}
+	switch (ssn.preference) {
+		case "stock":
+			var marqueeData = ssn.stockDataList;
+			break;
+		case "currency":
+			var marqueeData = ssn.currencyDataList;
+			break;
+	}
+
+	var stock_names = [];
+	var displayStocks = [];
+	var stock_tickers = "";
+
+	if (stocks.length > 0) {
+		for (i = 0; i < stocks.length; i++) {
+			stock_tickers += `${stocks[i].stock_name},`;
+			stock_names.push(stocks[i].stock_name);
+		}
+		var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+		ssn.closing_price = closing_price;
+		for (i = 0; i < stocks.length; i++) {
+			displayStocks[i] = stocks[i];
+			var today_price = closing_price[stock_names[i]];
+			displayStocks[i].profit = (
+				displayStocks[i].total_cost -
+				today_price * displayStocks[i].amount
+			).toFixed(2);
+			displayStocks[i].today_rate = today_price;
+		}
+		ssn.userStockData = {
+			displayStocks: displayStocks
+		};
+	} else {
+		ssn.userStockData = { displayStocks: displayStocks };
+	}
+
+	response.render("trading-success.hbs", {
+		title: message,
+		head: `Cash balance: $${cash2[0]}`,
+		marqueeData: marqueeData,
+		display: "Trading",
+		preference: ssn.preference,
+		userCash: cash2[0],
+		num_stocks: ssn.userStatsData.num_stocks,
+		num_transactions: ssn.userStatsData.num_transactions,
+		earnings: ssn.userStatsData.earnings,
+		amountBought: ssn.userStatsData.amountBought,
+		amountSold: ssn.userStatsData.amountSold,
+		stocks: ssn.userStockData.displayStocks,
+		uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+			-5,
+			ssn.userStatsData.uniqueTransactions.length
+		)
+	});
+
+	function check_existence(stock) {
+		var index = -1;
+
+		for (i = 0; i < stocks.length; i++) {
+			if (stocks[i].stock_name === stock) {
+				index = i;
+			}
+		}
+
+		return index;
+	}
+});
+
+app.post(
+	"/trading-success-sell",
+	isAuthenticated,
+	async (request, response) => {
+		// called when user submits ticker in stock sell form in trading page
+		var _id = request.session.passport.user._id;
+		var cash = request.session.passport.user.cash;
+		var cash2 = request.session.passport.user.cash2;
+		var qty = parseFloat(request.body.sellstockqty);
+		var stock = request.body.sellstockticker.toUpperCase();
+		var stocks = request.session.passport.user.stocks;
+		var num_stocks = request.session.passport.user.stocks.length;
+		var transactions = request.session.passport.user.transactions;
+		var num_transactions = transactions.length;
+		var earnings = cash2 - 10000;
+
+		var index = check_existence(stock);
+		var message;
+
+		try {
+			const stock_info = await axios.get(
+				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
+			);
+
+			var stock_name = stock_info.data.companyName;
+			var stock_price = stock_info.data.close;
+			var total_sale = Math.round(stock_price * qty * 100) / 100;
+			var cash_remaining = Math.round((cash2[0] + total_sale) * 100) / 100;
+			if (request.session.passport.user.stocks[index] !== undefined) {
+				var stock_qty = request.session.passport.user.stocks[index].amount;
+				var current_cost = request.session.passport.user.stocks[index].total_cost;
+			} else {
+				throw "you don't have this stock (abritrary error msg LOL)";
+			}
+			var stock_remaining = stock_qty - qty;
+
+			var amountBought = countStocksBought(transactions);
+
+			var amountSold = countStocksSold(transactions);
+
+			var uniqueTransactions = getUniqueTransactions(transactions);
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
+			if (stock_qty < qty) {
+				message = `You are trying to sell ${qty} shares of ${stock} when you only have ${stock_qty} shares.`;
+			} else if (stock_qty >= qty && total_sale > 0) {
+				var db = utils.getDb();
+
+				if (stock_remaining > 0) {
+					var stock_holding = {
+						stock_name: stock,
+						amount: parseFloat(stock_remaining),
+						total_cost: current_cost - total_sale
+					};
+					stocks[index] = stock_holding;
+					cash2[0] = cash_remaining;
+				} else {
+					stocks.splice(index, 1);
+					cash2[0] = cash_remaining;
+				}
+				var log = {
+					datetime: new Date().toString(),
+					stock: stock,
+					stock_name: stock_name,
+					qty: qty,
+					total_sale: total_sale,
+					type: "S",
+					balance: cash_remaining
+				};
+				transactions.push(log);
+				db.collection("user_accounts").updateOne(
+					{ _id: ObjectID(_id) },
+					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
+				);
+				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_sale}.`;
+			} else {
+				message = `You need to sell at least 1 share of ${stock}.`;
+			}
+		} catch (err) {
+			if (stock === "") {
+				message = `You cannot leave the sell input blank. Please input a stock ticker`;
+			} else {
+				message = `You do not own any shares with the ticker '${stock}'.`;
+			}
+		}
+		switch (ssn.preference) {
+			case "stock":
+				var marqueeData = ssn.stockDataList;
+				break;
+			case "currency":
+				var marqueeData = ssn.currencyDataList;
+				break;
+		}
+
+		var stock_names = [];
+		var displayStocks = [];
+		var stock_tickers = "";
+
+		if (stocks.length > 0) {
+			for (i = 0; i < stocks.length; i++) {
+				stock_tickers += `${stocks[i].stock_name},`;
+				stock_names.push(stocks[i].stock_name);
+			}
+			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+			ssn.closing_price = closing_price;
+			for (i = 0; i < stocks.length; i++) {
+				displayStocks[i] = stocks[i];
+				var today_price = closing_price[stock_names[i]];
+				displayStocks[i].profit = (
+					displayStocks[i].total_cost -
+					today_price * displayStocks[i].amount
+				).toFixed(2);
+
+				displayStocks[i].today_rate = today_price;
+			}
+			ssn.userStockData = {
+				displayStocks: displayStocks
+			};
+		} else {
+			ssn.userStockData = { displayStocks: displayStocks };
+		}
+
+		response.render("trading-success.hbs", {
+			title: message,
+			head: `Cash balance: $${cash2[0]}`,
+			marqueeData: marqueeData,
+			display: "Trading",
+			preference: ssn.preference,
+			userCash: cash2[0],
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: ssn.userStockData.displayStocks,
+			uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
+				-5,
+				ssn.userStatsData.uniqueTransactions.length
+			)
+		});
+
+		function check_existence(stock) {
+			var index = -1;
+			for (i = 0; i < stocks.length; i++) {
+				if (stocks[i].stock_name === stock) {
+					index = i;
+				}
+			}
+			return index;
 		}
 	}
 );
@@ -424,259 +897,61 @@ app.get("/news/stock/:id", isAuthenticated, async (request, response) => {
 	}
 });
 
-app.post(
-	"/trading-success-search",
-	isAuthenticated,
-	async (request, response) => {
-		// called when user submits a ticker in ticker search box in trading page
-		var stock = request.body.stocksearch.toUpperCase();
-		var cash2 = request.session.passport.user.cash2;
-
-		var message;
-
-		try {
-			const stock_info = await axios.get(
-				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
-			);
-			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.latestPrice;
-
-			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: $${stock_price} USD.`;
-		} catch (err) {
-			if (stock === "") {
-				message = "Please enter a stock ticker i.e. TSLA, MSFT";
-			} else {
-				message = `Sorry the stock ticker '${stock}' is invalid.`;
-			}
-		}
-
-		switch (ssn.preference) {
-			case "stock":
-				var marqueeData = ssn.stockDataList;
-				break;
-			case "currency":
-				var marqueeData = ssn.currencyDataList;
-				break;
-		}
-		response.render("trading-success.hbs", {
-			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
-			display: "Trading",
-			preference: ssn.preference
-		});
-	}
-);
-
-app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
-	// called when user submits ticker in stock buy form in trading page
-	var _id = request.session.passport.user._id;
-	var cash = request.session.passport.user.cash;
-	var qty = parseFloat(request.body.buystockqty);
-	var stock = request.body.buystockticker.toUpperCase();
+app.get("/trading-portfolio", isAuthenticated, (request, response) => {
+	// called when user loads their data in portfolio data
 	var stocks = request.session.passport.user.stocks;
+	var num_stocks = stocks.length;
+	var stock_keys = [];
+	var cash = request.session.passport.user.cash;
+	var message = "Shares: \n";
 	var cash2 = request.session.passport.user.cash2;
 	var transactions = request.session.passport.user.transactions;
+	var num_transactions = transactions.length;
 
-	var index = check_existence(stock);
-	var message;
-
-	try {
-		const stock_info = await axios.get(
-			`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
-		);
-		var stock_name = stock_info.data.companyName;
-		var stock_price = stock_info.data.latestPrice;
-		var total_cost = Math.round(stock_price * qty * 100) / 100;
-		var cash_remaining = Math.round((cash2 - total_cost) * 100) / 100;
-
-		if (cash_remaining >= 0 && total_cost !== 0 && qty > 0) {
-			var db = utils.getDb();
-			if (index >= 0) {
-				var stock_qty = request.session.passport.user.stocks[index].amount;
-				var stock_remaining = parseFloat(qty) + parseFloat(stock_qty);
-				stock_holding = {
-					stock_name: stock,
-					amount: parseFloat(stock_remaining)
-				};
-				stocks[index] = stock_holding;
-				cash2[0] = cash_remaining;
+	if (num_stocks === 0) {
+		message = "You currently do not have any stocks.";
+	} else {
+	}
+	if (num_transactions === 0) {
+		transact_message = "You currently do not have any transactions";
+	} else {
+		var displayTransactions = [];
+		for (i = 0; i < num_transactions; i++) {
+			var log = transactions[i];
+			var datetimeArr = log.datetime.split(" ");
+			var month = datetimeArr[1];
+			var day = datetimeArr[2];
+			var year = datetimeArr[3];
+			var stock_name = log.stock_name;
+			var qty = log.qty;
+			var type = log.type;
+			var balance = log.balance;
+			if (type === "B") {
+				var price = log.total_cost;
 			} else {
-				stock_holding = {
-					stock_name: stock,
-					amount: parseFloat(qty)
-				};
-				cash2[0] = cash_remaining;
-				stocks.push(stock_holding);
+				var price = log.total_sale;
 			}
-			var log = {
-				datetime: new Date().toString(),
+
+			displayLog = {
+				year: year,
+				month: month,
+				day: day,
 				stock_name: stock_name,
 				qty: qty,
-				total_cost: total_cost,
-				type: "B",
-				balance: cash_remaining
+				type: type,
+				price: price,
+				balance: balance
 			};
-			transactions.push(log);
-			db.collection("user_accounts").updateOne(
-				{ _id: ObjectID(_id) },
-				{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
-			);
 
-			message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_cost}.`;
-		} else if (total_cost === 0) {
-			message = `Sorry you need to purchase at least 1 stock. Change your quantity to 1 or more.`;
-		} else if (qty < 0) {
-			message = `You cannot buy negative shares.`;
-		} else {
-			message = `Sorry you only have $${
-				cash2[0]
-				}. The purchase did not go through. The total cost was $${total_cost}.`;
-		}
-	} catch (err) {
-		if (stock === "") {
-			message = `Sorry, you must input a stock to buy.`;
-		} else {
-			message = `Sorry the stock ticker '${
-				request.body.buystockticker
-				}' is invalid.`;
+			displayTransactions.push(displayLog);
 		}
 	}
-	switch (ssn.preference) {
-		case "stock":
-			var marqueeData = ssn.stockDataList;
-			break;
-		case "currency":
-			var marqueeData = ssn.currencyDataList;
-			break;
-	}
-	response.render("trading-success.hbs", {
-		title: message,
-		head: `Cash balance: $${cash2[0]}`,
-		marqueeData: marqueeData,
-		display: "Trading",
-		preference: ssn.preference
-	});
-
-	function check_existence(stock) {
-		var index = -1;
-
-		for (i = 0; i < stocks.length; i++) {
-			console.log(stocks[i].stock_name === stock)
-			if (stocks[i].stock_name === stock) {
-				index = i;
-			}
-		}
-
-		return index;
-	}
-});
-
-app.post(
-	"/trading-success-sell",
-	isAuthenticated,
-	async (request, response) => {
-		// called when user submits ticker in stock sell form in trading page
-		var _id = request.session.passport.user._id;
-		var cash = request.session.passport.user.cash;
-		var cash2 = request.session.passport.user.cash2;
-		var qty = parseFloat(request.body.sellstockqty);
-		var stock = request.body.sellstockticker.toUpperCase();
-		var stocks = request.session.passport.user.stocks;
-		var transactions = request.session.passport.user.transactions;
-		console.log(typeof cash2);
-		console.log(cash2)
-		var index = check_existence(stock);
-		console.log(`index: ${index}`)
-		var message;
-
-		try {
-			const stock_info = await axios.get(
-				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
-			);
-
-			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.latestPrice;
-			var total_sale = Math.round(stock_price * qty * 100) / 100;
-			var cash_remaining = Math.round((cash2[0] + total_sale) * 100) / 100;
-			var stock_qty = request.session.passport.user.stocks[index].amount;
-			var stock_remaining = stock_qty - qty;
-
-			if (stock_qty < qty) {
-				message = `You are trying to sell ${qty} shares of ${stock} when you only have ${stock_qty} shares.`;
-			} else if (stock_qty >= qty && total_sale > 0) {
-				var db = utils.getDb();
-
-				if (stock_remaining > 0) {
-					var stock_holding = {
-						stock_name: stock,
-						amount: parseFloat(stock_remaining)
-					};
-					stocks[index] = stock_holding;
-					cash2[0] = cash_remaining;
-				} else {
-					stocks.splice(index, 1);
-					cash2[0] = cash_remaining;
-				}
-				var log = {
-					datetime: new Date().toString(),
-					stock_name: stock_name,
-					qty: qty,
-					total_sale: total_sale,
-					type: "S",
-					balance: cash_remaining
-				};
-				transactions.push(log);
-				db.collection("user_accounts").updateOne(
-					{ _id: ObjectID(_id) },
-					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
-				);
-				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_sale}.`;
-			} else {
-				message = `You need to sell at least 1 share of ${stock}.`;
-			}
-		} catch (err) {
-			if (stock === "") {
-				message = `You cannot leave the sell input blank. Please input a stock ticker`;
-			} else {
-				console.log(err)
-				message = `You do not own any shares with the ticker '${stock}'.`;
-			}
-		}
-		switch (ssn.preference) {
-			case "stock":
-				var marqueeData = ssn.stockDataList;
-				break;
-			case "currency":
-				var marqueeData = ssn.currencyDataList;
-				break;
-		}
-		response.render("trading-success.hbs", {
-			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
-			display: "Trading",
-			preference: ssn.preference
-		});
-
-		function check_existence(stock) {
-			var index = -1;
-			for (i = 0; i < stocks.length; i++) {
-				console.log(stocks[i].stock_name === stock)
-				if (stocks[i].stock_name === stock) {
-					index = i;
-				}
-			}
-			return index;
-		}
-	}
-);
-
-app.get("/trading-portfolio", isAuthenticated, (request, response) => {
-	// called when user accesses portfolio page
 	response.render("trading-portfolio.hbs", {
-		title: "Welcome to the Portfolio Page.",
-		display: "Portfolio"
+		title: `Welcome to your portfolio`,
+		display: "Portfolio",
+		displayTransactions: displayTransactions,
+		userCash: cash2[0],
+		userStocks: stocks
 	});
 });
 
@@ -697,12 +972,7 @@ app.post(
 		if (num_stocks === 0) {
 			message = "You currently do not have any stocks.";
 		} else {
-			var i;
-			for (i = 0; i < num_stocks; i++) {
-				stock_keys.push(Object.keys(stocks[i]));
-				var key_value = stocks[i][stock_keys[i][0]];
-				message += stock_keys[i][0] + ": " + key_value + " shares." + "\n";
-			}
+			message = stocks;
 		}
 		if (num_transactions === 0) {
 			transact_message = "You currently do not have any transactions";
@@ -740,7 +1010,7 @@ app.post(
 		}
 		response.render("trading-portfolio.hbs", {
 			title: message,
-			head: `Cash: $${cash2[0]}`,
+			head: cash2[0],
 			display: "Portfolio",
 			displayTransactions: displayTransactions,
 			userStocks: stocks
@@ -866,74 +1136,79 @@ app.post("/admin-success-delete-user-success", isAdmin, function (
 });
 
 app.post("/admin-update", isAdmin, (request, response) => {
-	var username = request.body.user_id;
-	// Need to apply argument checks to these guys
-	var newBal = parseFloat(request.body.newBalance);
-	var newFN = request.body.firstName;
-	var newLN = request.body.lastName;
-	// var newPass = request.body.password;
-	var newType = request.body.type;
-	var findQuery = { username: username };
-	var updateQuery = {
-		$set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
-	};
-	var message;
+	try {
+		var username = request.body.user_id;
+		// Need to apply argument checks to these guys
+		var newBal = parseFloat(request.body.newBal);
+		var newFN = request.body.firstName;
+		var newLN = request.body.lastName;
+		// var newPass = request.body.password;
+		var findQuery = { username: username };
+		var updateQuery = {
+			$set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
+		};
 
-	if (check_str(newFN) === false) {
-		message = `First name must be 3-30 characters long and must only contain letters.`;
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: message
-		});
-	} else if (check_str(newLN) === false) {
-		message = `Last name must be 3-30 characters long and must only contain letters.`;
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: message
-		});
-	} else if (username === "") {
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: "Cannot be empty"
-		});
-	} else if (newBal < 0) {
-		message = `You cannot set the user, ${username}, to below $0.`;
-		response.render("admin-success-user-accounts-list.hbs", {
-			message: message
-		});
-	} else {
-		mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
-			assert.equal(null, err);
-			db.collection("user_accounts")
-				.find(findQuery)
-				.toArray(function (err, result) {
-					if (err) {
-						message = "Unable to Update Account";
-						response.render("admin-success-user-accounts-list.hbs", {
-							message: message
-						});
-					}
-					if (result === undefined || result.length == 0) {
-						message = "No user exists with that username";
-						response.render("admin-success-user-accounts-list.hbs", {
-							message: message
-						});
-					} else {
-						db.collection("user_accounts").updateOne(
-							findQuery,
-							updateQuery,
-							{ upsert: false },
-							function (err, result) {
-								if (err) throw err;
-								request.session.passport.user.cash2 = newBal;
-								message = `The user, ${username}, now has the balance of $${newBal}`;
-								response.render("admin-success-user-accounts-list.hbs", {
-									message: message
-								});
-
-								db.close;
-							}
-						);
-					}
-				});
-		});
+		var message;
+	
+		if (check_str(newFN) === false) {
+			message = `First name must be 3-30 characters long and must only contain letters.`;
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: message
+			});
+		} else if (check_str(newLN) === false) {
+			message = `Last name must be 3-30 characters long and must only contain letters.`;
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: message
+			});
+		} else if (username === "" || username === undefined) {
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: "Cannot be empty"
+			});
+		} else if (newBal < 0 || newBal === undefined) {
+			message = `You cannot set the user, ${username}, to below $0.`;
+			response.render("admin-success-user-accounts-list.hbs", {
+				message: message
+			});
+		} else {
+			mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
+				assert.equal(null, err);
+				db.collection("user_accounts")
+					.find(findQuery)
+					.toArray(function (err, result) {
+						if (err) {
+							message = "Unable to Update Account";
+							response.render("admin-success-user-accounts-list.hbs", {
+								message: message
+							});
+						}
+						if (result === undefined || result.length == 0) {
+							message = "No user exists with that username";
+							response.render("admin-success-user-accounts-list.hbs", {
+								message: message
+							});
+						} else {
+							db.collection("user_accounts").updateOne(
+								findQuery,
+								updateQuery,
+								{ upsert: false },
+								function (err, result) {
+									if (err) throw err;
+									request.session.passport.user.cash2[0] = newBal;
+									message = `The user, ${username}, now has the balance of $${newBal}`;
+									response.render("admin-success-user-accounts-list.hbs", {
+										message: message
+									});
+	
+									db.close;
+								}
+							);
+						}
+					});
+			});
+		}
+	} catch (e) {
+		console.log(e);
+		response.render("admin-success-user-accounts-list.hbs")
 	}
 });
 
@@ -944,6 +1219,40 @@ app.get("*", errorPage, (request, response) => {
 		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
 	});
 });
+
+function countStocksSold(transactionArray) {
+	var amountSold = 0;
+	for (i = 0; i < transactionArray.length; i++) {
+		if (transactionArray[i].type === "S") {
+			amountSold += transactionArray[i].qty;
+		}
+	}
+	return amountSold;
+}
+
+function countStocksBought(transactionArray) {
+	var amountBought = 0;
+	for (i = 0; i < transactionArray.length; i++) {
+		if (transactionArray[i].type === "B") {
+			amountBought += transactionArray[i].qty;
+		}
+	}
+	return amountBought;
+}
+
+function getUniqueTransactions(transactionArray) {
+	var uniqueTicker = [];
+	var uniqueTransactions = [];
+	for (i = 0; i < transactionArray.length; i++) {
+		var currentStock = transactionArray[i].stock;
+		if (uniqueTicker.includes(currentStock)) {
+		} else {
+			uniqueTicker.push(currentStock);
+			uniqueTransactions.push(transactionArray[i]);
+		}
+	}
+	return uniqueTransactions;
+}
 
 function errorPage(request, response, next) {
 	if (request.session.passport !== undefined) {
