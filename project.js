@@ -33,7 +33,7 @@ mongoose.connect("mongodb://localhost:27017/accounts", {
 var app = express();
 
 
-// set the view engine to hbs (used to read our hbs files)
+// set the view engine to hbs (us	ed to read our hbs files)
 app.set("view engine", "hbs");
 
 // set a directory to look for our hbs files, images, css, and native js files

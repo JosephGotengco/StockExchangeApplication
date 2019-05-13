@@ -2,43 +2,43 @@
 <html lang="en">
 
 <head>
-  <title>{{display}}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<title>{{display}}</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel='stylesheet' href='/css/style.css'>
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel='stylesheet' href='/css/style.css'>
 </head>
 
 <body>
 
 	<!-- NAV BAR -->
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
-        <h5 class="my-0 mr-md-auto font-weight-normal">
-            <a class="navbar-brand" href="/trading-success">
-                <i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
-                STOCK NAME
-            </a>
+	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+		<h5 class="my-0 mr-md-auto font-weight-normal">
+			<a class="navbar-brand" href="/trading-success">
+				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+				STOCK NAME
+			</a>
 
-        </h5>
+		</h5>
 
-        <nav class="my-2 my-md-0 mr-md-3 nav-pills">
-            <a class="p-2 text-light" href="/trading-success">Trading</a>
-            <a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
+			<a class="p-2 text-light" href="/trading-success">Trading</a>
+			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
 			<a class="p-2 text-light" href="/news-hub">Rankings</a>
-        </nav>
-        <a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
-        <a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
-    </div>
+		</nav>
+		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+	</div>
 
 	{{!-- Graph --}}
-	<canvas style="padding: 20px;" class="footer-spacer"  id="myChart" width="300" height="100"></canvas>
+	<canvas style="padding: 20px;" class="footer-spacer" id="myChart" width="300" height="100"></canvas>
 
 	<!-- Footer -->
 	{{> footer}}
@@ -86,47 +86,56 @@
 
 	// Any of the following formats may be used
 	var ctx = document.getElementById('myChart');
+	var myColors = ['red', 'green', 'blue'];
 	var myChart = new Chart(ctx, {
 		type: 'line',
 		data: {
-			labels: "[{{labels}}]".replace("[", "").replace("]", "").split(","),
-			datasets: [{
-				label: '{{chart_title}} (compared to USD)',
-				data: JSON.parse("[{{data}}]"),
-				borderColor: [
-					'rgba(255, 99, 132, 1)',
-					'rgba(54, 162, 235, 1)',
-					'rgba(255, 206, 86, 1)',
-					'rgba(75, 192, 192, 1)',
-					'rgba(153, 102, 255, 1)',
-					'rgba(255, 159, 64, 1)'
-				],
-				fill: false,
-				borderWidth: 1,
-				pointHitRadius: 1,
-				borderCapStyle: 'miter',
-				tension: 0
+			labels: {{{ json labels }}},
+	datasets: [{
+		label: '{{chart_title}} (compared to {{{currency_code}}})',
+		data: {{{ json data }}},
+		backgroundColor: [
+		'rgba(255, 99, 132, 0.2)',
+		'rgba(54, 162, 235, 0.2)',
+		'rgba(255, 206, 86, 0.2)',
+		'rgba(75, 192, 192, 0.2)',
+		'rgba(153, 102, 255, 0.2)',
+		'rgba(255, 159, 64, 0.2)'
+	],
+		borderColor: [
+		'rgba(255, 99, 132, 1)',
+		'rgba(54, 162, 235, 1)',
+		'rgba(255, 206, 86, 1)',
+		'rgba(75, 192, 192, 1)',
+		'rgba(153, 102, 255, 1)',
+		'rgba(255, 159, 64, 1)'
+	],
+		fill: true,
+		borderWidth: 1,
+		pointHitRadius: 1,
+		borderCapStyle: 'miter',
+		tension: 0
 			}]
 		},
-		options: {
-			scales: {
-				yAxes: [{
-					ticks: {
-						beginAtZero: false
-					},
-					scaleLabel: {
-						display: true,
-						labelString: 'Dollars ($)'
-					}
-				}],
+	options: {
+		scales: {
+			yAxes: [{
+				ticks: {
+					beginAtZero: false
+				},
+				scaleLabel: {
+					display: true,
+					labelString: '{{{currency_code}}} ({{{currency_symbol}}})'
+				}
+			}],
 				xAxes: [{
 					scaleLabel: {
 						display: true,
 						labelString: 'Date (yyyy-mm--dd)'
 					}
 				}]
-			}
 		}
+	}
 	});
 </script>
 
