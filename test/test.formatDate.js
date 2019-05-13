@@ -8,26 +8,26 @@ describe('formatDate function tests', () => {
         assert.equal(formatted_date, "1995-12-17");
     });
 
-    it("should return false", () => {
+    it("should attempt to format an invalid date", () => {
         var invalid_date = "invalid date";
         var formatted_date = formatDate.formatDate(invalid_date);
         assert.equal(formatted_date, false);
     })
 
     
-    it("should return false", () => {
+    it("should attempt to format a number", () => {
         var invalid_date = 1;
         var formatted_date = formatDate.formatDate(invalid_date);
         assert.equal(formatted_date, false);
     })
 
-    it("should return false", () => {
+    it("should attempt to format a float", () => {
         var invalid_date = 1.1;
         var formatted_date = formatDate.formatDate(invalid_date);
         assert.equal(formatted_date, false);
     })
 
-    it("should return false", () => {
+    it("should attempt to format an array", () => {
         var invalid_date = {};
         var formatted_date = formatDate.formatDate(invalid_date);
         assert.equal(formatted_date, false)

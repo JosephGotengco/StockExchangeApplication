@@ -1,25 +1,64 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+var validator = require("email-validator");
+var emailExistence = require("email-existence");
+var utils = require("../utils");
 
 const router = new express.Router();
-var utils = require("../utils");
+
+var saltRounds = 10;
+
+const sQuestions = [
+	"What was the house number and street name you lived in as a child?",
+	"What were the last four digits of your childhood telephone number?",
+	"What primary school did you attend?",
+	"In what town or city was your first full time job?",
+	"In what town or city did you meet your spouse/partner?",
+	"What is the middle name of your oldest child?",
+	"What are the last five digits of your driver's licence number?",
+	"What is your grandmother's (on your mother's side) maiden name?",
+	"What is your spouse or partner's mother's maiden name?",
+	"In what town or city did your mother and father meet?",
+	"What time of the day were you born? (hh:mm)",
+	"What time of the day was your first child born? (hh:mm)"
+];
+
+var staticData = {
+	s1Questions: sQuestions.slice(0,5),
+	s2Questions: sQuestions.slice(5,100),
+	display: "Register"
+}
+
+router
+	.route("/registration-logged-in")
+	.get(isAuthenticated, (request, response) => {
+		response.render("register-logged-in.hbs", {
+			title: "You are already logged in. Logout to make a new account.",
+			display: "Register"
+		});
+	});
 
 router
 	.route("/register")
 	.get((request, response) => {
-		// called when user goes to user registration page
-		response.render("registration.hbs", {
-			title: "To create an account please enter credentials."
-		});
+		response.render("register.hbs", {title: "To create an account please enter credentials.", ...staticData});
 	})
 	.post((request, response) => {
-		// called when user submits form data for user registration
+		var db = utils.getDb();
+
 		var firstname = request.body.firstname;
 		var lastname = request.body.lastname;
 		var username = request.body.username;
+		var email = request.body.email;
 		var password = request.body.password;
-		var message;
 		var confirm_password = request.body.confirm_password;
-		var db = utils.getDb();
+		var s1Q = request.body.s1Q;
+		var s1A = request.body.s1A;
+		var s2Q = request.body.s2Q;
+		var s2A = request.body.s2A;
+
+
+		var message;
 		var attributes = [
 			firstname,
 			lastname,
@@ -31,19 +70,62 @@ router
 
 		if (check_str(attributes[0]) === false) {
 			message = `First name must be 3-30 characters long and must only contain letters.`;
-			response.render("registration.hbs", { title: message });
+			response.render("register.hbs", {
+				title: message, ...staticData
+			});
 		} else if (check_str(attributes[1]) === false) {
 			message = `Last name must be 3-30 characters long and must only contain letters.`;
-			response.render("registration.hbs", { title: message });
+			response.render("register.hbs", {
+				title: message,...staticData
+			});
 		} else if (check_uniq(attributes[2]) === false) {
 			message = `Username must have 5-15 characters and may only be alphanumeric.`;
-			response.render("registration.hbs", { title: message });
-		} else if (check_uniq(attributes[3]) === false) {
+			response.render("register.hbs", {
+				title: message, ...staticData
+			});
+		} 
+		// else if (validator.validate(email) === false) {
+		// 	message = `Email must have 5-15 characters and may only be alphanumeric.`;
+		// 	response.render("register.hbs", {
+		// 		title: message, ...staticData
+		// 	});
+		// } 
+		else if (check_uniq(attributes[3]) === false) {
 			message = `Password must have 5-15 characters and may only be alphanumeric.`;
-			response.render("registration.hbs", { title: message });
+			response.render("register.hbs", {
+				title: message,
+				...staticData
+			});
 		} else if (attributes[3] !== attributes[4]) {
 			message = `Passwords do not match. Please try again.`;
-			response.render("registration.hbs", { title: message });
+			response.render("register.hbs", {
+				title: message,
+				...staticData
+			});
+		} else if (sQuestions.slice(0,5).includes(s1Q) === false) {
+			message = `Please pick and answer the first security question.`;
+			response.render("register.hbs", {
+				title: message,
+				...staticData
+			});
+		} else if (check_uniq(s1A) === false || s1A === undefined) {
+			message = `Your answer for security question #1 must have 5-15 characters and may only be alphanumeric.`;
+			response.render("register.hbs", {
+				title: message,
+				...staticData
+			});
+		} else if (sQuestions.slice(5,100).includes(s2Q) === false) {
+			message = `Please pick and answer a second security question.`;
+			response.render("register.hbs", {
+				title: message,
+				...staticData
+			});
+		} else if (check_uniq(s2A) === false || s2A === undefined) {
+			message = `Your answer for security question #2 must have 5-15 characters and may only be alphanumeric.`;
+			response.render("register.hbs", {
+				title: message,
+				...staticData
+			});
 		} else {
 			check = true;
 		}
@@ -62,33 +144,38 @@ router
 										firstname: firstname,
 										lastname: lastname,
 										username: username,
+										email: email,
 										password: hash,
+										s1Q: s1Q,
+										s1A: s1A,
+										s2Q: s2Q,
+										s2A: s2A,
 										type: "standard",
 										cash2: [10000],
 										stocks: [],
-										transactions: [
-											{
-												datetime: new Date().toString(),
-												type: "C",
-												balance: 10000
-											}
-										]
+										creation_date: new Date().toString(),
+										transactions: []
 									},
 									(err, result) => {
 										if (err) {
 											messsage = `There was an error in creating your account. Please try again.`;
-											response.render("registration.hbs", {
-												title: `There was an error in creating your account. Please try again.`
+											response.render("register.hbs", {
+												title: `There was an error in creating your account. Please try again.`,
+												...staticData
 											});
 										}
 										message = `You have successfully created an account with the username '${username}' and have been granted $10,000 USD. Head over to the login page.`;
-										response.render("registration.hbs", { title: message });
+										response.render("register.hbs", {
+											title: message,
+											...staticData
+										});
 									}
 								);
 							} else {
 								message = `The username '${username}' already exists within the system.`;
-								response.render("registration.hbs", {
-									title: `The username '${username}' already exists within the system.`
+								response.render("register.hbs", {
+									title: `The username '${username}' already exists within the system.`,
+									...staticData
 								});
 							}
 						}
@@ -98,15 +185,6 @@ router
 		}
 	});
 
-router
-	.route("/registration-logged-in")
-	.get(isAuthenticated, (request, response) => {
-		// called when user is already logged in and goes to user registration page
-		response.render("registration-logged-in.hbs", {
-			title: "You are already logged in. Logout to make a new account.",
-			display: "Register"
-		});
-	})
 
 
 
@@ -125,7 +203,7 @@ function check_str(string_input) {
 
 function check_uniq(string_input) {
 	// checks if string value is between 5 and 15 characters, uses RegEx to confirm only alphanumerical chars
-	var valid_chars = /^([a-zA-Z0-9_-]){5,15}$/;
+	var valid_chars = /^([a-zA-Z0-9:_-]){5,15}$/;
 
 	if (valid_chars.test(string_input)) {
 		flag = true;
@@ -137,7 +215,6 @@ function check_uniq(string_input) {
 
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
-		console.log(request.session.passport);
 		next();
 	} else {
 		response.redirect("/");
@@ -145,3 +222,4 @@ function isAuthenticated(request, response, next) {
 }
 
 module.exports = router;
+
