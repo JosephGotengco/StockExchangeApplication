@@ -7,6 +7,7 @@ var getCurrData = async(curr) => {
         if (typeof curr != "string") {
             throw TypeError("wrong type")
         }
+
         var curr = curr.toUpperCase();
         var date = new Date();
         var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -37,7 +38,6 @@ var getCurrData = async(curr) => {
             return (parseInt(Object.keys(a)[0].slice(-2)) - parseInt(Object.keys(b)[0].slice(-2)));
         });
     
-        // console.log(chart_data)
     
         var result = {};
         for (var i=0;i<chart_data.length;i++) {
@@ -47,14 +47,14 @@ var getCurrData = async(curr) => {
         return result
     } catch(e) {
         if (e instanceof TypeError && e.message === "wrong type") {
-            // console.log("hit 1")
+            // console.log("getCurrData was given a non-string type as the argument");
             return false
         }
         if (e.response === undefined) {
-            // console.log("hit 2")
+            // console.log("getCurrData did not get a respones from the exchangeratesapi");
             return false
         } if (e.response.data["error"] === `Symbols \'${curr}'\ are invalid.` && e.response.status === 400) {
-            // console.log("hit 3")
+            // console.log("getCurrData arguments were not valid symbols for exchangeratesapi");
             return false
         } else {
             // console.log("hit 4")

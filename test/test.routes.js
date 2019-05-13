@@ -88,7 +88,7 @@ fixtures
 describe("Routing tests", function () {
     var agent = chai.request.agent(app);
     describe("GET /unknown-endpoint", function () {
-        it("should return webpage with title of 'Sorry the URL 'localhost:8080/unknown-endpoint' does not exist.' ", function (done) {
+        it("should return 400 response", function (done) {
             request(app)
                 .get("/unknown-endpoint")
                 .end(function (err, res) {
@@ -104,7 +104,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and return 400 response", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -129,7 +129,7 @@ describe("Routing tests", function () {
     });
 
     describe('/registration-logged-in', () => {
-        it("Successful log in", function (done) {
+        it("should login and go to register page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -155,7 +155,7 @@ describe("Routing tests", function () {
 
     describe("GET/POST /register", function () {
 
-        it("should return webpage with title of 'To create an account please enter credentials.' ", function (done) {
+        it("should go to register page", function (done) {
             request(app)
                 .get("/register")
                 .end(function (err, res) {
@@ -168,7 +168,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid firstname", function (done) {
+        it("should attempt to register with empty firstname field", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -177,7 +177,11 @@ describe("Routing tests", function () {
                     lastname: "validLastname",
                     username: "validUsername",
                     password: "validPassword",
-                    confirm_password: "validPassword"
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -192,7 +196,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid lastname", function (done) {
+        it("should attempt to register with empty lastname field", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -201,7 +205,11 @@ describe("Routing tests", function () {
                     lastname: "",
                     username: "validUsername",
                     password: "validPassword",
-                    confirm_password: "validPassword"
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -216,7 +224,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid username", function (done) {
+        it("should attempt to register with empty username field", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -225,7 +233,11 @@ describe("Routing tests", function () {
                     lastname: "validLastname",
                     username: "",
                     password: "validPassword",
-                    confirm_password: "validPassword"
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -240,7 +252,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid password", function (done) {
+        it("should attempt to register with empty password field", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -249,7 +261,11 @@ describe("Routing tests", function () {
                     lastname: "validLastname",
                     username: "validUsername",
                     password: "",
-                    confirm_password: "validPassword"
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -264,7 +280,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Passwords do not match", function (done) {
+        it("should attempt to resgister with non-matching passwords", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -273,7 +289,11 @@ describe("Routing tests", function () {
                     lastname: "validLastname",
                     username: "validUsername",
                     password: "validPassword",
-                    confirm_password: ""
+                    confirm_password: "",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -285,7 +305,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful creation", function (done) {
+        it("should attempt to register without picking the first security question", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -294,7 +314,111 @@ describe("Routing tests", function () {
                     lastname: "validLastname",
                     username: "validUsername",
                     password: "validPassword",
-                    confirm_password: "validPassword"
+                    confirm_password: "validPassword",
+                    s1Q: "",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
+                })
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    assert.equal(title, "Please pick and answer the first security question.");
+                    done();
+                });
+        });
+
+        it("should attempt to resgister without answering their first security question", function (done) {
+            request(app)
+                .post("/register")
+                .send({
+                    _method: "post",
+                    firstname: "validFirstname",
+                    lastname: "validLastname",
+                    username: "validUsername",
+                    password: "validPassword",
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
+                })
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    assert.equal(title, "Your answer for security question #1 must have 5-15 characters and may only be alphanumeric.");
+                    done();
+                });
+        });
+
+        it("should attempt to resgister without picking the second security question", function (done) {
+            request(app)
+                .post("/register")
+                .send({
+                    _method: "post",
+                    firstname: "validFirstname",
+                    lastname: "validLastname",
+                    username: "validUsername",
+                    password: "validPassword",
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "",
+                    s2A: "24:24"
+                })
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    assert.equal(title, "Please pick and answer a second security question.");
+                    done();
+                });
+        });
+
+        it("should attempt to resgister without answering their first security question", function (done) {
+            request(app)
+                .post("/register")
+                .send({
+                    _method: "post",
+                    firstname: "validFirstname",
+                    lastname: "validLastname",
+                    username: "validUsername",
+                    password: "validPassword",
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: ""
+                })
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                    var $ = cheerio.load(res.text);
+                    var title = $("h1[class=title]").text();
+                    assert.equal(title, "Your answer for security question #2 must have 5-15 characters and may only be alphanumeric.");
+                    done();
+                });
+        });
+
+        it("should register successfully", function (done) {
+            request(app)
+                .post("/register")
+                .send({
+                    _method: "post",
+                    firstname: "validFirstname",
+                    lastname: "validLastname",
+                    username: "validUsername",
+                    password: "validPassword",
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -309,7 +433,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful creation", function (done) {
+        it("should attempt to register with a pre-existing account (based on username)", function (done) {
             request(app)
                 .post("/register")
                 .send({
@@ -318,7 +442,11 @@ describe("Routing tests", function () {
                     lastname: "validLastname",
                     username: "validUsername",
                     password: "validPassword",
-                    confirm_password: "validPassword"
+                    confirm_password: "validPassword",
+                    s1Q: "What primary school did you attend?",
+                    s1A: "Selkirk",
+                    s2Q: "What time of the day were you born? (hh:mm)",
+                    s2A: "24:24"
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -337,7 +465,7 @@ describe("Routing tests", function () {
 
 
     describe("GET/POST /", function () {
-        it("should return webpage with title of 'Welcome to the login page.' ", function (done) {
+        it("should go to login page ", function (done) {
             request(app)
                 .get("/")
                 .end(function (err, res) {
@@ -350,7 +478,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should log in and access trading page", function (done) {
             agent
                 .post("/")
                 .send({
@@ -372,7 +500,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid username", function (done) {
+        it("should attempt to log in with invalid username and access trading page", function (done) {
             agent
                 .post("/")
                 .send({
@@ -400,7 +528,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /login", function () {
-        it("Should log me in.' ", function (done) {
+        it("Should go to login page", function (done) {
             request(app)
                 .get("/login")
                 .end(function (err, res) {
@@ -416,7 +544,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should log in with invalid username and access trading page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -438,7 +566,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid username", function (done) {
+        it("should attempt to log in with invalid username and access trading page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -461,7 +589,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid password", function (done) {
+        it("should attempt to log in with invalid password and access trading page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -489,7 +617,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("GET/POST /login", function () {
-        it("Successful log in", function (done) {
+        it("should log in and access the trading page", function (done) {
             agent
                 .post("/login-fail")
                 .send({
@@ -511,7 +639,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid username", function (done) {
+        it("should attempt to log in with invalid username and access trading page", function (done) {
             agent
                 .post("/login-fail")
                 .send({
@@ -534,7 +662,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Invalid password", function (done) {
+        it("should attempt to log in with invalid password and access trading page", function (done) {
             agent
                 .post("/login-fail")
                 .send({
@@ -560,7 +688,7 @@ describe("Routing tests", function () {
 
 
     describe("GET /logout", function () {
-        it("should return no webpage", function (done) {
+        it("should logout", function (done) {
             request(app)
                 .get("/logout")
                 .set("Accept", "application/json")
@@ -583,7 +711,7 @@ describe("Routing tests", function () {
 
 
     describe("GET /news-hub", function () {
-        it("Check stock data was received", function (done) {
+        it("should log in and access news-hub page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -620,7 +748,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Check currency data was received", function (done) {
+        it("should log in and access news-hub page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -661,7 +789,7 @@ describe("Routing tests", function () {
 
 
     describe("GET /trading", function () {
-        it("should return webpage with title of 'You are not logged in. You must be logged in to view this page.' ", function (done) {
+        it("should attempt to access trading page while not logged in", function (done) {
             request(app)
                 .get("/trading")
                 .end(function (err, res) {
@@ -681,7 +809,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /login", function () {
-        it("Successful log in", function (done) {
+        it("should log in and should change marquee data", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -707,7 +835,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("GET /news/currency/:id", function () {
-        it("Check if graph was generated", function (done) {
+        it("should login and access a currency graph", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -731,7 +859,7 @@ describe("Routing tests", function () {
     });
 
     describe("GET /news/stock/:id", function () {
-        it("Check if graph was generated", function (done) {
+        it("should login and access a stock graph", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -756,7 +884,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /trading-success-search", function () {
-        it("Successful log in", function (done) {
+        it("should login, change marquee to stock data, and search for a stock", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -787,7 +915,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to search for a stock with an empty stocksearch field", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -814,7 +942,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("shoud log in and search for a stock with a invalid ticker", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -841,7 +969,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and search for a valid ticker", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -877,7 +1005,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /trading-success-buy", function () {
-        it("Successful log in", function (done) {
+        it("should login and buy a stock", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -905,7 +1033,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and buy 0 stocks", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -933,7 +1061,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and buy a negative amount of stocks", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -962,7 +1090,7 @@ describe("Routing tests", function () {
         });
 
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to buy a stock with insufficent funds", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -990,7 +1118,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to buy a stock with an empty buystockticker field", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1018,7 +1146,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to buy a stock with an invalid ticker", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1056,7 +1184,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /trading-success-sell#1", function () {
-        it("Successful log in", function (done) {
+        it("should login and sell a stock", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1084,7 +1212,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to sell 0 stocks", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1112,7 +1240,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to sell more stocks than user has", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1141,7 +1269,7 @@ describe("Routing tests", function () {
         });
 
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to sell a stock that user does not have", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1170,7 +1298,7 @@ describe("Routing tests", function () {
         });
 
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to sell a stock with an empty sellstockticker field", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1207,7 +1335,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /trading-success-sell#2", function () {
-        it("Successful log in", function (done) {
+        it("should login and sell a stock", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1235,7 +1363,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and sell 0 stocks", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1264,7 +1392,7 @@ describe("Routing tests", function () {
         });
 
 
-        it("Successful log in", function (done) {
+        it("should login and sell a stock that the user does not have", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1293,7 +1421,7 @@ describe("Routing tests", function () {
         });
 
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to sell a stock with an empty sellstockticker field", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1328,7 +1456,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /trading-portfolio", function () {
-        it("Successful log in", function (done) {
+        it("should login and go to portfolio page and generate transactions, balance, and current stocks", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1354,7 +1482,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and go to portfolio page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1382,7 +1510,7 @@ describe("Routing tests", function () {
     });
 
     describe("GET /admin", function () {
-        it("should return webpage with title of 'Sorry the URL 'localhost:8080/unknown-endpoint' does not exist.' ", function (done) {
+        it("should attempt to access admin page", function (done) {
             request(app)
                 .get("/admin")
                 .end(function (err, res) {
@@ -1401,7 +1529,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("GET /admin-restricted", function () {
-        it("should return webpage with title of 'Sorry the URL 'localhost:8080/unknown-endpoint' does not exist.' ", function (done) {
+        it("should attempt to access admin success page", function (done) {
             request(app)
                 .get("/admin-success")
                 .end(function (err, res) {
@@ -1412,7 +1540,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to access admin-restricted page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1439,7 +1567,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /admin-success", function () {
-        it("Successful log in", function (done) {
+        it("should login as admin and access the admin page", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1466,7 +1594,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /admin-success-user-accounts", function () {
-        it("Successful log in", function (done) {
+        it("should login as admin and generate list of all the users", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1493,7 +1621,7 @@ describe("Routing tests", function () {
 
     var agent = chai.request.agent(app);
     describe("POST /admin-success-user-accounts", function () {
-        it("Successful log in", function (done) {
+        it("should login as admin and attempt to dleete a user with a invalid user_id", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1521,7 +1649,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login with an admin account and attempt to delete themselves", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1549,7 +1677,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login as admin and delete a user", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1577,7 +1705,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login and attempt to delete an already deleted user", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1605,7 +1733,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login as admin and upder a user's firstname, lastname, and account balance", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1636,7 +1764,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login as admin and update their own account", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1667,7 +1795,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login as admin and update their own account with a negative balance", function (done) {
             agent
                 .post("/login")
                 .send({
@@ -1698,7 +1826,7 @@ describe("Routing tests", function () {
                 });
         });
 
-        it("Successful log in", function (done) {
+        it("should login as admin and attempt to update a user with an invalid user_id", function (done) {
             agent
                 .post("/login")
                 .send({

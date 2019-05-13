@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Quantico');
+
 * {
     box-sizing: border-box;
 }
@@ -18,6 +19,9 @@ body {
     margin-top: 75px;
 }
 
+.tabs {
+    height: 100vh;
+}
 .nav-margin {
     margin-bottom: 75px;
 }
@@ -56,7 +60,11 @@ body {
     width: 50%;
 }
 
-.nav-color, .footer {
+.nav-color {
+    background-color: #272727;
+}
+
+.footer {
     background-color: #272727;
 }
 
@@ -66,3 +74,10 @@ body {
     margin-bottom: 200px;
 }
 
+.tabulator .tabulator-tableHolder{
+    overflow: hidden !important;
+}
+
+canvas {
+    width: 100px;
+}
