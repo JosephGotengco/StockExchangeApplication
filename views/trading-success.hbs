@@ -13,30 +13,72 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<link rel='stylesheet' href='./css/style.css'>
-	<link rel='stylesheet' href='./css/trading-success.css'>
+	<link rel='stylesheet' href='/css/style.css'>
+	<link rel='stylesheet' href='/css/trading-success.css'>
 </head>
 
 <body>
 	<!-- NAV BAR -->
 	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-0 border-bottom shadow-sm nav-color">
-		<h5 class="my-0 mr-md-auto font-weight-normal">
+		<h5 class="my-0 font-weight-normal">
 			<a class="navbar-brand" href="/trading-success">
 				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
 				STOCK NAME
 			</a>
 		</h5>
+
+
+		<form id="event-form" action="/convert/currency" method="POST">
+			<select  id="currency-code-select" class="browser-default custom-select button-container mr-3" name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+				<option id="USD" value="USD">USD</option>
+				<option id="JPY" value="JPY">JPY</option>
+				<option id="BGN" value="BGN">BGN</option>
+				<option id="CZK" value="CZK">CZK</option>
+				<option id="DKK" value="DKK">DKK</option>
+				<option id="GBP" value="GBP">GBP</option>
+				<option id="HUF" value="HUF">HUF</option>
+				<option id="PLN" value="PLN">PLN</option>
+				<option id="RON" value="RON">RON</option>
+				<option id="SEK" value="SEK">SEK</option>
+				<option id="CHF" value="CHF">CHF</option>
+				<option id="ISK" value="ISK">ISK</option>
+				<option id="NOK" value="NOK">NOK</option>
+				<option id="HRK" value="HRK">HRK</option>
+				<option id="RUB" value="RUB">RUB</option>
+				<option id="TRY" value="TRY">TRY</option>
+				<option id="AUD" value="AUD">AUD</option>
+				<option id="BRL" value="BRL">BRL</option>
+				<option id="CAD" value="CAD">CAD</option>
+				<option id="CNY" value="CNY">CNY</option>
+				<option id="HKD" value="HKD">HKD</option>
+				<option id="IDR" value="IDR">IDR</option>
+				<option id="ILS" value="ILS">ILS</option>
+				<option id="INR" value="INR">INR</option>
+				<option id="KRW" value="KRW">KRW</option>
+				<option id="MXN" value="MXN">MXN</option>
+				<option id="MYR" value="MYR">MYR</option>
+				<option id="NZD" value="NZD">NZD</option>
+				<option id="PHP" value="PHP">PHP</option>
+				<option id="SGD" value="SGD">SGD</option>
+				<option id="THB" value="THB">THB</option>
+				<option id="ZAR" value="ZAR">ZAR</option>
+			</select>
+		</form>
+
+		
 		{{#ifEquals preference "currency"}}
-		<form action='/trading-success-stocks' method="POST" class="mr-3">
+		<form action='/trading-success-stocks' method="POST" class="button-container mr-auto">
 			<input type="hidden" id="pref" name="pref" value="stock">
 			<button type="submit" class="btn btn-primary">Stocks</button>
 		</form>
 		{{else}}
-		<form action='/trading-success' method="GET" class="mr-3">
+		<form action='/trading-success-currency' method="POST" class="button-container mr-auto">
 			<input type="hidden" id="pref" name="pref" value="currency">
 			<button type="submit" class="btn btn-primary">Currencies</button>
 		</form>
 		{{/ifEquals}}
+
+
 		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
 			<a class="p-2 text-light" href="/trading-success">Trading</a>
 			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
@@ -53,12 +95,12 @@
 			<div class="row">
 				<div class="col-sm text-center">
 					<p class="font-weight-light mb-0 text-muted">PORTFOLIO EARNINGS</p>
-					<big class="font-weight-light mb-0 text-primary">${{{roundToTwo earnings }}}<small><i
+					<big class="font-weight-light mb-0 text-primary">{{{currency_symbol}}}{{{roundToTwo earnings }}}<small><i
 								class="fa fa-arrow-alt-circle-up"></i></small> </big>
 				</div>
 				<div class="col-sm text-center left-line">
 					<p class="font-weight-light mb-0 text-muted">ACCOUNT BALANCE</p>
-					<big class="font-weight-light mb-0 text-primary">${{{userCash}}}</big>
+					<big class="font-weight-light mb-0 text-primary">{{{currency_symbol}}}{{{userCash}}}</big>
 				</div>
 				<div class="col-sm text-center left-line">
 					<p class="font-weight-light mb-0 text-muted">STOCKS BOUGHT</p>
@@ -81,18 +123,17 @@
 		{{#each marqueeData}}
 		<a href="/news/currency/{{this.code}}" target="_blank" class="mx-3"><span
 				style="color: #0984e3"><b>{{{this.code}}}:</b></span><span
-				style="color: #0984e3"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
+				style="color: #0984e3"><b>{{{../currency_symbol}}} {{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
 				hspace=2; padding=2px;></a>
 		{{/each}}
 	</marquee>
-
 	{{else}}
 	<marquee class="border-bottom py-2 remove-on-small-screen" behaviour="scroll" ; bgcolor="white" ; scrollamount=10;
 		onmouseover="this.stop();" onmouseleave="this.start();">
 		{{#each marqueeData}}
 		<a href="/news/stock/{{this.code}}" target="_blank" class="mx-3"><span
 				style="color: #0984e3"><b>{{{this.code}}}:</b></span><span
-				style="color: #0984e3"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
+				style="color: #0984e3"><b>{{{../currency_symbol}}} {{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
 				hspace=2; padding=2px;></a>
 		{{/each}}
 	</marquee>
@@ -205,14 +246,10 @@
 						<h5 class="card-title">{{{this.stock_name}}}</h5>
 						<p class="d-flex justify-content-between"><small>AMOUNT:</small> <small>{{{this.amount}}}<i
 									class="far fa-clone ml-1"></i></small></p>
-						<p class="d-flex justify-content-between"><small>PROFIT:</small> <small>{{{this.profit}}}<i
+						<p class="d-flex justify-content-between"><small>PROFIT:</small> <small>{{{../currency_symbol}}} {{{this.profit}}}<i
 									class="far fa-money-bill-alt ml-1"></i></small></p>
-						{{!-- Don't think total spent is good if we don't have total gained we should probably move that to the portfolio page
-						because it's more statistics that don't help with trading --}}
-						{{!-- <p class="d-flex justify-content-between"><small>TOTAL SPENT:</small>
-							<small>{{{roundToTwo this.total_cost}}}<i class="far fa-money-bill-alt ml-1"></i></small></p> --}}
 						<p class="d-flex justify-content-between"><small>PRICE/STOCK:</small>
-							<small>{{{roundToTwo this.today_rate}}}<i class="far fa-money-bill-alt ml-1"></i></small>
+							<small>{{{../currency_symbol}}} {{{roundToTwo this.today_rate}}}<i class="far fa-money-bill-alt ml-1"></i></small>
 						</p>
 						<p class="d-flex justify-content-between"><small><a target="_blank"
 									href="/news/stock/{{{this.stock_name}}}">Show me some stats!</a></small></p>
@@ -240,6 +277,16 @@
 		crossorigin="anonymous"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script>
+
+	function switchCode(event) {
+		var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
+		document.getElementById("currency-code-select").selectedIndex = index;
+	}
+	switchCode();
+
+	</script>
 
 </body>
 

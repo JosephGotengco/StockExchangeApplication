@@ -1,28 +1,208 @@
-const express = require('express');
-var axios = require('axios');
-var ObjectID = require('mongodb').ObjectID;
-var utils = require('../utils');
+const express = require("express");
+var axios = require("axios");
+var ObjectID = require("mongodb").ObjectID;
+var utils = require("../utils");
 var ssn;
+// function for getting stock data for the graph
+var stockFunc = require("../feature_functions/chartStockData");
+// function for getting currency data for the graph
+var currFunc = require("../feature_functions/chartCurrData");
+// function for getting stock data for the marquee element
+var marqueeStock = require("../feature_functions/MarqueeStock");
+// function for getting the currency data for the marquee element
+var marqueeCurrency = require("../feature_functions/MarqueeCurrency");
+// function for getting a single stock's price
+var getBatch = require("../feature_functions/getBatchPrice");
+// function for converting monetary values
+var convert = require("../feature_functions/getRates");
+// function for retrieving symbols for currency codes
+const rate_symbols = require('../feature_functions/rate_symbols');
 
 const router = new express.Router();
 
+router.route("/news-hub").get(isAuthenticated, async (request, response) => {
+	var ssn = request.session.passport.user;
+
+	if (ssn.stockDataList === undefined) {
+		var stockDataList = await marqueeStock.getMarqueeStock();
+		ssn.stockDataList = stockDataList;
+	}
+
+	response.render("news-hub.hbs", {
+		title: "Stock and Currency.",
+		currencyDataList: ssn.currencyDataList,
+		stockDataList: ssn.stockDataList,
+		display: "Ranking"
+	});
+});
+
 router
-	.route("/trading")
-	.get((request, response) => {
-		// called when user goes to trading page while not logged in
-		response.render("trading.hbs", {
-			title: "You are not logged in. You must be logged in to view this page.",
-			display: "Trading"
-		});
-	})
+	.route("/news/currency/:id")
+	.get(isAuthenticated, async (request, response) => {
+		try {
+			var currency_code = request.params.id;
+
+			var chart_data = await currFunc.getCurrData(currency_code);
+
+			var labels = Object.keys(chart_data);
+			var data = Object.values(chart_data);
+
+			response.render("currency-info.hbs", {
+				title: "Welcome to the trading page.",
+				chart_title: `${currency_code} Price`,
+				labels: labels,
+				data: data,
+				display: `${currency_code} Price`
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	});
+
+router
+	.route("/news/stock/:id")
+	.get(isAuthenticated, async (request, response) => {
+		try {
+			var ticker = request.params.id;
+
+			var chart_data = await stockFunc.getStockData(ticker);
+
+			var labels = Object.keys(chart_data);
+			var data = Object.values(chart_data);
+
+			response.render("stock-info.hbs", {
+				title: "Welcome to the trading page.",
+				chart_title: `${ticker} Price`,
+				labels: labels,
+				data: data,
+				display: `${ticker} Price`
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	});
+
+router.route("/trading").get((request, response) => {
+	response.render("trading.hbs", {
+		title: "You are not logged in. You must be logged in to view this page.",
+		display: "Trading"
+	});
+});
+
+router
+	.route("/convert/currency")
+	.post(isAuthenticated, async (request, response) => {
+		try {
+			var ssn = request.session.passport.user;
+
+			ssn.currency_preference = request.body.currency_preference;
+			var currency_preference = ssn.currency_preference;
+
+			var cash2 = ssn.cash2;
+			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
+			var userStocks = ssn.stocks;
+			var currency_symbol = rate_symbols.getCurrencySymbol(currency_preference);
+
+
+
+			switch (ssn.preference) {
+				case "stock":
+					var marqueeData = ssn.stockDataList;
+					break;
+				case "currency":
+					var marqueeData = ssn.currencyDataList;
+					break;
+			}
+
+
+			var rates = await convert();
+			var preference = ssn.currency_preference;
+			var rate = rates[preference];
+
+			var displayTransactions = clone(uniqueTransactions)
+			displayTransactions.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayTransactions[i].total_cost = rate * total_cost;
+				var balance = val.balance;
+				displayTransactions[i].balance = rate * balance;
+			})
+
+			var displayStocks = clone(userStocks)
+			displayStocks.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayStocks[i].total_cost = rate * total_cost;
+				var today_rate = val.today_rate;
+				displayStocks[i].today_rate = rate * today_rate;
+			})
+
+
+
+			var displayMarqueeData = clone(marqueeData);
+			displayMarqueeData.forEach((val, i) => {
+				var price = val.price;
+				var price = parseFloat(price);
+				displayMarqueeData[i].price = rate * price;
+			})
+
+
+
+			response.render("trading-success.hbs", {
+				title: "Welcome to the trading page.",
+				marqueeData: displayMarqueeData,
+				display: "Trading",
+				preference: ssn.preference,
+				userCash: cash2[0] * rate,
+				num_stocks: ssn.userStatsData.num_stocks,
+				num_transactions: ssn.userStatsData.num_transactions,
+				earnings: ssn.userStatsData.earnings * rate,
+				amountBought: ssn.userStatsData.amountBought,
+				amountSold: ssn.userStatsData.amountSold,
+				stocks: displayStocks,
+				uniqueTransactions: displayTransactions.slice(
+					-5,
+					displayTransactions.length
+				),
+				currency_preference: currency_preference,
+				currency_symbol: currency_symbol
+			});
+		} catch (err) {
+			console.log(err);
+		}
+	});
 
 router
 	.route("/trading-success")
 	.get(isAuthenticated, async (request, response) => {
-		// called when user logs in successfully => redicted to this page
 		try {
-			ssn = request.session;
-			var cash2 = request.session.passport.user.cash2;
+			var ssn = request.session.passport.user;
+
+			if (ssn.currency_preference === undefined) {
+				ssn.currency_preference = "USD";
+			}
+
+			var currency_preference = ssn.currency_preference;
+			console.log(currency_preference);
+
+			var cash2 = ssn.cash2;
+			var earnings = cash2 - 10000;
+			var stocks = ssn.stocks;
+			var num_stocks = ssn.stocks.length;
+			var transactions = ssn.transactions;
+			var num_transactions = transactions.length;
+			// console.log("Start API")
+			var amountBought = countStocksBought(transactions);
+			var amountSold = countStocksSold(transactions);
+			var uniqueTransactions = getUniqueTransactions(transactions);
+			// console.log("First API Batch Done")
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
+
 			var defaultPreference = "currency";
 			if (ssn.preference === undefined) {
 				ssn.preference = defaultPreference;
@@ -31,48 +211,274 @@ router
 			if (ssn.currencyDataList === undefined) {
 				var currencyDataList = await marqueeCurrency.getMarqueeCurrency();
 				ssn.currencyDataList = currencyDataList;
+				marqueeData = ssn.currencyDataList;
+				ssn.preference = "currency";
 			}
+
+			switch (ssn.preference) {
+				case "stock":
+					var marqueeData = ssn.stockDataList;
+					break;
+				case "currency":
+					var marqueeData = ssn.currencyDataList;
+					break;
+			}
+
+			var stock_names = [];
+			var userStocks = [];
+			var stock_tickers = "";
+
+			if (stocks.length > 0) {
+				for (i = 0; i < stocks.length; i++) {
+					stock_tickers += `${stocks[i].stock_name},`;
+					stock_names.push(stocks[i].stock_name);
+				}
+				var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+				ssn.closing_price = closing_price;
+				for (i = 0; i < stocks.length; i++) {
+					userStocks[i] = stocks[i];
+					var today_price = closing_price[stock_names[i]];
+					userStocks[i].profit = (
+						userStocks[i].total_cost -
+						today_price * userStocks[i].amount
+					).toFixed(2);
+					userStocks[i].today_rate = today_price;
+				}
+				ssn.userStockData = {
+					userStocks: userStocks
+				};
+			} else {
+				ssn.userStockData = { userStocks: userStocks };
+			}
+
+			var rates = await convert();
+			var preference = ssn.currency_preference;
+			var rate = rates[preference];
+			var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+			var displayTransactions = clone(uniqueTransactions)
+			displayTransactions.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayTransactions[i].total_cost = rate * total_cost;
+				var balance = val.balance;
+				displayTransactions[i].balance = rate * balance;
+			})
+
+			var displayStocks = clone(userStocks)
+			displayStocks.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayStocks[i].total_cost = rate * total_cost;
+				var today_rate = val.today_rate;
+				displayStocks[i].today_rate = rate * today_rate;
+			})
+
+			var displayMarqueeData = clone(marqueeData);
+			displayMarqueeData.forEach((val, i) => {
+				var price = val.price;
+				var price = parseFloat(price);
+				displayMarqueeData[i].price = rate * price;
+			})
 
 			response.render("trading-success.hbs", {
 				title: "Welcome to the trading page.",
-				marqueeData: ssn.currencyDataList,
+				marqueeData: displayMarqueeData,
 				display: "Trading",
 				preference: ssn.preference,
-				userCash: cash2[0]
+				userCash: cash2[0] * rate,
+				num_stocks: ssn.userStatsData.num_stocks,
+				num_transactions: ssn.userStatsData.num_transactions,
+				earnings: ssn.userStatsData.earnings * rate,
+				amountBought: ssn.userStatsData.amountBought,
+				amountSold: ssn.userStatsData.amountSold,
+				stocks: displayStocks,
+				uniqueTransactions: displayTransactions.slice(
+					-5,
+					displayTransactions.length
+				),
+				currency_preference: currency_preference,
+				currency_symbol: currency_symbol
 			});
 		} catch (err) {
 			console.log(err);
 		}
-	})
+	});
 
 router
 	.route("/trading-success-stocks")
 	.post(isAuthenticated, async (request, response) => {
 		try {
+			ssn = request.session.passport.user;
+
+			var currency_preference = ssn.currency_preference;
+
+			var cash2 = ssn.cash2;
+			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
+			var userStocks = ssn.stocks;
+
 			ssn.preference = "stock";
 			if (ssn.stockDataList === undefined) {
 				var stockDataList = await marqueeStock.getMarqueeStock();
 				ssn.stockDataList = stockDataList;
 			}
 
+			var rates = await convert();
+			var preference = ssn.currency_preference;
+			var rate = rates[preference];
+			var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+			switch (ssn.preference) {
+				case "stock":
+					var marqueeData = ssn.stockDataList;
+					break;
+				case "currency":
+					var marqueeData = ssn.currencyDataList;
+					break;
+			}
+
+			var displayTransactions = clone(uniqueTransactions)
+			displayTransactions.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayTransactions[i].total_cost = rate * total_cost;
+				var balance = val.balance;
+				displayTransactions[i].balance = rate * balance;
+			})
+
+			var displayStocks = clone(userStocks)
+			displayStocks.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayStocks[i].total_cost = rate * total_cost;
+				var today_rate = val.today_rate;
+				displayStocks[i].today_rate = rate * today_rate;
+			})
+
+
+
+			var displayMarqueeData = clone(marqueeData);
+			displayMarqueeData.forEach((val, i) => {
+				var price = val.price;
+				var price = parseFloat(price);
+				displayMarqueeData[i].price = rate * price;
+			})
+
 			response.render("trading-success.hbs", {
 				title: "Welcome to the trading page.",
-				marqueeData: ssn.stockDataList,
+				marqueeData: displayMarqueeData,
 				display: "Trading",
 				preference: ssn.preference,
+				userCash: cash2[0] * rate,
+				num_stocks: ssn.userStatsData.num_stocks,
+				num_transactions: ssn.userStatsData.num_transactions,
+				earnings: ssn.userStatsData.earnings * rate,
+				amountBought: ssn.userStatsData.amountBought,
+				amountSold: ssn.userStatsData.amountSold,
+				stocks: displayStocks,
+				uniqueTransactions: displayTransactions.slice(
+					-5,
+					displayTransactions.length
+				),
+				currency_preference: currency_preference,
+				currency_symbol: currency_symbol
 			});
 		} catch (err) {
 			console.log(err);
 		}
-	})
+	});
+
+
+router
+	.route("/trading-success-currency")
+	.post(isAuthenticated, async (request, response) => {
+		try {
+			var ssn = request.session.passport.user;
+
+			var currency_preference = ssn.currency_preference;
+
+			var cash2 = ssn.cash2;
+			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
+			var userStocks = ssn.stocks;
+
+			var rates = await convert();
+			var preference = ssn.currency_preference;
+			var rate = rates[preference];
+			var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+			ssn.preference = "currency";
+			switch (ssn.preference) {
+				case "stock":
+					var marqueeData = ssn.stockDataList;
+					break;
+				case "currency":
+					var marqueeData = ssn.currencyDataList;
+					break;
+			}
+
+			var displayTransactions = clone(uniqueTransactions)
+			displayTransactions.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayTransactions[i].total_cost = rate * total_cost;
+				var balance = val.balance;
+				displayTransactions[i].balance = rate * balance;
+			})
+
+			var displayStocks = clone(userStocks)
+			displayStocks.forEach((val, i) => {
+				var total_cost = val.total_cost;
+				displayStocks[i].total_cost = rate * total_cost;
+				var today_rate = val.today_rate;
+				displayStocks[i].today_rate = rate * today_rate;
+			})
+
+
+
+			var displayMarqueeData = clone(marqueeData);
+			displayMarqueeData.forEach((val, i) => {
+				var price = val.price;
+				var price = parseFloat(price);
+				displayMarqueeData[i].price = rate * price;
+			})
+
+			response.render("trading-success.hbs", {
+				title: "Welcome to the trading page.",
+				marqueeData: displayMarqueeData,
+				display: "Trading",
+				preference: ssn.preference,
+				userCash: cash2[0] * rate,
+				num_stocks: ssn.userStatsData.num_stocks,
+				num_transactions: ssn.userStatsData.num_transactions,
+				earnings: ssn.userStatsData.earnings * rate,
+				amountBought: ssn.userStatsData.amountBought,
+				amountSold: ssn.userStatsData.amountSold,
+				stocks: displayStocks,
+				uniqueTransactions: displayTransactions.slice(
+					-5,
+					displayTransactions.length
+				),
+				currency_preference: currency_preference,
+				currency_symbol: currency_symbol
+			});
+		} catch (err) {
+			console.log(err);
+		}
+	});
 
 router
 	.route("/trading-success-search")
-	.post(isAuthenticated, (request, response) => {
-		// called when user submits a ticker in ticker search box in trading page
+	.post(isAuthenticated, async (request, response) => {
+		var ssn = request.session.passport.user;
+
+		var currency_preference = ssn.currency_preference;
+
+		var cash2 = ssn.cash2;
+		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
+		var userStocks = ssn.stocks;
+
+		var rates = await convert();
+		var preference = ssn.currency_preference;
+		var rate = rates[preference];
+		var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
 		var stock = request.body.stocksearch.toUpperCase();
-		var cash2 = request.session.passport.user.cash2;
-		console.log(cash2)
+
 		var message;
 
 		try {
@@ -80,9 +486,11 @@ router
 				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
 			);
 			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.latestPrice;
+			var stock_price = stock_info.data.close;
 
-			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: $${stock_price} USD.`;
+
+
+			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: ${currency_symbol}${stock_price * rate} ${currency_preference}.`;
 		} catch (err) {
 			if (stock === "") {
 				message = "Please enter a stock ticker i.e. TSLA, MSFT";
@@ -99,27 +507,83 @@ router
 				var marqueeData = ssn.currencyDataList;
 				break;
 		}
+
+
+
+
+		var displayTransactions = clone(uniqueTransactions)
+		displayTransactions.forEach((val, i) => {
+			var total_cost = val.total_cost;
+			displayTransactions[i].total_cost = rate * total_cost;
+			var balance = val.balance;
+			displayTransactions[i].balance = rate * balance;
+		})
+
+		var displayStocks = clone(userStocks)
+		displayStocks.forEach((val, i) => {
+			var total_cost = val.total_cost;
+			displayStocks[i].total_cost = rate * total_cost;
+			var today_rate = val.today_rate;
+			displayStocks[i].today_rate = rate * today_rate;
+		})
+
+
+
+		var displayMarqueeData = clone(marqueeData);
+		displayMarqueeData.forEach((val, i) => {
+			var price = val.price;
+			var price = parseFloat(price);
+			displayMarqueeData[i].price = rate * price;
+		})
+
+
+
 		response.render("trading-success.hbs", {
 			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
+			head: `Cash balance: ${currency_symbol}${cash2[0] * rate}`,
+			marqueeData: displayMarqueeData,
 			display: "Trading",
-			preference: ssn.preference
+			preference: ssn.preference,
+			userCash: cash2[0] * rate,
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings * rate,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: displayStocks,
+			uniqueTransactions: displayTransactions.slice(
+				-5,
+				displayTransactions.length
+			),
+			currency_preference: currency_preference,
+			currency_symbol: currency_symbol
 		});
-	})
-
+	});
 
 router
 	.route("/trading-success-buy")
 	.post(isAuthenticated, async (request, response) => {
-		// called when user submits ticker in stock buy form in trading page
-		var _id = request.session.passport.user._id;
-		var cash = request.session.passport.user.cash;
+		var ssn = request.session.passport.user;
+
+		var currency_preference = ssn.currency_preference;
+
+		var _id = ssn._id;
+		var cash2 = ssn.cash2;
+		var earnings = cash2 - 10000;
+		var stocks = ssn.stocks;
+		var userStocks = ssn.stocks;
+		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
+		var num_stocks = ssn.stocks.length;
+		var transactions = ssn.transactions;
+		var num_transactions = transactions.length;
+
 		var qty = parseFloat(request.body.buystockqty);
 		var stock = request.body.buystockticker.toUpperCase();
-		var stocks = request.session.passport.user.stocks;
-		var cash2 = request.session.passport.user.cash2;
-		var transactions = request.session.passport.user.transactions;
+
+		var rates = await convert();
+		var preference = ssn.currency_preference;
+		var rate = rates[preference];
+		var currency_symbol = rate_symbols.getCurrencySymbol(preference);
 
 		var index = check_existence(stock);
 		var message;
@@ -129,52 +593,74 @@ router
 				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
 			);
 			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.latestPrice;
+			var stock_price = stock_info.data.close;
 			var total_cost = Math.round(stock_price * qty * 100) / 100;
 			var cash_remaining = Math.round((cash2 - total_cost) * 100) / 100;
 
+			var amountBought = countStocksBought(transactions);
+
+			var amountSold = countStocksSold(transactions);
+
+			var uniqueTransactions = getUniqueTransactions(transactions);
+
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
+
 			if (cash_remaining >= 0 && total_cost !== 0 && qty > 0) {
 				var db = utils.getDb();
+
 				if (index >= 0) {
-					var stock_qty = request.session.passport.user.stocks[index].amount;
+					var stock_qty = ssn.stocks[index].amount;
+					var current_cost = ssn.stocks[index].total_cost;
 					var stock_remaining = parseFloat(qty) + parseFloat(stock_qty);
 					stock_holding = {
 						stock_name: stock,
-						amount: parseFloat(stock_remaining)
+						amount: parseFloat(stock_remaining),
+						total_cost: current_cost + total_cost
 					};
 					stocks[index] = stock_holding;
 					cash2[0] = cash_remaining;
 				} else {
 					stock_holding = {
 						stock_name: stock,
-						amount: parseFloat(qty)
+						amount: parseFloat(qty),
+						total_cost: total_cost
 					};
 					cash2[0] = cash_remaining;
 					stocks.push(stock_holding);
 				}
+
 				var log = {
 					datetime: new Date().toString(),
+					stock: stock,
 					stock_name: stock_name,
 					qty: qty,
 					total_cost: total_cost,
 					type: "B",
 					balance: cash_remaining
 				};
+
 				transactions.push(log);
 				db.collection("user_accounts").updateOne(
 					{ _id: ObjectID(_id) },
 					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
 				);
 
-				message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_cost}.`;
+				message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at ${currency_symbol}${stock_price * rate}/share for ${currency_symbol}${total_cost * rate}.`;
 			} else if (total_cost === 0) {
 				message = `Sorry you need to purchase at least 1 stock. Change your quantity to 1 or more.`;
 			} else if (qty < 0) {
 				message = `You cannot buy negative shares.`;
 			} else {
-				message = `Sorry you only have $${
-					cash2[0]
-					}. The purchase did not go through. The total cost was $${total_cost}.`;
+				message = `Sorry you only have ${currency_symbol}${
+					cash2[0] * rate
+					}. The purchase did not go through. The total cost was ${currency_symbol}${total_cost * rate}.`;
 			}
 		} catch (err) {
 			if (stock === "") {
@@ -185,6 +671,7 @@ router
 					}' is invalid.`;
 			}
 		}
+
 		switch (ssn.preference) {
 			case "stock":
 				var marqueeData = ssn.stockDataList;
@@ -193,19 +680,84 @@ router
 				var marqueeData = ssn.currencyDataList;
 				break;
 		}
+
+		var stock_names = [];
+		var userStocks = [];
+		var stock_tickers = "";
+
+		if (stocks.length > 0) {
+			for (i = 0; i < stocks.length; i++) {
+				stock_tickers += `${stocks[i].stock_name},`;
+				stock_names.push(stocks[i].stock_name);
+			}
+			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+			ssn.closing_price = closing_price;
+			for (i = 0; i < stocks.length; i++) {
+				userStocks[i] = stocks[i];
+				var today_price = closing_price[stock_names[i]];
+				userStocks[i].profit = (
+					userStocks[i].total_cost -
+					today_price * userStocks[i].amount
+				).toFixed(2);
+				userStocks[i].today_rate = today_price;
+			}
+			ssn.userStockData = {
+				userStocks: userStocks
+			};
+		} else {
+			ssn.userStockData = { userStocks: userStocks };
+		}
+
+		var displayTransactions = clone(uniqueTransactions)
+		displayTransactions.forEach((val, i) => {
+			var total_cost = val.total_cost;
+			displayTransactions[i].total_cost = rate * total_cost;
+			var balance = val.balance;
+			displayTransactions[i].balance = rate * balance;
+		})
+
+		var displayStocks = clone(userStocks)
+		displayStocks.forEach((val, i) => {
+			var total_cost = val.total_cost;
+			displayStocks[i].total_cost = rate * total_cost;
+			var today_rate = val.today_rate;
+			displayStocks[i].today_rate = rate * today_rate;
+		})
+
+
+
+		var displayMarqueeData = clone(marqueeData);
+		displayMarqueeData.forEach((val, i) => {
+			var price = val.price;
+			var price = parseFloat(price);
+			displayMarqueeData[i].price = rate * price;
+		})
+
 		response.render("trading-success.hbs", {
 			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
+			head: `Cash balance: ${currency_symbol}${cash2[0] * rate}`,
+			marqueeData: displayMarqueeData,
 			display: "Trading",
-			preference: ssn.preference
+			preference: ssn.preference,
+			userCash: cash2[0] * rate,
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings * rate,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: displayStocks,
+			uniqueTransactions: displayTransactions.slice(
+				-5,
+				displayTransactions.length
+			),
+			currency_preference: currency_preference,
+			currency_symbol: currency_symbol
 		});
 
 		function check_existence(stock) {
 			var index = -1;
 
 			for (i = 0; i < stocks.length; i++) {
-				console.log(stocks[i].stock_name === stock)
 				if (stocks[i].stock_name === stock) {
 					index = i;
 				}
@@ -213,23 +765,34 @@ router
 
 			return index;
 		}
-	})
+	});
 
 router
 	.route("/trading-success-sell")
-	.post(isAuthenticated, (request, response) => {
-		// called when user submits ticker in stock sell form in trading page
-		var _id = request.session.passport.user._id;
-		var cash = request.session.passport.user.cash;
-		var cash2 = request.session.passport.user.cash2;
+	.post(isAuthenticated, async (request, response) => {
+		var ssn = request.session.passport.user;
+
+		var currency_preference = ssn.currency_preference;
+
+		var _id = ssn._id;
+		var cash2 = ssn.cash2;
+		var earnings = cash2 - 10000;
+		var stocks = ssn.stocks;
+		var userStocks = ssn.stocks;
+		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
+		var num_stocks = ssn.stocks.length;
+		var transactions = ssn.transactions;
+		var num_transactions = transactions.length;
+
 		var qty = parseFloat(request.body.sellstockqty);
 		var stock = request.body.sellstockticker.toUpperCase();
-		var stocks = request.session.passport.user.stocks;
-		var transactions = request.session.passport.user.transactions;
-		console.log(typeof cash2);
-		console.log(cash2)
+
+		var rates = await convert();
+		var preference = ssn.currency_preference;
+		var rate = rates[preference];
+		var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
 		var index = check_existence(stock);
-		console.log(`index: ${index}`)
 		var message;
 
 		try {
@@ -238,11 +801,30 @@ router
 			);
 
 			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.latestPrice;
+			var stock_price = stock_info.data.close;
 			var total_sale = Math.round(stock_price * qty * 100) / 100;
 			var cash_remaining = Math.round((cash2[0] + total_sale) * 100) / 100;
-			var stock_qty = request.session.passport.user.stocks[index].amount;
+			if (ssn.stocks[index] !== undefined) {
+				var stock_qty = ssn.stocks[index].amount;
+				var current_cost = ssn.stocks[index].total_cost;
+			} else {
+				throw "you don't have this stock (abritrary error msg LOL)";
+			}
 			var stock_remaining = stock_qty - qty;
+
+			var amountBought = countStocksBought(transactions);
+
+			var amountSold = countStocksSold(transactions);
+
+			var uniqueTransactions = getUniqueTransactions(transactions);
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
 
 			if (stock_qty < qty) {
 				message = `You are trying to sell ${qty} shares of ${stock} when you only have ${stock_qty} shares.`;
@@ -252,7 +834,8 @@ router
 				if (stock_remaining > 0) {
 					var stock_holding = {
 						stock_name: stock,
-						amount: parseFloat(stock_remaining)
+						amount: parseFloat(stock_remaining),
+						total_cost: current_cost - total_sale
 					};
 					stocks[index] = stock_holding;
 					cash2[0] = cash_remaining;
@@ -262,6 +845,7 @@ router
 				}
 				var log = {
 					datetime: new Date().toString(),
+					stock: stock,
 					stock_name: stock_name,
 					qty: qty,
 					total_sale: total_sale,
@@ -273,7 +857,7 @@ router
 					{ _id: ObjectID(_id) },
 					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
 				);
-				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_sale}.`;
+				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at ${currency_symbol}${stock_price * rate}/share for ${currency_symbol}${total_sale * rate}.`;
 			} else {
 				message = `You need to sell at least 1 share of ${stock}.`;
 			}
@@ -281,10 +865,10 @@ router
 			if (stock === "") {
 				message = `You cannot leave the sell input blank. Please input a stock ticker`;
 			} else {
-				console.log(err)
 				message = `You do not own any shares with the ticker '${stock}'.`;
 			}
 		}
+
 		switch (ssn.preference) {
 			case "stock":
 				var marqueeData = ssn.stockDataList;
@@ -293,37 +877,135 @@ router
 				var marqueeData = ssn.currencyDataList;
 				break;
 		}
+
+		var stock_names = [];
+		var userStocks = [];
+		var stock_tickers = "";
+
+		if (stocks.length > 0) {
+			for (i = 0; i < stocks.length; i++) {
+				stock_tickers += `${stocks[i].stock_name},`;
+				stock_names.push(stocks[i].stock_name);
+			}
+			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
+			ssn.closing_price = closing_price;
+			for (i = 0; i < stocks.length; i++) {
+				userStocks[i] = stocks[i];
+				var today_price = closing_price[stock_names[i]];
+				userStocks[i].profit = (
+					userStocks[i].total_cost -
+					today_price * userStocks[i].amount
+				).toFixed(2);
+
+				userStocks[i].today_rate = today_price;
+			}
+			ssn.userStockData = {
+				userStocks: userStocks
+			};
+		} else {
+			ssn.userStockData = { userStocks: userStocks };
+		}
+
+		var displayTransactions = clone(uniqueTransactions)
+		displayTransactions.forEach((val, i) => {
+			var total_cost = val.total_cost;
+			displayTransactions[i].total_cost = rate * total_cost;
+			var balance = val.balance;
+			displayTransactions[i].balance = rate * balance;
+		})
+
+		var displayStocks = clone(userStocks)
+		displayStocks.forEach((val, i) => {
+			var total_cost = val.total_cost;
+			displayStocks[i].total_cost = rate * total_cost;
+			var today_rate = val.today_rate;
+			displayStocks[i].today_rate = rate * today_rate;
+		})
+
+		var displayMarqueeData = clone(marqueeData);
+		displayMarqueeData.forEach((val, i) => {
+			var price = val.price;
+			var price = parseFloat(price);
+			displayMarqueeData[i].price = rate * price;
+		})
+
 		response.render("trading-success.hbs", {
 			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
+			head: `Cash balance: ${currency_symbol}${cash2[0] * rate}`,
+			marqueeData: displayMarqueeData,
 			display: "Trading",
-			preference: ssn.preference
+			preference: ssn.preference,
+			userCash: cash2[0] * rate,
+			num_stocks: ssn.userStatsData.num_stocks,
+			num_transactions: ssn.userStatsData.num_transactions,
+			earnings: ssn.userStatsData.earnings * rate,
+			amountBought: ssn.userStatsData.amountBought,
+			amountSold: ssn.userStatsData.amountSold,
+			stocks: ssn.userStockData.displayStocks,
+			uniqueTransactions: displayTransactions.slice(
+				-5,
+				displayTransactions.length
+			),
+			currency_preference: currency_preference,
+			currency_symbol: currency_symbol
 		});
 
 		function check_existence(stock) {
 			var index = -1;
 			for (i = 0; i < stocks.length; i++) {
-				console.log(stocks[i].stock_name === stock)
 				if (stocks[i].stock_name === stock) {
 					index = i;
 				}
 			}
 			return index;
 		}
-	})
+	});
 
+function clone(src) {
+	return JSON.parse(JSON.stringify(src));
+}
 
+function countStocksSold(transactionArray) {
+	var amountSold = 0;
+	for (i = 0; i < transactionArray.length; i++) {
+		if (transactionArray[i].type === "S") {
+			amountSold += transactionArray[i].qty;
+		}
+	}
+	return amountSold;
+}
 
+function countStocksBought(transactionArray) {
+	var amountBought = 0;
+	for (i = 0; i < transactionArray.length; i++) {
+		if (transactionArray[i].type === "B") {
+			amountBought += transactionArray[i].qty;
+		}
+	}
+	return amountBought;
+}
 
-
+function getUniqueTransactions(transactionArray) {
+	var uniqueTicker = [];
+	var uniqueTransactions = [];
+	for (i = 0; i < transactionArray.length; i++) {
+		var currentStock = transactionArray[i].stock;
+		if (uniqueTicker.includes(currentStock)) {
+		} else {
+			uniqueTicker.push(currentStock);
+			uniqueTransactions.push(transactionArray[i]);
+		}
+	}
+	return uniqueTransactions;
+}
 
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
-		console.log(request.session.passport);
 		next();
 	} else {
-		response.redirect('/');
+		response.redirect("/");
 	}
 }
+
+
 module.exports = router;
