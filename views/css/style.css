@@ -19,10 +19,9 @@ body {
     margin-top: 75px;
 }
 
-/* form {
-    width: 100%;
-} */
-
+.tabs {
+    height: 100vh;
+}
 .nav-margin {
     margin-bottom: 75px;
 }
@@ -77,4 +76,8 @@ body {
 
 .tabulator .tabulator-tableHolder{
     overflow: hidden !important;
+}
+
+canvas {
+    width: 100px;
 }
