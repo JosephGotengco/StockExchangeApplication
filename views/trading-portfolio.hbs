@@ -1,86 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{{> head }}
+<head>
+	<title>{{display}}</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel='stylesheet' href='/css/style.css'>
+	<link rel='stylesheet' href='/css/trading-success.css'>
+</head>
 
 <body>
 
 
 	<!-- NAV BAR -->
-	{{> loggedInNavbar}}
-	<div class="container">
-		<ul class="nav nav-tabs">
-			<li class="active"><a data-toggle="tab" href="#home">Account Information</a></li>
-			<li><a data-toggle="tab" href="#menu1">Transactions</a></li>
-			<li><a data-toggle="tab" href="#menu2">Statistics</a></li>
-		</ul>
+	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+		<h5 class="my-0 font-weight-normal">
+			<a class="navbar-brand" href="/trading-success">
+				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+				STOCK NAME
+			</a>
+		</h5>
+
+
+		<form id="event-form" action="/trading-portfolio" method="POST" class="mr-auto">
+			<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+				name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+				<option id="USD" value="USD">USD</option>
+				<option id="JPY" value="JPY">JPY</option>
+				<option id="BGN" value="BGN">BGN</option>
+				<option id="CZK" value="CZK">CZK</option>
+				<option id="DKK" value="DKK">DKK</option>
+				<option id="GBP" value="GBP">GBP</option>
+				<option id="HUF" value="HUF">HUF</option>
+				<option id="PLN" value="PLN">PLN</option>
+				<option id="RON" value="RON">RON</option>
+				<option id="SEK" value="SEK">SEK</option>
+				<option id="CHF" value="CHF">CHF</option>
+				<option id="ISK" value="ISK">ISK</option>
+				<option id="NOK" value="NOK">NOK</option>
+				<option id="HRK" value="HRK">HRK</option>
+				<option id="RUB" value="RUB">RUB</option>
+				<option id="TRY" value="TRY">TRY</option>
+				<option id="AUD" value="AUD">AUD</option>
+				<option id="BRL" value="BRL">BRL</option>
+				<option id="CAD" value="CAD">CAD</option>
+				<option id="CNY" value="CNY">CNY</option>
+				<option id="HKD" value="HKD">HKD</option>
+				<option id="IDR" value="IDR">IDR</option>
+				<option id="ILS" value="ILS">ILS</option>
+				<option id="INR" value="INR">INR</option>
+				<option id="KRW" value="KRW">KRW</option>
+				<option id="MXN" value="MXN">MXN</option>
+				<option id="MYR" value="MYR">MYR</option>
+				<option id="NZD" value="NZD">NZD</option>
+				<option id="PHP" value="PHP">PHP</option>
+				<option id="SGD" value="SGD">SGD</option>
+				<option id="THB" value="THB">THB</option>
+				<option id="ZAR" value="ZAR">ZAR</option>
+			</select>
+		</form>
+
+
+
+		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
+			<a class="p-2 text-light" href="/trading-success">Trading</a>
+			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+			<a class="p-2 text-light" href="/news-hub">Rankings</a>
+		</nav>
+		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
 	</div>
 
-	<div class="tab-content tabs">
-		<div id="home" class="tab-pane fade in active">
-			<div class="container">
-				<h1 class="display-4">Your Portfolio</h1>
-				<p class="lead">Please note all prices are in {{{currency_code}}}.</p>
-			</div>
 
-			<div class='chfont container'>
-				<p class="font-weight-bold">First Name: {{{firstname}}}</p>
-				<p class="font-weight-bold">Last Name: {{{lastname}}}</p>
-				<p class="font-weight-bold">User Name: {{{username}}}</p>
-				<p class="font-weight-bold">Date Joined:
-					{{#with date_joined}}
-					{{day_joined}}, {{month_joined}} {{day_num_joined}}, {{year_joined}}
-					{{/with}}</p>
-				<p class="font-weight-bold">
-					Stocks:
-					{{#each title}}
-					{{this.stock_name}} ({{this.amount}}),
-					{{/each}}
-				</p>
-				<p class="font-weight-bold">Balance: {{{currency_symbol}}} {{head}}</p>
-				<br>
-			</div>
-		</div>
-		<div id="menu1" class="tab-pane fade">
-			<div class="container">
-				<h2 class="display-4">TRANSACTIONS</h2>
-				<div class="table-responsive">
-					<table name="mytable" class="table">
-						<thead>
-							<tr>
-								<th>Date</th>
-								<th>Company</th>
-								<th>Quantity</th>
-								<th>Amount ({{{currency_symbol}}})</th>
-								<th>Balance ({{{currency_symbol}}})</th>
-							</tr>
-						</thead>
-						<tbody>
-							{{#each displayTransactions}}
-							<tr>
-								<td>{{this.year}}, {{this.month}} {{this.day}}</td>
-								<td>{{this.stock_name}}</td>
-								<td>{{this.qty}}</td>
-								{{#ifEquals this.type "S"}}
-								<td>{{this.price}}</td>
-								{{else}}
-								<td>-{{this.price}}</td>
-								{{/ifEquals}}
-								<td>{{this.balance}}</td>
-							</tr>
-							{{/each}}
-						</tbody>
-					</table>
+
+	<div class="container mb-5">
+		<ul class="nav nav-tabs" id="pills-tab" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+					aria-controls="pills-home" aria-selected="true">Account Details</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab"
+					aria-controls="pills-profile" aria-selected="false">Transactions</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab"
+					aria-controls="pills-contact" aria-selected="false">Statistics</a>
+			</li>
+		</ul>
+		<div class="tab-content" id="pills-tabContent">
+			<div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+				<div class="container">
+					<h1 class="display-4">Your Portfolio</h1>
+					<p class="lead">Please note all prices are in {{{currency_code}}}.</p>
+				</div>
+
+				<div class='chfont container'>
+					<p class="font-weight-bold">First Name: {{{firstname}}}</p>
+					<p class="font-weight-bold">Last Name: {{{lastname}}}</p>
+					<p class="font-weight-bold">User Name: {{{username}}}</p>
+					<p class="font-weight-bold">Date Joined:
+						{{#with date_joined}}
+						{{day_joined}}, {{month_joined}} {{day_num_joined}}, {{year_joined}}
+						{{/with}}</p>
+					{{!-- <p class="font-weight-bold">
+						Stocks:
+						{{#each title}}
+						{{this.stock_name}} ({{this.amount}}),
+						{{/each}}
+					</p> --}}
+					<p class="font-weight-bold">Balance: {{head}}</p>
+					<p class="font-weight-bold">Total Earnings: {{{earnings}}}</p>
+					<br>
+					<p class="font-weight-bold">Your Stocks:</p>
+					<div class="row">
+						{{#if stocks}}
+						{{#each stocks}}
+						<div class="card col-md-3 mx-2 my-2">
+							<div class="card-body">
+								<h5 class="card-title">{{{this.stock_name}}}</h5>
+								<p class="d-flex justify-content-between"><small>AMOUNT:</small>
+									<small>{{{this.amount}}}<i class="far fa-clone ml-1"></i></small></p>
+								<p class="d-flex justify-content-between"><small>PROFIT:</small>
+									<small>{{{../currency_symbol}}} {{{this.profit}}}<i
+											class="far fa-money-bill-alt ml-1"></i></small></p>
+								<p class="d-flex justify-content-between"><small>PRICE/STOCK:</small>
+									<small>{{{../currency_symbol}}} {{{roundToTwo this.today_rate}}}<i
+											class="far fa-money-bill-alt ml-1"></i></small>
+								</p>
+								<p class="d-flex justify-content-between"><small><a target="_blank"
+											href="/news/stock/{{{this.stock_name}}}">Show me some stats!</a></small>
+								</p>
+							</div>
+						</div>
+						{{/each}}
+						{{else}}
+						<p class="text-muted">Your currently don't have any stocks.</p>
+						{{/if}}
+					</div>
 				</div>
 			</div>
-		</div>
-		<div id="menu2" class="tab-pane fade">
-			<div class="container">
-				<h3>Account Statistics</h3>
-				<p>WORK IN PROGRESS</p>
-				<div class="row">
-					<div class="col-md-6">
-						<canvas id="buy_vs_sell" width="200" height="100"></canvas>
+			<div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+				<div class="container">
+					<h2 class="display-4">TRANSACTIONS</h2>
+					{{#with userStatsData}}
+					<p class="font-weight-bold">Stocks Bought: {{{amountBought}}}</p>
+					<p class="font-weight-bold">Stocks Sold: {{{amountSold}}}</p>
+					<p class="font-weight-bold">Total Transactions: {{{num_transactions}}}</p>
+					{{/with}}
+					<div class="table-responsive">
+						<table name="mytable" class="table">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Company</th>
+									<th>Quantity</th>
+									<th>Amount ({{{currency_symbol}}})</th>
+									<th>Balance ({{{currency_symbol}}})</th>
+									<th>Type</th>
+								</tr>
+							</thead>
+							<tbody>
+								{{#each displayTransactions}}
+								<tr>
+									<td>{{this.year}}, {{this.month}} {{this.day}}</td>
+									<td>{{this.stock_name}}</td>
+									<td>{{this.qty}}</td>
+									{{#ifEquals this.type "S"}}
+									<td>{{this.price}}</td>
+									{{else}}
+									<td>-{{this.price}}</td>
+									{{/ifEquals}}
+									<td>{{this.balance}}</td>
+									<td>
+										{{#ifEquals this.type "S"}}
+									<td>Sale</td>
+									{{else}}
+									<td>Purchase</td>
+									{{/ifEquals}}
+									</td>
+								</tr>
+								{{/each}}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+				<div class="container">
+					<h1 class="display-4">Your Portfolio</h1>
+					<p>WORK IN PROGRESS</p>
+					<div class="row">
+						<div class="col-md-6">
+							<canvas id="buy_vs_sell" width="200" height="100"></canvas>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -88,9 +209,8 @@
 	</div>
 
 
-
-	<!-- Footer -->
 	{{> footer}}
+
 
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -119,7 +239,15 @@
 
 	<!-- ChartJS CDN 4 -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+	<script>
 
+	function switchCode(event) {
+		var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
+		document.getElementById("currency-code-select").selectedIndex = index;
+	}
+	switchCode();
+
+	</script>
 	<script>
 		var userStatsData = {{{ json userStatsData }}};
 		console.log(userStatsData);
@@ -152,80 +280,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-{{!-- 
-	<!-- Portfolio -->
-	<div class="container">
-		<div class="jumbotron jumbotron-fluid">
-			<div class="container">
-				<h1 class="display-4">Your Portfolio</h1>
-				<p class="lead">Please note all prices are in {{{currency_code}}}.</p>
-			</div>
-
-			<div class='chfont container'>
-				<p class="font-weight-bold">First Name: {{{firstname}}}</p>
-				<p class="font-weight-bold">Last Name: {{{lastname}}}</p>
-				<p class="font-weight-bold">User Name: {{{username}}}</p>
-				<p class="font-weight-bold">Date Joined:
-					{{#with date_joined}}
-					{{day_joined}}, {{month_joined}} {{day_num_joined}}, {{year_joined}}
-					{{/with}}</p>
-				<p class="font-weight-bold">
-					Stocks:
-					{{#each title}}
-					{{this.stock_name}} ({{this.amount}}),
-					{{/each}}
-				</p>
-				<p class="font-weight-bold">Balance: {{{currency_symbol}}} {{head}}</p>
-				<br>
-			</div>
-		</div>
-	</div>
-
-
-
-
-	<div class="container footer-spacer">
-		<div class="jumbotron jumbotron-fluid" style="padding: 20px 40px;">
-			<h2 class="display-4">TRANSACTIONS</h2>
-			<div class="table-responsive">
-				<table name="mytable" class="table">
-					<thead>
-						<tr>
-							<th>Date</th>
-							<th>Company</th>
-							<th>Quantity</th>
-							<th>Amount ({{{currency_symbol}}})</th>
-							<th>Balance ({{{currency_symbol}}})</th>
-						</tr>
-					</thead>
-					<tbody>
-						{{#each displayTransactions}}
-						<tr>
-							<td>{{this.year}}, {{this.month}} {{this.day}}</td>
-							<td>{{this.stock_name}}</td>
-							<td>{{this.qty}}</td>
-							{{#ifEquals this.type "S"}}
-							<td>{{this.price}}</td>
-							{{else}}
-							<td>-{{this.price}}</td>
-							{{/ifEquals}}
-							<td>{{this.balance}}</td>
-						</tr>
-						{{/each}}
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div> --}}
