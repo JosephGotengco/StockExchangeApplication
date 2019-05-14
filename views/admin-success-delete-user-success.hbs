@@ -1,7 +1,7 @@
 <!DOCTYPE html>
     
 <head>
-    <title>Registration Page</title>
+    <title>{{display}}</title>
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -33,7 +33,7 @@
                 <p><i>{{message}}</i></p>
                 <div class="row">
                     <div class="col">
-                        <form onsubmit="return confirm('Do you really want to delete the user?') "action='/admin-success-delete-user-success', method='POST'>
+                        <form  id="deleteuser" action='/admin-success-delete-user-success', method='POST'>
                             <label for="stocksearch">Enter Username to Delete</label>
                             <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
                             <br>
@@ -51,11 +51,7 @@
             </div>
 
         </div>
-                <footer class="chfont page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-            <a href="">Stock Trader</a>  All Rights Reserved
-
-        </footer>
+{{> footer}}
     </div> 
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

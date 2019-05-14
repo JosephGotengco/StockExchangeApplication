@@ -1,82 +1,84 @@
 <!DOCTYPE html>
-    
+<html lang="en">
+
 <head>
-    <title>Registration Page</title>
-    <meta charset="utf-8">
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-
+  <title>{{display}}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-    
+
 <body>
-<div class="defcontainer">
 
 
-        <div class="defheader">
-        </div>
-        
+  {{!-- NavBar --}}
+  {{> loggedOutNavbar}}
 
-        <div class="defmenu">
-            <div class='list-group'>
-                <a href="login" class="list-group-item">Login</a>
-                <a href="register" class="list-group-item list-group-item-info">Registration</a>
-                <a href="trading" class="list-group-item">Trading</a>
-                <a href="admin" class="list-group-item">Admin Panel</a>
+  <!-- Registeration Form -->
+  <div class="content-margin footer-spacer">
+      <h1 class="title">{{title}}</h1>
+    <div class="container-fluid d-flex">
+      <div class="m-auto">
+        <form action="/register" method="POST">
+          <br>
+          <br>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="firstname">First Name</label>
+              <input type="text" class="form-control" name='firstname' id="firstname"
+                placeholder="First name must be 3-30 characters long and must only contain letters.">
             </div>
-        </div>
-        
-
-        <div class="defcontent">
-            <br>
-            <div class='chfont container'>
-
-                <form action ="/register" method="POST">
-                <p>{{title}}</p>
-
-                    <br>
-
-                  <div class="form-group">
-                    <label for="firstname">First Name</label>
-                    <input type="text" class="form-control" name='firstname' id="firstname" placeholder="First name must be 3-30 characters long and must only contain letters.">
-                  </div>
-                  <div class="form-group">
-                    <label for="lastname">Last Name</label>
-                    <input type="text" class="form-control" name='lastname' id="lastname" placeholder="Last name must be 3-30 characters long and must only contain letters.">
-                  </div>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" name='username' id="username" placeholder="Username must have 5-15 characters and may only be alphanumeric.">
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" name='password' id="password" placeholder="Password must have 5-15 characters and may only be alphanumeric.">
-                  </div>
-                  <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" class="form-control" name='confirm_password' id="confirm_password" placeholder="Confirm Password">
-                  </div>
-                    <input type="submit" class="btn btn-secondary" value="Register">
-
-                <br><br>
-                </form>
-
-                <div id='submission'></div>
+            <div class="form-group col-md-12">
+              <label for="lastname">Last Name</label>
+              <input type="text" class="form-control" name='lastname' id="lastname"
+                placeholder="Last name must be 3-30 characters long and must only contain letters.">
             </div>
-        </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" name='username' id="username"
+                placeholder="Username must have 5-15 characters and may only be alphanumeric.">
+            </div>
+            <div class="form-group col-md-12">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" name='password' id="password"
+                placeholder="Password must have 5-15 characters and may only be alphanumeric.">
+            </div>
+            <div class="form-group col-md-12">
+              <label for="confirm_password">Confirm Password</label>
+              <input type="password" class="form-control" name='confirm_password' id="confirm_password"
+                placeholder="Confirm Password">
+            </div>
+          </div>
+          <input type="submit" class="btn btn-secondary" value="Register">
+          </button>
+        </form>
+        <div id='submission'></div>
+      </div>
+    </div>
+  </div>
 
-        <footer class="chfont page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2019 Copyright:
-            <a href="">Stock Trader</a>  All Rights Reserved
-        </footer>
+  <!-- Footer -->
+ {{> footer}}
 
-        
-    </div> 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script type='text/javascript' src='bundle_1.js'></script>
-    </body>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+  <script type='text/javascript' src='bundle_1.js'></script>
+</body>
+
 </html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{> head}}
+
+<body>
+	<!-- NAV BAR -->
+	{{> loggedInNavbar}}
+
+	<marquee behaviour="scroll" ; bgcolor="black" ; scrollamount=10; onmouseover="this.stop();"
+		onmouseleave="this.start();">
+		{{#each marqueeData}}
+		<a href="/news/stock/{{this.code}}" target="_blank"><span style="color: red"><b>{{{this.code}}}:</b></span><span
+				style="color: white"><b>{{{this.price}}}</b></span> <img src="{{{this.img}}}" height=20px; width=20px;
+				hspace=2; padding=2px;></a>,
+		{{/each}}
+	</marquee>
+
+
+	<form action='/trading-success' method="GET">
+		<input type="hidden" id="pref" name="pref" value="currency">
+		<button type="submit" class="btn btn-primary">Currencies</button>
+	</form>
+
+	{{> tradingBody}}
+
+	<!-- Footer -->
+	{{> footer}}
+
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

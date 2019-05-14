@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Stock Name</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <!-- Nav Bar -->
+  <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+    <h5 class="my-0 mr-md-auto font-weight-normal"><img src="./images/logo.png" alt="logo" width="115" height="20">
+      <nav style="float: right; margin-left: 9px;">
+        <div class="dropdown">
+          <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Ticker
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Stocks</a>
+            <a class="dropdown-item" href="/news/currency/{{this.code}}">Currency</a>
+          </div>
+        </div>
+      </nav>
+    </h5>
+
+    <nav class="my-2 my-md-0 mr-md-3 nav-pills">
+      <a class="p-2 text-dark" href="#">Trading</a>
+      <a class="p-2 text-dark" href="#">Portfolio</a>
+    </nav>
+    <a class="btn btn-outline-danger" href="logout" style="margin-right: 7px;">Sign Out</a>
+    <a class="btn btn-outline-info" href="admin-sucess" style="margin-right: 7px;">Admin</a>
+  </div>
+
+  <div class="jumbotron mx-auto" style="width: 1200px;">
+    <h1 class="display-4">About Stock Name</h1>
+    <p class="lead">Who we are and what we have created</p>
+    <hr class="my-4">
+    <div class="row col-lg-12">
+      <div class="col-sm-6">
+        <div class="card">
+          <img class="mx-auto" src="images/bcit-logo.png" alt="Card image cap" height="200" width="200">
+          <div class="card-body">
+            <h5 class="card-title">Special title treatment</h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card">
+          <br><br><br><img class="mx-auto pt-3" src="images/logo.png" alt="Card image cap" height="50" width="200"><br><br><br>
+          <div class="card-body">
+            <h5 class="card-title">Special title treatment</h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
