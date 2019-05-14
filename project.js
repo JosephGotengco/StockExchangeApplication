@@ -1,106 +1,75 @@
-const express = require("express");
-const axios = require("axios");
-const hbs = require("hbs");
-const LocalStrategy = require("passport-local");
-const passport = require("passport");
-const bodyParser = require("body-parser");
-var mongoose = require("mongoose");
-var fs = require("fs");
-var session = require("express-session");
-const MongoClient = require("mongodb").MongoClient;
-const check = require("express-validator");
-var utils = require("./utils");
-var cookieParser = require("cookie-parser");
-var ObjectID = require("mongodb").ObjectID;
-var assert = require("assert");
-var moment = require("moment");
-var bcrypt = require("bcrypt");
+//#------ These lines below import modules ------#//
+const express = require('express');
+const axios = require('axios');
+const hbs = require('hbs');
+const path = require("path");
+const LocalStrategy = require('passport-local');
+const passport = require('passport');
+const bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var fs = require('fs');
+var session = require('express-session');
+const MongoClient = require('mongodb').MongoClient;
+const check = require('express-validator');
+var utils = require('./utils');
+var cookieParser = require('cookie-parser');
+var ObjectID = require('mongodb').ObjectID;
+var assert = require('assert');
 
-var saltRounds = 10;
-// function for getting stock data for the graph
-var stockFunc = require("./feature_functions/chartStockData");
-// function for getting currency data for the graph
-var currFunc = require("./feature_functions/chartCurrData");
-// function for getting stock data for the marquee element
-var marqueeStock = require("./feature_functions/MarqueeStock");
-// function for getting the currency data for the marquee element
-var marqueeCurrency = require("./feature_functions/MarqueeCurrency");
-// function for getting a single stock's price
-var getBatch = require("./feature_functions/getBatchPrice");
 
-// configure which port to use and set it as a environment variable in the process
-const port = process.env.PORT || 8080;
+// vvvvvvv CONFIGURATION vvvvvv //
 
-// set a directory to to find partials in
-hbs.registerPartials(__dirname + "/views/partials/");
+//#------ This line makes a link (like css link) for the folder that contains placeholders for hbs files------#//
+hbs.registerPartials(__dirname + '/views/partials');
+module.exports = app;
 
-// unknown
 mongoose.Promise = global.Promise;
 
-// used for logging in? (unsure)
-mongoose.connect("mongodb://localhost:27017/accounts", {
-	useNewUrlParser: true
-});
+// password login
+mongoose.connect("mongodb://localhost:27017/accounts", { useNewUrlParser: true });
 
-// make the application instance
 var app = express();
-// create a global variable
-var ssn;
 
-// set the view engine to hbs (used to read our hbs files)
-app.set("view engine", "hbs");
+//#------ Sets the view engine to hbs which allows the application (this file) to use hbs files instead of html files ------#//
+app.set('view engine', 'hbs');
 
-// set a directory to look for our hbs files, images, css, and native js files
-app.use(express.static(__dirname + "/views"));
-// set application to use json
+//#------ Lines below help parse data that comes in from users (webpages); don't need to touch these ------#//
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
-// set application to be able to access nested objects
 app.use(bodyParser.urlencoded({ extended: true }));
-// initializes passport
 app.use(passport.initialize());
-// alters request object and change the 'user' value from session id (client cookie) to the true desserialized user object
 app.use(passport.session());
-// set application to parse cookies (unsure)
 app.use(cookieParser());
 
-hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
-	return arg1 == arg2 ? options.fn(this) : options.inverse(this);
-});
+hbs.registerHelper('dbConnection', function(req,res) {
+	var url = "mongodb://localhost:27017/accounts";
+	return url;
+})
 
-hbs.registerHelper("json", function (context) {
-	return JSON.stringify(context);
-});
+//#------ | Helps differentiate between multiple users who connect to this application (this file) vvv ------#//
 
-hbs.registerHelper("roundToTwo", function (num) {
-	return num.toFixed(2);
-});
+app.use(session({
+	secret: 'secretcode',
+	resave: false,
+	saveUninitialized: false
+}));
 
-// cookie configuration
-app.use(
-	session({
-		secret: "secretcode",
-		resave: false,
-		saveUninitialized: false
-	})
-);
 
-// sets the session id as the cookie in user's browser
-passport.serializeUser(function (user, done) {
-	done(null, user);
-});
+passport.serializeUser(function(user, done) {
+        done(null, user); 
+    });
 
-// gets the session id as the cookie from the user's browser
-passport.deserializeUser(function (user, done) {
-	done(null, user);
-});
+passport.deserializeUser(function(user, done) {
+        done(null, user); 
+    });
 
-// logs whenever a user has successfully logged in
 app.use((request, response, next) => {
 	var time = new Date().toString();
 	var log_entry = `${time}: ${request.method} ${request.url}`;
-	fs.appendFile("server.log", log_entry + "\n", error => {
+	console.log(log_entry);
+	fs.appendFile('server.log', log_entry + '\n', (error) => {
 		if (error) {
-			console.log("Unable to log message");
+			console.log('Unable to log message');
 		}
 	});
 	next();
@@ -121,24 +90,44 @@ var account_schema = new mongoose.Schema({
 		maxlength: 60
 	}
 });
+// ^^^^^^^ CONFIGURATION ^^^^^^^ //
 
-app.get("/registration-logged-in", isAuthenticated, (request, response) => {
-	// called when user is already logged in and goes to user registration page
-	response.render("registration-logged-in.hbs", {
-		title: "You are already logged in. Logout to make a new account.",
-		display: "Register"
-	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// vvvvvv REGISTRATION vvvvvv //
+
+// End point if user goes to registeration webpage but is already logged in
+app.get('/registration-logged-in', isAuthenticated, (request, response) => {
+	response.render('registration-logged-in.hbs', {
+		title: 'You are already logged in. Logout to make a new account.'
+	})
 });
 
-app.get("/register", (request, response) => {
-	// called when user goes to user registration page
-	response.render("registration.hbs", {
-		title: "To create an account please enter credentials."
-	});
+
+// End point for a new user
+app.get('/register', (request, response) => {
+	response.render('registration.hbs', {
+		title: 'To create an account please enter credentials.'
+	})
 });
 
-app.post("/register", function (request, response) {
-	// called when user submits form data for user registration
+// Post end point for registering a new user
+app.post('/register', function(request, response) {
+
 	var firstname = request.body.firstname;
 	var lastname = request.body.lastname;
 	var username = request.body.username;
@@ -151,544 +140,302 @@ app.post("/register", function (request, response) {
 
 	if (check_str(attributes[0]) === false) {
 		message = `First name must be 3-30 characters long and must only contain letters.`;
-		response.render("registration.hbs", { title: message });
-	} else if (check_str(attributes[1]) === false) {
+		response.render('registration.hbs', {title: message});
+	}
+	else if (check_str(attributes[1]) === false) {
 		message = `Last name must be 3-30 characters long and must only contain letters.`;
-		response.render("registration.hbs", { title: message });
-	} else if (check_uniq(attributes[2]) === false) {
+		response.render('registration.hbs', {title: message});
+	}
+	else if (check_uniq(attributes[2]) === false) {
 		message = `Username must have 5-15 characters and may only be alphanumeric.`;
-		response.render("registration.hbs", { title: message });
-	} else if (check_uniq(attributes[3]) === false) {
+		response.render('registration.hbs', {title: message});
+	}
+	else if (check_uniq(attributes[3]) === false) {
 		message = `Password must have 5-15 characters and may only be alphanumeric.`;
-		response.render("registration.hbs", { title: message });
-	} else if (attributes[3] !== attributes[4]) {
+		response.render('registration.hbs', {title: message});
+	}
+	else if ((attributes[3]) !== attributes[4]) {
 		message = `Passwords do not match. Please try again.`;
-		response.render("registration.hbs", { title: message });
-	} else {
+		response.render('registration.hbs', {title: message});
+	}
+	else {
 		check = true;
 	}
 
 	if (check) {
-		bcrypt.hash(password, saltRounds, (err, hash) => {
-			if (err) {
-				console.error(err);
-			} else {
-				db.collection("user_accounts").findOne({ username: username }, function (
-					err,
-					result
-				) {
-					if (result === null) {
-						db.collection("user_accounts").insertOne(
-							{
-								firstname: firstname,
-								lastname: lastname,
-								username: username,
-								password: hash,
-								type: "standard",
-								cash2: [10000],
-								stocks: [],
-								creation_date: new Date().toString(),
-								transactions: []
-							},
-							(err, result) => {
-								if (err) {
-									messsage = `There was an error in creating your account. Please try again.`;
-									response.render("registration.hbs", {
-										title: `There was an error in creating your account. Please try again.`
-									});
-								}
-								message = `You have successfully created an account with the username '${username}' and have been granted $10,000 USD. Head over to the login page.`;
-								response.render("registration.hbs", { title: message });
-							}
-						);
-					} else {
-						message = `The username '${username}' already exists within the system.`;
-						response.render("registration.hbs", {
-							title: `The username '${username}' already exists within the system.`
-						});
+		db.collection('user_accounts').findOne({username: username}, function(err, result) {
+
+			if (result === null) {
+				db.collection('user_accounts').insertOne({
+					firstname: firstname,
+					lastname: lastname,
+					username: username,
+					password: password,
+					type: 'standard',
+					cash2: [10000],
+					stocks: []
+
+				}, (err, result) => {
+					if (err) {
+						messsage = `There was an error in creating your account. Please try again.`;
+						response.render('registration.hbs', {title: `There was an error in creating your account. Please try again.`});
 					}
+					message = `You have successfully created an account with the username '${username}' and have been granted $10,000 USD. Head over to the login page.`;
+					response.render('registration.hbs', {title: message});
 				});
 			}
-		});
-	}
+			else {
+				message = `The username '${username}' already exists within the system.`;
+				response.render('registration.hbs', {title: `The username '${username}' already exists within the system.`});
+			}
+		}
+
+	)};
 });
 
-function check_str(string_input) {
+function check_str (string_input) {
 	// checks if string value is between 3 and 12 characters, uses RegEx to confirm only alphabetical characters
 	var valid_chars = /^[a-zA-Z ]{3,30}$/;
+	var string_length = string_input.length;
 
 	if (valid_chars.test(string_input)) {
 		flag = true;
-	} else {
+	}
+	else {
 		flag = false;
 	}
 	return flag;
 }
 
-function check_uniq(string_input) {
+function check_uniq (string_input) {
 	// checks if string value is between 5 and 15 characters, uses RegEx to confirm only alphanumerical chars
 	var valid_chars = /^([a-zA-Z0-9_-]){5,15}$/;
 
 	if (valid_chars.test(string_input)) {
 		flag = true;
-	} else {
+	}
+	else {
 		flag = false;
 	}
 	return flag;
 }
+// ^^^^^^ REGISTRATION ^^^^^^ //
+
+
+
+
+
+
+
+
+
+// vvvvvv LOGIN vvvvvv //
 
 const user_account = mongoose.model("user_accounts", account_schema);
+// var Users = mongoose.model('user_accounts', account_schema);
 
-app.get("/", (request, response) => {
-	// called when user connects to application
-	request.session.destroy(function (err) {
-		response.render("login.hbs", {
-			title: "Welcome to the login page.",
-			display: "Login"
-		});
+
+// End point for logging in (First Page a user sees)
+app.get('/', (request, response) => {
+	request.session.destroy(function(err) {
+		response.render('login.hbs', {
+			title: 'Welcome to the login page.'
+		})
 	});
 });
 
-app.get("/login", (request, response) => {
-	// called when user connects to application
-	request.session.destroy(function (err) {
-		response.render("login.hbs", {
-			title: "Welcome to the login page.",
-			display: "Login"
-		});
+// ^^^ Cannot we just redirect them to the GET root endpoint? ^^^ 
+app.get('/login', (request, response) => {
+	request.session.destroy(function(err) {
+		response.render('login.hbs', {
+			title: 'Welcome to the login page.'
+		})
 	});
 });
 
-app.get("/login-fail", (request, response) => {
-	// called when user enters invalid username and/or password
-	request.session.destroy(function (err) {
-		response.status(200);
-		response.render("login.hbs", {
-			title:
-				"You have entered an invalid username or password. Please try again or create a new account.",
-			display: "Login"
-		});
+// End point if user has invalid credentials
+app.get('/login-fail', (request, response) => {
+	request.session.destroy(function(err) {
+		response.render('login.hbs', {
+			title: 'You have entered an invalid username or password. Please try again or create a new account.'
+		})
 	});
 });
 
-app.get("/logout", function (request, response) {
-	// called when user logs out
-	request.session.destroy(function (err) {
-		response.redirect("/");
-	});
+// End point for logging user out of session (passport)
+app.get('/logout', function (request, response){
+  request.session.destroy(function (err) {
+  	response.redirect('/');
+  });
 });
 
-// called when user logs in successfully from /
-app.post(
-	"/",
-	passport.authenticate("local", {
-		successRedirect: "/trading-success",
-		failureRedirect: "/login-fail"
+// Post end point for logging in
+app.post('/', passport.authenticate('local', { successRedirect: '/trading-success', failureRedirect: '/login-fail' }));
+
+// Authenticates user and redirects them to /trading-success end point
+app.post('/login', passport.authenticate('local', {successRedirect: '/trading-success', failureRedirect: '/login-fail' }));
+
+// Literally does same thing as above end point (Subject to fix!!!)
+app.post('/login-fail', passport.authenticate('local', {successRedirect: '/trading-success', failureRedirect: '/login-fail' }));
+
+// Specifies how we are going to authenticate the user
+// We search the database for any docuemnt that has the specified username and password	
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    user_account.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      if (user.password != password) { return done(null, false); }
+      return done(null, user);
+    });
+  }
+));
+
+// ^^^^^^ LOGIN ^^^^^^ //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Holy Moly VVVVVVVVVVVVVVVVVVVVVVV Hell nah
+
+app.get('/trading', (request, response) => {
+	response.render('trading.hbs', {
+		title: 'You are not logged in. You must be logged in to view this page.'
 	})
-);
+});
 
-// called when user logs in successfully from /login
-app.post(
-	"/login",
-	passport.authenticate("local", {
-		successRedirect: "/trading-success",
-		failureRedirect: "/login-fail"
+app.get('/trading-success', isAuthenticated, (request, response) => {
+	response.render('trading-success.hbs', {
+		title: 'Welcome to the trading page.'
 	})
-);
-
-// called when uesr logs in successfully from /login-fail
-app.post(
-	"/login-fail",
-	passport.authenticate("local", {
-		successRedirect: "/trading-success",
-		failureRedirect: "/login-fail"
-	})
-);
-
-passport.use(
-	new LocalStrategy(function (username, password, done) {
-		user_account.findOne({ username: username }, function (err, user) {
-			if (err) {
-				return done(err);
-			}
-			if (!user) {
-				return done(null, false);
-			}
-			bcrypt.compare(password, user.password, function (err, result) {
-				if (err) {
-					return done(null, false);
-				}
-				if (result) {
-					return done(null, user);
-				} else {
-					return done(null, false);
-				}
-			});
-		});
-	})
-);
-
-app.get("/about", isAuthenticated, (request, response) => {
-	response.render("about.hbs");
 });
 
-app.get("/news-hub", isAuthenticated, async (request, response) => {
-	// called when user goes to the news hub page
-	if (ssn.stockDataList === undefined) {
-		var stockDataList = await marqueeStock.getMarqueeStock();
-		ssn.stockDataList = stockDataList;
-	}
-	response.render("news-hub.hbs", {
-		title: "Stock and Currency.",
-		currencyDataList: ssn.currencyDataList,
-		stockDataList: ssn.stockDataList,
-		display: "Ranking"
-	});
-});
+app.post('/trading-success-search', isAuthenticated, async(request, response) => {
+	// Gets information about stock (What stock it searches is from the input box on trading-success.hbs)
 
-app.get("/trading", (request, response) => {
-	// called when user goes to trading page while not logged in
-	response.render("trading.hbs", {
-		title: "You are not logged in. You must be logged in to view this page.",
-		display: "Trading"
-	});
-});
+	var stock = request.body.stocksearch;
+	var cash2 = request.session.passport.user.cash2;
 
-app.get("/trading-success", isAuthenticated, async (request, response) => {
-	// called when user logs in successfully => redicted to this page
-	try {
-		ssn = request.session;
-		var cash2 = request.session.passport.user.cash2;
-		var stocks = request.session.passport.user.stocks;
-		var num_stocks = request.session.passport.user.stocks.length;
-		var transactions = request.session.passport.user.transactions;
-		var num_transactions = transactions.length;
-		var earnings = cash2 - 10000;
-
-		var amountBought = countStocksBought(transactions);
-
-		var amountSold = countStocksSold(transactions);
-
-		var uniqueTransactions = getUniqueTransactions(transactions);
-
-		ssn.userStatsData = {
-			num_stocks: num_stocks,
-			num_transactions: num_transactions,
-			earnings: earnings,
-			amountBought: amountBought,
-			amountSold: amountSold,
-			uniqueTransactions: uniqueTransactions
-		};
-		var defaultPreference = "currency";
-		if (ssn.preference === undefined) {
-			ssn.preference = defaultPreference;
-		}
-
-		if (ssn.currencyDataList === undefined) {
-			var currencyDataList = await marqueeCurrency.getMarqueeCurrency();
-			ssn.currencyDataList = currencyDataList;
-		}
-
-		var stock_names = [];
-		var displayStocks = [];
-		var stock_tickers = "";
-
-		if (stocks.length > 0) {
-			for (i = 0; i < stocks.length; i++) {
-				stock_tickers += `${stocks[i].stock_name},`;
-				stock_names.push(stocks[i].stock_name);
-			}
-			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
-			ssn.closing_price = closing_price;
-			for (i = 0; i < stocks.length; i++) {
-				displayStocks[i] = stocks[i];
-				var today_price = closing_price[stock_names[i]];
-				displayStocks[i].profit = (
-					displayStocks[i].total_cost -
-					today_price * displayStocks[i].amount
-				).toFixed(2);
-				displayStocks[i].today_rate = today_price;
-			}
-			ssn.userStockData = {
-				displayStocks: displayStocks
-			};
-		} else {
-			ssn.userStockData = { displayStocks: displayStocks };
-		}
-
-		// Updated cookies @ every endpoint
-		response.render("trading-success.hbs", {
-			title: "Welcome to the trading page.",
-			marqueeData: ssn.currencyDataList,
-			display: "Trading",
-			preference: ssn.preference,
-			userCash: cash2[0],
-			num_stocks: num_stocks,
-			num_transactions: num_transactions,
-			earnings: earnings,
-			amountBought: amountBought,
-			amountSold: amountSold,
-			stocks: displayStocks,
-			uniqueTransactions: uniqueTransactions.slice(
-				-5,
-				uniqueTransactions.length
-			)
-		});
-	} catch (err) {
-		console.log(err);
-	}
-});
-
-app.post(
-	"/trading-success-stocks",
-	isAuthenticated,
-	async (request, response) => {
-		try {
-			var cash2 = request.session.passport.user.cash2;
-			ssn.preference = "stock";
-			if (ssn.stockDataList === undefined) {
-				var stockDataList = await marqueeStock.getMarqueeStock();
-				ssn.stockDataList = stockDataList;
-			}
-
-			response.render("trading-success.hbs", {
-				title: "Welcome to the trading page.",
-				marqueeData: ssn.stockDataList,
-				display: "Trading",
-				preference: ssn.preference,
-				userCash: cash2[0],
-				num_stocks: ssn.userStatsData.num_stocks,
-				num_transactions: ssn.userStatsData.num_transactions,
-				earnings: ssn.userStatsData.earnings,
-				amountBought: ssn.userStatsData.amountBought,
-				amountSold: ssn.userStatsData.amountSold,
-				stocks: ssn.userStockData.displayStocks,
-				uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
-					-5,
-					ssn.userStatsData.uniqueTransactions.length
-				)
-			});
-		} catch (err) {
-			console.log(err);
-		}
-	}
-);
-
-app.post(
-	"/trading-success-search",
-	isAuthenticated,
-	async (request, response) => {
-		// called when user submits a ticker in ticker search box in trading page
-		var stock = request.body.stocksearch.toUpperCase();
-		var cash2 = request.session.passport.user.cash2;
 		var message;
 
 		try {
-			const stock_info = await axios.get(
-				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
-			);
+			const stock_info = await axios.get(`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`);
 			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.close;
+			var stock_price = stock_info.data.latestPrice;
 
-			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: $${stock_price} USD.`;
-		} catch (err) {
-			if (stock === "") {
-				message = "Please enter a stock ticker i.e. TSLA, MSFT";
-			} else {
+			message = `The price of the selected ticker '${stock.toUpperCase()}' which belongs to '${stock_name}' is currently: $${stock_price} USD.`;
+			
+		}
+		catch (err) {
+			if (stock === '') {
+				message = 'Please enter a stock ticker i.e. TSLA, MSFT';
+			}
+			else {
 				message = `Sorry the stock ticker '${stock}' is invalid.`;
 			}
-		}
+		}	
+		response.render('trading-success.hbs', {
+				title: message,
+				head: `Cash balance: $${cash2[0]}`
+				})
 
-		switch (ssn.preference) {
-			case "stock":
-				var marqueeData = ssn.stockDataList;
-				break;
-			case "currency":
-				var marqueeData = ssn.currencyDataList;
-				break;
-		}
-		response.render("trading-success.hbs", {
-			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
-			display: "Trading",
-			preference: ssn.preference,
-			userCash: cash2[0],
-			num_stocks: ssn.userStatsData.num_stocks,
-			num_transactions: ssn.userStatsData.num_transactions,
-			earnings: ssn.userStatsData.earnings,
-			amountBought: ssn.userStatsData.amountBought,
-			amountSold: ssn.userStatsData.amountSold,
-			stocks: ssn.userStockData.displayStocks,
-			uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
-				-5,
-				ssn.userStatsData.uniqueTransactions.length
-			)
-		});
-	}
-);
+});
 
-app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
-	// called when user submits ticker in stock buy form in trading page
-	// FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX
+app.post('/trading-success-buy', isAuthenticated, async(request, response) => {
+
 	var _id = request.session.passport.user._id;
 	var cash = request.session.passport.user.cash;
-	var qty = parseFloat(request.body.buystockqty);
-	var stock = request.body.buystockticker.toUpperCase();
+	var qty = request.body.buystockqty;
+	var stock = (request.body.buystockticker).toUpperCase();
 	var stocks = request.session.passport.user.stocks;
 	var cash2 = request.session.passport.user.cash2;
-	var num_stocks = request.session.passport.user.stocks.length;
-	var transactions = request.session.passport.user.transactions;
-	var num_transactions = transactions.length;
-	var earnings = cash2 - 10000;
 
 
 	var index = check_existence(stock);
-	var message;
 
-	try {
-		const stock_info = await axios.get(
-			`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
-		);
+	try {		
+		const stock_info = await axios.get(`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`);
 		var stock_name = stock_info.data.companyName;
-		var stock_price = stock_info.data.close;
-		var total_cost = Math.round(stock_price * qty * 100) / 100;
-		var cash_remaining = Math.round((cash2 - total_cost) * 100) / 100;
+		var stock_price = stock_info.data.latestPrice;
+		var total_cost = Math.round(stock_price*qty*100)/100;
+		var cash_remaining = Math.round((cash2 - total_cost)*100)/100;
+		var stock_holding = {[stock]:parseInt(qty)};
 
-		var amountBought = countStocksBought(transactions);
+		if ((cash_remaining >= 0) && (total_cost !== 0) && (qty > 0)) {
 
-		var amountSold = countStocksSold(transactions);
-
-		var uniqueTransactions = getUniqueTransactions(transactions);
-
-		ssn.userStatsData = {
-			num_stocks: num_stocks,
-			num_transactions: num_transactions,
-			earnings: earnings,
-			amountBought: amountBought,
-			amountSold: amountSold,
-			uniqueTransactions: uniqueTransactions
-		};
-
-		if (cash_remaining >= 0 && total_cost !== 0 && qty > 0) {
 			var db = utils.getDb();
 
 			if (index >= 0) {
-				var stock_qty = request.session.passport.user.stocks[index].amount;
-				var current_cost =
-					request.session.passport.user.stocks[index].total_cost;
-				var stock_remaining = parseFloat(qty) + parseFloat(stock_qty);
-				stock_holding = {
-					stock_name: stock,
-					amount: parseFloat(stock_remaining),
-					total_cost: current_cost + total_cost
-				};
+				var stock_qty = request.session.passport.user.stocks[index][stock];
+				var stock_remaining = parseInt(qty) + parseInt(stock_qty);
+				stock_holding = {[stock]:parseInt(stock_remaining)};
 				stocks[index] = stock_holding;
 				cash2[0] = cash_remaining;
-			} else {
-				stock_holding = {
-					stock_name: stock,
-					amount: parseFloat(qty),
-					total_cost: total_cost
-				};
+			}
+			else {
 				cash2[0] = cash_remaining;
+				
+				console.log("cash_remaining after else, after cash=cash_remain:"+cash_remaining);
+
+
 				stocks.push(stock_holding);
 			}
+			console.log('cash_remaining before update:'+cash_remaining);
+			console.log('cash added to database' + cash);
 
-			var log = {
-				datetime: new Date().toString(),
-				stock: stock,
-				stock_name: stock_name,
-				qty: qty,
-				total_cost: total_cost,
-				type: "B",
-				balance: cash_remaining
-			};
-			transactions.push(log);
-			db.collection("user_accounts").updateOne(
-				{ _id: ObjectID(_id) },
-				{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
+			db.collection('user_accounts').updateOne(
+				{ "_id": ObjectID(_id)},
+				{ $set: { "cash2": cash2, "stocks": stocks}}
 			);
 
 			message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_cost}.`;
-		} else if (total_cost === 0) {
+
+		}
+		else if (total_cost === 0) {
 			message = `Sorry you need to purchase at least 1 stock. Change your quantity to 1 or more.`;
-		} else if (qty < 0) {
+		}
+		else if (qty < 0) {
 			message = `You cannot buy negative shares.`;
-		} else {
-			message = `Sorry you only have $${
-				cash2[0]
-				}. The purchase did not go through. The total cost was $${total_cost}.`;
 		}
-	} catch (err) {
-		if (stock === "") {
+		else {
+			message = `Sorry you only have $${cash2[0]}. The purchase did not  go through. The total cost was $${total_cost}.`;
+		}
+
+	}
+	catch (err) {
+		if (stock === '') {
 			message = `Sorry, you must input a stock to buy.`;
-		} else {
-			message = `Sorry the stock ticker '${
-				request.body.buystockticker
-				}' is invalid.`;
+		}
+		else {
+			message = `Sorry the stock ticker '${request.body.buystockticker}' is invalid.`;
 		}
 	}
-	switch (ssn.preference) {
-		case "stock":
-			var marqueeData = ssn.stockDataList;
-			break;
-		case "currency":
-			var marqueeData = ssn.currencyDataList;
-			break;
-	}
 
-	var stock_names = [];
-	var displayStocks = [];
-	var stock_tickers = "";
-
-	if (stocks.length > 0) {
-		for (i = 0; i < stocks.length; i++) {
-			stock_tickers += `${stocks[i].stock_name},`;
-			stock_names.push(stocks[i].stock_name);
-		}
-		var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
-		ssn.closing_price = closing_price;
-		for (i = 0; i < stocks.length; i++) {
-			displayStocks[i] = stocks[i];
-			var today_price = closing_price[stock_names[i]];
-			displayStocks[i].profit = (
-				displayStocks[i].total_cost -
-				today_price * displayStocks[i].amount
-			).toFixed(2);
-			displayStocks[i].today_rate = today_price;
-		}
-		ssn.userStockData = {
-			displayStocks: displayStocks
-		};
-	} else {
-		ssn.userStockData = { displayStocks: displayStocks };
-	}
-
-	response.render("trading-success.hbs", {
-		title: message,
-		head: `Cash balance: $${cash2[0]}`,
-		marqueeData: marqueeData,
-		display: "Trading",
-		preference: ssn.preference,
-		userCash: cash2[0],
-		num_stocks: ssn.userStatsData.num_stocks,
-		num_transactions: ssn.userStatsData.num_transactions,
-		earnings: ssn.userStatsData.earnings,
-		amountBought: ssn.userStatsData.amountBought,
-		amountSold: ssn.userStatsData.amountSold,
-		stocks: ssn.userStockData.displayStocks,
-		uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
-			-5,
-			ssn.userStatsData.uniqueTransactions.length
-		)
-	});
+	response.render('trading-success.hbs', {
+					title: message,
+					head: `Cash balance: $${cash2[0]}`
+				})
 
 	function check_existence(stock) {
 		var index = -1;
 
 		for (i = 0; i < stocks.length; i++) {
-			if (stocks[i].stock_name === stock) {
+			if (stocks[i][stock] !== undefined) {
 				index = i;
 			}
 		}
@@ -697,680 +444,364 @@ app.post("/trading-success-buy", isAuthenticated, async (request, response) => {
 	}
 });
 
-app.post(
-	"/trading-success-sell",
-	isAuthenticated,
-	async (request, response) => {
-		// called when user submits ticker in stock sell form in trading page
-		var _id = request.session.passport.user._id;
-		var cash = request.session.passport.user.cash;
-		var cash2 = request.session.passport.user.cash2;
-		var qty = parseFloat(request.body.sellstockqty);
-		var stock = request.body.sellstockticker.toUpperCase();
-		var stocks = request.session.passport.user.stocks;
-		var num_stocks = request.session.passport.user.stocks.length;
-		var transactions = request.session.passport.user.transactions;
-		var num_transactions = transactions.length;
-		var earnings = cash2 - 10000;
+app.post('/trading-success-sell', isAuthenticated, async(request, response) => {
+	// console.log(request.session.passport.user._id);
+	// console.log();
+	var _id = request.session.passport.user._id;
+	var cash = request.session.passport.user.cash;
+	var cash2 = request.session.passport.user.cash2;
+	var qty = parseInt(request.body.sellstockqty);
+	var stock = (request.body.sellstockticker).toUpperCase();
+	var stocks = request.session.passport.user.stocks;
 
-		var index = check_existence(stock);
-		var message;
+		
 
-		try {
-			const stock_info = await axios.get(
-				`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`
-			);
+	var index = check_existence(stock);
+	var message;
 
-			var stock_name = stock_info.data.companyName;
-			var stock_price = stock_info.data.close;
-			var total_sale = Math.round(stock_price * qty * 100) / 100;
-			var cash_remaining = Math.round((cash2[0] + total_sale) * 100) / 100;
-			if (request.session.passport.user.stocks[index] !== undefined) {
-				var stock_qty = request.session.passport.user.stocks[index].amount;
-				var current_cost = request.session.passport.user.stocks[index].total_cost;
-			} else {
-				throw "you don't have this stock (abritrary error msg LOL)";
+	try {		
+		const stock_info = await axios.get(`https://cloud.iexapis.com/beta/stock/${stock}/quote?token=sk_291eaf03571b4f0489b0198ac1af487d`);
+
+		var stock_name = stock_info.data.companyName;
+		var stock_price = stock_info.data.latestPrice;
+		var total_sale = Math.round(stock_price*qty*100)/100;
+		var remaining_balance = Math.round((cash2[0] + total_sale)*100)/100;
+		var stock_qty = request.session.passport.user.stocks[index][stock];
+		var stock_remaining = stock_qty - qty;
+
+		if (stock_qty < qty) {
+			message = `You are trying to sell ${qty} shares of ${stock} when you only have ${stock_qty} shares.`;
+		}
+		else if ((stock_qty >= qty) && (total_sale > 0)) {
+			var db = utils.getDb();
+			console.log(stocks);
+
+			if (stock_remaining > 0) {
+				var stock_holding = {[stock]:parseInt(stock_remaining)};
+				stocks[index] = stock_holding;
+				cash2[0] = remaining_balance;
 			}
-			var stock_remaining = stock_qty - qty;
+			else {
+				stocks.splice(index, 1);
+				cash2[0] = remaining_balance;
+			}
 
-			var amountBought = countStocksBought(transactions);
-
-			var amountSold = countStocksSold(transactions);
-
-			var uniqueTransactions = getUniqueTransactions(transactions);
-			ssn.userStatsData = {
-				num_stocks: num_stocks,
-				num_transactions: num_transactions,
-				earnings: earnings,
-				amountBought: amountBought,
-				amountSold: amountSold,
-				uniqueTransactions: uniqueTransactions
-			};
-			if (stock_qty < qty) {
-				message = `You are trying to sell ${qty} shares of ${stock} when you only have ${stock_qty} shares.`;
-			} else if (stock_qty >= qty && total_sale > 0) {
-				var db = utils.getDb();
-
-				if (stock_remaining > 0) {
-					var stock_holding = {
-						stock_name: stock,
-						amount: parseFloat(stock_remaining),
-						total_cost: current_cost - total_sale
-					};
-					stocks[index] = stock_holding;
-					cash2[0] = cash_remaining;
-				} else {
-					stocks.splice(index, 1);
-					cash2[0] = cash_remaining;
-				}
-				var log = {
-					datetime: new Date().toString(),
-					stock: stock,
-					stock_name: stock_name,
-					qty: qty,
-					total_sale: total_sale,
-					type: "S",
-					balance: cash_remaining
-				};
-				transactions.push(log);
-				db.collection("user_accounts").updateOne(
-					{ _id: ObjectID(_id) },
-					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
+			db.collection('user_accounts').updateOne(
+					{ "_id": ObjectID(_id)},
+					{ $set: { "cash2": cash2, "stocks": stocks}}
 				);
-				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_sale}.`;
-			} else {
-				message = `You need to sell at least 1 share of ${stock}.`;
-			}
-		} catch (err) {
-			if (stock === "") {
-				message = `You cannot leave the sell input blank. Please input a stock ticker`;
-			} else {
-				message = `You do not own any shares with the ticker '${stock}'.`;
-			}
+
+			message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at $${stock_price}/share for $${total_sale}.`
 		}
-		switch (ssn.preference) {
-			case "stock":
-				var marqueeData = ssn.stockDataList;
-				break;
-			case "currency":
-				var marqueeData = ssn.currencyDataList;
-				break;
+		else {
+			message = `You need to sell atleast 1 share of ${stock}.`;
 		}
 
-		var stock_names = [];
-		var displayStocks = [];
-		var stock_tickers = "";
+	}
+	catch(err) {
+		if (stock === '') {
+			message = `You cannot leave the sell input blank. Please input a stock ticker`;
 
-		if (stocks.length > 0) {
-			for (i = 0; i < stocks.length; i++) {
-				stock_tickers += `${stocks[i].stock_name},`;
-				stock_names.push(stocks[i].stock_name);
-			}
-			var closing_price = await getBatch.getBatchClosePrice(stock_tickers);
-			ssn.closing_price = closing_price;
-			for (i = 0; i < stocks.length; i++) {
-				displayStocks[i] = stocks[i];
-				var today_price = closing_price[stock_names[i]];
-				displayStocks[i].profit = (
-					displayStocks[i].total_cost -
-					today_price * displayStocks[i].amount
-				).toFixed(2);
-
-				displayStocks[i].today_rate = today_price;
-			}
-			ssn.userStockData = {
-				displayStocks: displayStocks
-			};
-		} else {
-			ssn.userStockData = { displayStocks: displayStocks };
 		}
-
-		response.render("trading-success.hbs", {
-			title: message,
-			head: `Cash balance: $${cash2[0]}`,
-			marqueeData: marqueeData,
-			display: "Trading",
-			preference: ssn.preference,
-			userCash: cash2[0],
-			num_stocks: ssn.userStatsData.num_stocks,
-			num_transactions: ssn.userStatsData.num_transactions,
-			earnings: ssn.userStatsData.earnings,
-			amountBought: ssn.userStatsData.amountBought,
-			amountSold: ssn.userStatsData.amountSold,
-			stocks: ssn.userStockData.displayStocks,
-			uniqueTransactions: ssn.userStatsData.uniqueTransactions.slice(
-				-5,
-				ssn.userStatsData.uniqueTransactions.length
-			)
-		});
-
-		function check_existence(stock) {
-			var index = -1;
-			for (i = 0; i < stocks.length; i++) {
-				if (stocks[i].stock_name === stock) {
-					index = i;
-				}
-			}
-			return index;
+		else {
+			message = `You do not own any shares with the ticker '${stock}'.`;
 		}
 	}
-);
+	response.render('trading-success.hbs', {
+		title: message,
+		head: `Cash balance: $${cash2[0]}`
+	})		
 
-app.get("/news/currency/:id", isAuthenticated, async (request, response) => {
-	// called when user clicks on currency text in marquee element
-	// or in news hub page
-	try {
-		var currency_code = request.params.id;
-		var chart_data = await currFunc.getCurrData(currency_code);
-		var labels = Object.keys(chart_data);
-		var data = Object.values(chart_data);
+	function check_existence(stock) {
+		var index = -1;
 
-		response.render("currency-info.hbs", {
-			title: "Welcome to the trading page.",
-			chart_title: `${currency_code} Price`,
-			labels: labels,
-			data: data,
-			display: `${currency_code} Price`
-		});
-	} catch (e) {
-		console.error(e);
+		for (i = 0; i < stocks.length; i++) {
+			if (stocks[i][stock] !== undefined) {
+				index = i;
+			}
+		}
+		return index;
 	}
 });
 
-app.get("/news/stock/:id", isAuthenticated, async (request, response) => {
-	// called when user clicks on stock text in marquee element
-	// or in news hub page
-	try {
-		var ticker = request.params.id;
-		var chart_data = await stockFunc.getStockData(ticker);
-		var labels = Object.keys(chart_data);
-		var data = Object.values(chart_data);
-
-		response.render("stock-info.hbs", {
-			title: "Welcome to the trading page.",
-			chart_title: `${ticker} Price`,
-			labels: labels,
-			data: data,
-			display: `${ticker} Price`
-		});
-	} catch (e) {
-		console.error(e);
-	}
-});
-
-app.get("/trading-portfolio", isAuthenticated, (request, response) => {
-	// called when user loads their data in portfolio data
+app.post('/trading-success-holdings', isAuthenticated, (request, response) => {
 	var stocks = request.session.passport.user.stocks;
 	var num_stocks = stocks.length;
 	var stock_keys = [];
 	var cash = request.session.passport.user.cash;
-	var message = "Shares: \n";
+	var message = 'Shares: \n';
 	var cash2 = request.session.passport.user.cash2;
-	var transactions = request.session.passport.user.transactions;
-	var num_transactions = transactions.length;
 
 	if (num_stocks === 0) {
-		message = "You currently do not have any stocks.";
-	} else {
+		message = 'You currently do not have any stocks.';
 	}
-	if (num_transactions === 0) {
-		transact_message = "You currently do not have any transactions";
-	} else {
-		var displayTransactions = [];
-		for (i = 0; i < num_transactions; i++) {
-			var log = transactions[i];
-			var datetimeArr = log.datetime.split(" ");
-			var month = datetimeArr[1];
-			var day = datetimeArr[2];
-			var year = datetimeArr[3];
-			var stock_name = log.stock_name;
-			var qty = log.qty;
-			var type = log.type;
-			var balance = log.balance;
-			if (type === "B") {
-				var price = log.total_cost;
-			} else {
-				var price = log.total_sale;
-			}
-
-			displayLog = {
-				year: year,
-				month: month,
-				day: day,
-				stock_name: stock_name,
-				qty: qty,
-				type: type,
-				price: price,
-				balance: balance
-			};
-
-			displayTransactions.push(displayLog);
+	else {
+		var i;
+		for (i = 0; i < num_stocks; i++) {
+			stock_keys.push(Object.keys(stocks[i]));
+			var key_value = stocks[i][stock_keys[i][0]];
+			message += stock_keys[i][0] + ': ' + key_value + ' shares.' + '\n';
+			console.log(message);
 		}
 	}
-	response.render("trading-portfolio.hbs", {
-		title: `Welcome to your portfolio`,
-		display: "Portfolio",
-		displayTransactions: displayTransactions,
-		userCash: cash2[0],
-		userStocks: stocks
-	});
+
+	response.render('trading-success.hbs', {
+		title: message,
+		head: `Cash: $${cash2[0]}`
+	})
 });
 
-app.post(
-	"/trading-portfolio-holdings",
-	isAuthenticated,
-	(request, response) => {
-		// called when user loads their data in portfolio data
-		var stocks = request.session.passport.user.stocks;
-		var num_stocks = stocks.length;
-		var stock_keys = [];
-		var cash = request.session.passport.user.cash;
-		var message = "Shares: \n";
-		var cash2 = request.session.passport.user.cash2;
-		var transactions = request.session.passport.user.transactions;
-		var num_transactions = transactions.length;
+app.get('/admin', (request, response) => {
+	response.render('admin-restricted-not-logged-in.hbs', {
+		title: 'You are not authorized to view this page. Please log in with an administrator account.'
+	})
+});
 
-		if (num_stocks === 0) {
-			message = "You currently do not have any stocks.";
-		} else {
-			message = stocks;
-		}
-		if (num_transactions === 0) {
-			transact_message = "You currently do not have any transactions";
-		} else {
-			var displayTransactions = [];
-			for (i = 0; i < num_transactions; i++) {
-				var log = transactions[i];
-				var datetimeArr = log.datetime.split(" ");
-				var month = datetimeArr[1];
-				var day = datetimeArr[2];
-				var year = datetimeArr[3];
-				var stock_name = log.stock_name;
-				var qty = log.qty;
-				var type = log.type;
-				var balance = log.balance;
-				if (type === "B") {
-					var price = log.total_cost;
-				} else {
-					var price = log.total_sale;
-				}
+app.get('/admin-restricted', isAuthenticated, (request, response) => {
+	response.render('admin-restricted.hbs', {
+		title: 'You are not authorized to view this page. Go back to the Trading page.'
+	})
+});
 
-				displayLog = {
-					year: year,
-					month: month,
-					day: day,
-					stock_name: stock_name,
-					qty: qty,
-					type: type,
-					price: price,
-					balance: balance
-				};
+app.get('/admin-success', isAdmin, (request, response) => {
+    response.render('admin-success', {
+    	title: 'Welcome to the Admin Page'
+    });
+ });
 
-				displayTransactions.push(displayLog);
+app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
+	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+		assert.equal(null, err);
+		db.collection('user_accounts').find().toArray(function(err, result) {
+			if (err) {
+				res.send('Unable to fetch Accounts');
 			}
-		}
-		response.render("trading-portfolio.hbs", {
-			title: message,
-			head: cash2[0],
-			display: "Portfolio",
-			displayTransactions: displayTransactions,
-			userStocks: stocks
+			res.render('admin-success-user-accounts-list.hbs', {
+				result: result
+			});
 		});
-	}
-);
-
-app.get("/admin", (request, response) => {
-	// called when user who is not logged in tries to access the admin page
-	response.render("admin-restricted-not-logged-in.hbs", {
-		title:
-			"You are not authorized to view this page. Please log in with an administrator account.",
-			display: "Admin"
-	});
-});
-
-app.get("/admin-restricted", isAuthenticated, (request, response) => {
-	// called when user is logged in and tries to access the admin page
-	response.render("admin-restricted.hbs", {
-		title:
-			"You are not authorized to view this page. Go back to the Trading page.",
-			display: "Admin"
-	});
-});
-
-app.get("/admin-success", isAdmin, (request, response) => {
-	// called when user is admin and is logged in
-	// called when admin user loads all user accounts from database
-	mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
-		assert.equal(null, err);
-		db.collection("user_accounts")
-			.find()
-			.toArray(function (err, result) {
-				if (err) {
-					response.send("Unable to fetch Accounts");
-				}
-				response.render("admin-success.hbs", {
-					title: "Welcome to the Admin page",
-					result: result,
-					display: "Admin"
-				});
-			});
 		db.close;
 	});
 });
 
-app.post("/admin-success-user-accounts", isAdmin, function (
-	request,
-	response,
-	next
-) {
-	// called when admin user loads all user accounts from database
-	mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
+app.post('/admin-success-delete-user', isAdmin, function(req, res, next) {
+	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
 		assert.equal(null, err);
-		db.collection("user_accounts")
-			.find()
-			.toArray(function (err, result) {
-				if (err) {
-					response.send("Unable to fetch Accounts");
-				}
-				response.render("admin-success-user-accounts-list.hbs", {
-					result: result,
-					display: "Admin"
-				});
+		db.collection('user_accounts').find().toArray(function(err, result) {
+			if(err) {
+				res.send('Unable to fetch Accounts');
+			}
+			res.render('admin-success-delete-user-success.hbs', {
+				result: result
 			});
+		});
 		db.close;
-	});
-});
+	})});
 
-app.post("/admin-success-delete-user-success", isAdmin, function (
-	request,
-	response,
-	next
-) {
-	// I think this does the same thing as POST /admin-success-delete-user
-	var user_name_to_delete = request.body.user_id;
-	var username = request.session.passport.user.username;
+app.post('/admin-success-delete-user-success', function(req, res, next) {
+	var user_name_to_delete = req.body.user_id;
+	var username = req.session.passport.user.username;
 
-	if (user_name_to_delete == username) {
-		response.render("admin-success-user-accounts-list.hbs", {
+	console.log(user_name_to_delete)
+	console.log(username)
+	if(user_name_to_delete == username){
+		res.render('admin-success-delete-user-success.hbs', {
 			message: "Cannot delete your own account!"
 		});
 		return;
-	} else {
-		if (user_name_to_delete == "") {
-			response.render("admin-success-user-accounts-list.hbs", {
+	}else{
+		if(user_name_to_delete == '') {
+			res.render('admin-success-delete-user-success.hbs', {
 				message: "Cannot be empty"
 			});
-		} else {
-			message = "";
-			mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
-				assert.equal(null, err);
+		}else{
+			// try {
+				// console.log(user_id_to_delete);
+				message = '';
+				mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+					assert.equal(null, err);
 
-				var query = { username: user_name_to_delete };
+					var query = { username: user_name_to_delete }
 
-				db.collection("user_accounts")
-					.find(query)
-					.toArray(function (err, result) {
-						if (err) {
-							message = "Unable to Delete Account";
-							response.render("admin-success-user-accounts-list.hbs", {
-								message: message,
-								display: "Admin"
+					//console.log(query)
+					db.collection('user_accounts').find(query).toArray(function(err, result) {
+						if(err) {
+							message = 'Unable to Delete Account';
+							console.log(message)
+							// console.log(err);
+							res.render('admin-success-delete-user-success.hbs', {
+								message: message
 							});
-						}
-						if (result === undefined || result.length == 0) {
-							message = "No user exists with that username";
-							response.render("admin-success-user-accounts-list.hbs", {
-								message: message,
-								display: "Admin"
+						};
+						//console.log(result);
+						if(result === undefined || result.length == 0) {
+							message = 'No user exists with that username';
+							console.log(message)
+							res.render('admin-success-delete-user-success.hbs', {
+								message: message
 							});
-						} else {
-							db.collection("user_accounts").deleteOne(query, function (
-								err,
-								obj
-							) {
-								if (err) throw err;
-								message = "User is Deleted";
-								response.render("admin-success-user-accounts-list.hbs", {
-									message: message,
-									display: "Admin"
-								});
-								db.close;
+						}else {
+							db.collection('user_accounts').deleteOne(query, function(err, obj) {
+								if(err) throw err;
+								console.log("User Deleted");
+								message ='User is Deleted';
+								res.render('admin-success-delete-user-success.hbs', {
+								message: message
 							});
-						}
+								db.close();
+							});
+						};
 					});
-			});
-		}
-	}
-});
+				});
 
-app.post("/admin-update", isAdmin, (request, response) => {
-	try {
-		var username = request.body.user_id;
-		// Need to apply argument checks to these guys
-		var newBal = parseFloat(request.body.newBal);
-		var newFN = request.body.firstName;
-		var newLN = request.body.lastName;
-		// var newPass = request.body.password;
-		var findQuery = { username: username };
-		var updateQuery = {
-			$set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
+			};
 		};
-
-		var message;
-	
-		if (check_str(newFN) === false) {
-			message = `First name must be 3-30 characters long and must only contain letters.`;
-			response.render("admin-success-user-accounts-list.hbs", {
-				message: message,
-				display: "Admin"
-			});
-		} else if (check_str(newLN) === false) {
-			message = `Last name must be 3-30 characters long and must only contain letters.`;
-			response.render("admin-success-user-accounts-list.hbs", {
-				message: message,
-				display: "Admin"
-			});
-		} else if (username === "" || username === undefined) {
-			response.render("admin-success-user-accounts-list.hbs", {
-				message: "Cannot be empty",
-				display: "Admin"
-			});
-		} else if (newBal < 0 || newBal === undefined) {
-			message = `You cannot set the user, ${username}, to below $0.`;
-			response.render("admin-success-user-accounts-list.hbs", {
-				message: message,
-				display: "Admin"
-			});
-		} else {
-			mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
-				assert.equal(null, err);
-				db.collection("user_accounts")
-					.find(findQuery)
-					.toArray(function (err, result) {
-						if (err) {
-							message = "Unable to Update Account";
-							response.render("admin-success-user-accounts-list.hbs", {
-								message: message
-							});
-						}
-						if (result === undefined || result.length == 0) {
-							message = "No user exists with that username";
-							response.render("admin-success-user-accounts-list.hbs", {
-								message: message
-							});
-						} else {
-							db.collection("user_accounts").updateOne(
-								findQuery,
-								updateQuery,
-								{ upsert: false },
-								function (err, result) {
-									if (err) throw err;
-									request.session.passport.user.cash2[0] = newBal;
-									message = `The user, ${username}, now has the balance of $${newBal}`;
-									response.render("admin-success-user-accounts-list.hbs", {
-										message: message,
-										display: "Admin"
-									});
-	
-									db.close;
-								}
-							);
-						}
-					});
-			});
-		}
-	} catch (e) {
-		console.log(e);
-		response.render("admin-success-user-accounts-list.hbs")
-	}
 });
 
-// app.post('/admin-success-change-user-type', isAdmin, function(req, res, next) {
-// 	// IN PROGRESS 
-// 	// IN PROGRESS 
-// 	// IN PROGRESS 
-// 	// IN PROGRESS 
-// 	// IN PROGRESS 
-// 	// IN PROGRESS 
-// 	var userToAdmin = req.body.user_to_admin;
-// 	var username = req.session.passport.user.username
-// 	var type = "admin";
-// 	console.log(userToAdmin);
-// 	console.log(req.body.user_to_admin);
-// 	if(userToAdmin == username){
-// 		res.render('admin-success-change-user-type.hbs', {
-// 			message1: "You are already an admin."
-// 		});
-// 		return;
-// 	}else{
-// 		if(userToAdmin == '') {
-// 			res.render('admin-success-change-user-type.hbs', {
-// 				message1: "Cannot be empty",
-// 			});
-// 		}else{
-// 			message1 = '';
-// 			mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
-// 				assert.equal(null, err);
-
-// 				var query = { username: userToAdmin }
-
-// 				console.log(query)
-// 				db.collection('user_accounts').find(query).toArray(function(err, result) {
-// 					if(err) {
-// 						message = 'Unable to Update Account';
-// 						console.log(message)
-// 						// console.log(err);
-// 						res.render('admin-success-change-user-type.hbs', {
-// 							message1: message
-// 						});
-// 					};
-// 					console.log(result);
-// 					if(result === undefined || result.length == 0) {
-// 						message = 'No user exists with that username';
-// 						console.log(message)
-// 						res.render('admin-success-change-user-type.hbs', {
-// 							message1: message
-// 						});
-// 					}
-// 					else if(result[0].type == type){
-// 						message = 'User is already an admin';
-// 						res.render('admin-success-change-user-type.hbs', {
-// 							message1: message
-// 						})
-// 					}else {
-// 						db.collection('user_accounts').updateOne(
-// 							{ "username": userToAdmin},
-// 							{ $set: { "type": type }
-// 						});
-// 						res.render('admin-success-change-user-type.hbs', {
-// 							message1: 'Updated Successfully'
-// 						});
-// 					};
-// 				});
-// 			});
-// 		};
-// 	};
-// });
-
-app.get("*", errorPage, (request, response) => {
-	// called when request page cannot be found
-	response.status(400);
-	response.render("404.hbs", {
-		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`,
-		display: "Error"
+app.get('/admin-success-update-balances', isAdmin, function(req, res, next) {
+	res.render('admin-success-update-balances.hbs', {
+		message: 'Enter the user ID and cash you would like to change to.'
 	});
 });
 
-function countStocksSold(transactionArray) {
-	var amountSold = 0;
-	for (i = 0; i < transactionArray.length; i++) {
-		if (transactionArray[i].type === "S") {
-			amountSold += transactionArray[i].qty;
-		}
-	}
-	return amountSold;
-}
+app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
+	var user_id = req.body.user_id;
+	var new_balance = req.body.user_balance;
+	var balance_to_list = [new_balance];
+	var message;
 
-function countStocksBought(transactionArray) {
-	var amountBought = 0;
-	for (i = 0; i < transactionArray.length; i++) {
-		if (transactionArray[i].type === "B") {
-			amountBought += transactionArray[i].qty;
-		}
-	}
-	return amountBought;
-}
+	console.log(new_balance);
 
-function getUniqueTransactions(transactionArray) {
-	var uniqueTicker = [];
-	var uniqueTransactions = [];
-	for (i = 0; i < transactionArray.length; i++) {
-		var currentStock = transactionArray[i].stock;
-		if (uniqueTicker.includes(currentStock)) {
-		} else {
-			uniqueTicker.push(currentStock);
-			uniqueTransactions.push(transactionArray[i]);
+	if (new_balance > 0) {
+
+		try {
+			db.collection('user_accounts').findOne({_id: user_id}, function(err, result) {
+
+				if (result !== null) {
+
+					db.collection('user_accounts').updateOne(
+						{ "_id": ObjectID(_id)},
+						{ $set: {"cash2": balance_to_list}}
+					);
+
+					message = `ID: ${user_id} cash has been changed to ${new_balance}.`
+				}
+			})
+		}
+		catch(err) {
+			message = `User ID doesn't exist.`;
 		}
 	}
-	return uniqueTransactions;
-}
+	else {
+		message = `Number must be greater than 0.`;
+	}
+
+	res.render('admin-success-update-balances.hbs', {
+		message: message
+	});
+})
+
+app.post('/admin-success-update-balances', isAdmin, function(req, res, next) {
+	mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+		assert.equal(null, err);
+		db.collection('user_accounts').find().toArray(function(err, result) {
+			if (err) {
+				res.send('Unable to fetch Accounts');
+			}
+			res.render('admin-success-update-balances.hbs', {
+				result: result
+			});
+		});
+		db.close;
+	});
+});
+
+app.post('/admin-success-update-balances-success', isAdmin, function(req, res, next){
+	var user_id_to_update = req.body.user_id
+	var user_balance = parseInt(req.body.user_balance)
+	console.log(user_balance);
+	var balance_to_list = []
+	balance_to_list[0] = user_balance
+	console.log(balance_to_list[0]);
+	if(user_id_to_update == '') {
+		res.render('admin-success-update-balances-success.hbs', {
+			message: "Cannot be empty"
+		});
+	}else{
+	console.log(user_id_to_update);
+		message = '';
+		mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+			assert.equal(null, err);
+			var query = { _id: ObjectID(user_id_to_update) }
+			//console.log(query)
+			db.collection('user_accounts').findOne(query).toArray(function(err, result) {
+				if(err) {
+					message = 'Unable to Update Account';
+					console.log(message)
+					// console.log(err);
+					res.render('admin-success-update-balances-success.hbs', {
+						message: message
+					});
+				}
+				//console.log(result);
+				if(result === undefined || result.length == 0) {
+					message = 'No user exists with that Id';
+					console.log(message)
+					res.render('admin-success-update-balances-success.hbs', {
+						message: message
+					});
+				}else {
+					db.collection('user_accounts').updateOne(
+						{ "_id": user_id_to_update},
+						{ $set: { "cash2": balance_to_list }
+
+				})
+					res.render('admin-success-update-balances-success.hbs', {
+						message: 'Update Successfully'
+				});
+				}
+			})
+		})
+	}})
+
+app.get('*', errorPage, (request, response) => {
+	response.render('404.hbs', {
+		title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
+	})
+});
 
 function errorPage(request, response, next) {
 	if (request.session.passport !== undefined) {
+		console.log(request.session.passport);
 		next();
 	} else {
-		response.status(400);
-		response.render("404x.hbs", {
-			title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`,
-			display: "Error"
-		});
+		// response.redirect('/login');
+		response.render('404x.hbs', {
+			title: `Sorry the URL 'localhost:8080${request.url}' does not exist.`
+		})
 	}
 }
 
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
+		console.log(request.session.passport);
 		next();
 	} else {
-		response.redirect("/");
+		response.redirect('/');
 	}
 }
 
 function isAdmin(request, response, next) {
-	if (
-		request.session.passport !== undefined &&
-		request.session.passport.user.type === "admin"
-	) {
+	if ((request.session.passport !== undefined) && (request.session.passport.user.type === 'admin')) {
+		console.log(request.session.passport);
 		next();
 	} else {
-		response.redirect("/admin-restricted");
+		response.redirect('/admin-restricted');
 	}
 }
 
-app.listen(port, () => {
-	// application listens on port specified at top of file
-	console.log(`Server is up on port ${port}`);
+// listen to port 8080
+app.listen(8080, () => {
+	console.log('Server is up on port 8080');
 	utils.init();
 });
-
-// export application to be used for testing purposes
-module.exports = app;

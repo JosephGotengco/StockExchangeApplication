@@ -1,18 +1,17 @@
 {
-  "name": "summer_project",
+  "name": "class_9",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=html mocha --timeout 10000 --recursive --exit",
-    "start": "node project.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Team Stock Name",
+  "author": "Michael J",
   "license": "ISC",
   "dependencies": {
     "assert": "^1.4.1",
     "axios": "^0.18.0",
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^3.0.5",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^2.0.3",
@@ -28,25 +27,12 @@
     "handlebars": "^4.1.1",
     "hbs": "^4.0.3",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.24.0",
+    "mongoose": "^5.4.20",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "promised-handlebars": "^2.0.1",
     "q": "^1.5.1"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "cheerio": "^1.0.0-rc.3",
-    "mocha": "^6.1.4",
-    "mocha-simple-html-reporter": "^1.1.0",
-    "mockgoose": "^8.0.1",
-    "mongoose": "^5.5.5",
-    "nock": "^10.0.6",
-    "node-mongodb-fixtures": "^3.0.5",
-    "nyc": "^14.1.0",
-    "supertest": "^4.0.2"
   }
 }
