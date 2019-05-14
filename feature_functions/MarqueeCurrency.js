@@ -3,7 +3,6 @@
     var getMarqueeCurrency = async() => {
         var yesterday = moment().subtract(2, 'days');
         var date = yesterday.format('YYYY-MM-DD');
-        console.log(date);
         var rate = await axios.get('https://api.exchangeratesapi.io/latest?base=USD');
         var yest_rate = await axios.get(`https://api.exchangeratesapi.io/${date}?base=USD`);
         var json = rate.data.rates;

@@ -11,17 +11,77 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-    <link href="https://unpkg.com/tabulator-tables@4.1.4/dist/css/bootstrap/tabulator_bootstrap4.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/tabulator-tables@4.1.4/dist/css/bootstrap/tabulator_bootstrap4.min.css"
+        rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.4/dist/js/tabulator.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel='stylesheet' href='./css/style.css'>
+    <link rel='stylesheet' href='/css/style.css'>
 </head>
 
 <body>
 
-    <!-- NAV BAR -->
-    {{> loggedInNavbar}}
+	<!-- NAV BAR -->
+	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+		<h5 class="my-0 font-weight-normal">
+			<a class="navbar-brand" href="/trading-success">
+				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+				STOCK NAME
+			</a>
+		</h5>
+
+
+		<form id="event-form" action="/admin-success" method="POST" class="mr-auto">
+			<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+				name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+				<option id="USD" value="USD">USD</option>
+				<option id="JPY" value="JPY">JPY</option>
+				<option id="BGN" value="BGN">BGN</option>
+				<option id="CZK" value="CZK">CZK</option>
+				<option id="DKK" value="DKK">DKK</option>
+				<option id="GBP" value="GBP">GBP</option>
+				<option id="HUF" value="HUF">HUF</option>
+				<option id="PLN" value="PLN">PLN</option>
+				<option id="RON" value="RON">RON</option>
+				<option id="SEK" value="SEK">SEK</option>
+				<option id="CHF" value="CHF">CHF</option>
+				<option id="ISK" value="ISK">ISK</option>
+				<option id="NOK" value="NOK">NOK</option>
+				<option id="HRK" value="HRK">HRK</option>
+				<option id="RUB" value="RUB">RUB</option>
+				<option id="TRY" value="TRY">TRY</option>
+				<option id="AUD" value="AUD">AUD</option>
+				<option id="BRL" value="BRL">BRL</option>
+				<option id="CAD" value="CAD">CAD</option>
+				<option id="CNY" value="CNY">CNY</option>
+				<option id="HKD" value="HKD">HKD</option>
+				<option id="IDR" value="IDR">IDR</option>
+				<option id="ILS" value="ILS">ILS</option>
+				<option id="INR" value="INR">INR</option>
+				<option id="KRW" value="KRW">KRW</option>
+				<option id="MXN" value="MXN">MXN</option>
+				<option id="MYR" value="MYR">MYR</option>
+				<option id="NZD" value="NZD">NZD</option>
+				<option id="PHP" value="PHP">PHP</option>
+				<option id="SGD" value="SGD">SGD</option>
+				<option id="THB" value="THB">THB</option>
+				<option id="ZAR" value="ZAR">ZAR</option>
+			</select>
+		</form>
+
+
+
+		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
+			<a class="p-2 text-light" href="/trading-success">Trading</a>
+			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+			<a class="p-2 text-light" href="/news-hub">Rankings</a>
+		</nav>
+		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+	</div>
 
 
     <!-- Admin Panel -->
@@ -41,8 +101,8 @@
                 </div>
                 <br>
                 <div class="form-group">
-                    <form action="/admin-success-user-accounts" method="POST">
-                        <input type="submit" class="btn btn-info" id="loadport" value="Load Users">
+                    <form action="#" method="GET">
+                        <input type="submit" class="btn btn-info" id="SubmitChanges" value="Submit Changes">
                     </form>
                 </div>
             </div>
@@ -51,7 +111,7 @@
                 <p><i>{{message}}</i></p>
                 <div class="row">
                     <div class="col">
-                        <form id="deleteuser" action='/admin-success-delete-user-success' , method='POST'>
+                        <form id="deleteuser" action='/admin-success-delete-user-success' method='POST'>
                             <label for="stocksearch">Enter Username to Delete</label>
                             <input type="text" class="form-control" name="user_id" id="user_id" placeholder="Username">
                             <br>
@@ -64,25 +124,13 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-
         </div>
     </div>
     </div>
     </div>
-
-
-
-
     <!-- Footer -->
     {{> footer}}
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
@@ -93,26 +141,136 @@
 </body>
 
 <script>
-    console.log({{{ json result }}})
-    //define some sample data
+
+    function switchCode(event) {
+        var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
+        document.getElementById("currency-code-select").selectedIndex = index;
+    }
+    switchCode();
+
+</script>
+
+
+<script>
+
     var tabledata = {{{ json result }}};
 
     //create Tabulator on DOM element with id "example-table"
     var table = new Tabulator("#example-table", {
         height: 205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
-        data: tabledata, //assign data to table
-        layout: "fitColumns", //fit columns to width of table (optional)
+        data: clone(tabledata), //assign data to table
+        layout: "fitColumns",
+        resizableRows: false,
+        resizableColumns: false,
         columns: [ //Define Table Columns
-            { title: "Username", field: "username"},
-            { title: "First Name", field: "firstname"},
-            { title: "First Name", field: "firstname"},
-            { title: "Balance", field: "cash2", width: 150 },
-            { title: "Account Type", field: "type", width: 150 },
-        ],
-        rowClick: function (e, row) { //trigger an alert message when the row is clicked
-            alert(`${row.getData().username} ${row.getData().firstname}`)
-        },
+            { title: "Username", field: "username" },
+            { title: "First Name", field: "firstname", editor: true },
+            { title: "Last Name", field: "lastname", editor: true },
+            { title: "Balance ({{{currency_symbol}}})", field: "cash2", width: 150, editor: true },
+            { title: "Account Type", field: "type", width: 150, editor: true },
+        ]
     });
+
+
+
+
+    $("#SubmitChanges").click(function () {
+
+        var query = {
+            updated_users: []
+        };
+        var updated_users = [];
+        $('.tabulator-row').each(function (i, obj) {
+            var new_user = {};
+            var username = $("[tabulator-field=username]", obj).text();
+            var firstname = $("[tabulator-field=firstname]", obj).text();
+            var lastname = $("[tabulator-field=lastname]", obj).text();
+            var cash2 = $("[tabulator-field=cash2]", obj).text();
+            var type = $("[tabulator-field=type]", obj).text();
+
+            new_user.username = username;
+            new_user.firstname = firstname;
+            new_user.lastname = lastname;
+            new_user.cash2 = [parseFloat(cash2)];
+            new_user.type = type;
+            updated_users.push(new_user);
+            var cloned_tabledata = clone(tabledata)
+
+            for (var i = cloned_tabledata.length; i--;) {
+                var matched = matchTable(cloned_tabledata[i]);
+                if (matched.username === new_user.username) {
+                    var check = isUpdated(matched, new_user);
+                    if (check) {
+                        query.updated_users.push(new_user);
+                    }
+                }
+            }
+        });
+        console.log(query);
+
+        if (query.updated_users.length === 0) {
+            console.log("no changes made");
+        } else {
+            $.ajax({
+                url: "/test",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(query),
+                contentType: "application/json",
+                cache: false,
+                timeout: 5000,
+                complete: function () {
+                    //called when complete
+                    console.log('process complete');
+                },
+
+                success: function (data) {
+                    console.log(data);
+                    console.log('process success');
+                },
+
+                error: function () {
+                    console.log('process error');
+                }
+            });
+        }
+    });
+
+    function isUpdated(original, updated) {
+        var original = Object.values(original);
+        var updated = Object.values(updated);
+
+
+        for (var i = original.length; i--;) {
+            if (original[i] !== updated[i]) {
+                if (typeof original[i] === "object") {
+                    if (original[i][0] !== updated[i][0]) {
+                        return true
+                    }
+                } else {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+    function matchTable(obj) {
+        updated_obj = {};
+        updated_obj.username = obj.username;
+        updated_obj.firstname = obj.firstname;
+        updated_obj.lastname = obj.lastname;
+        updated_obj.cash2 = [parseFloat(obj.cash2)];
+        updated_obj.type = obj.type
+        return updated_obj
+    }
+
+    function clone(src) {
+        return JSON.parse(JSON.stringify(src));
+    }
+
+
 </script>
 
 </html>

@@ -25,7 +25,7 @@ hbs.registerPartials(__dirname + "/views/partials/");
 mongoose.Promise = global.Promise;
 
 // used for logging in? (unsure)
-mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts", {
+mongoose.connect("mongodb://localhost:27017/accounts", {
 	useNewUrlParser: true
 });
 

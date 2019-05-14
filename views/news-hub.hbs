@@ -8,77 +8,76 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    {{!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-                integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> --}}
+
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
     <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
-    <link rel='stylesheet' href="./css/style.css">
-    {{!-- <style>
-        * {
-            box-sizing: border-box;
-        }
+    <link rel='stylesheet' href="/css/style.css">
 
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            font-size: 1rem;
-            line-height: 1.5;
-            height: 100%;
-        }
-
-            {
-                {
-                 !-- .side1 {
-                    background-color: #55efc4;
-                }
-
-                .side2 {
-                    background-color: #fd79a8;
-                }
-
-                --
-            }
-        }
-
-        .card {
-            width: 45%;
-            max-height: 250px;
-            margin: 5px auto;
-        }
-
-        .column-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .thinner {
-            font-weight: 400;
-        }
-
-        img {
-            width: 100%;
-            height: 30px;
-        }
-
-        .card-body {
-            max-height: 50%;
-        }
-
-        .bottom-space {
-            padding-bottom: 100px;
-        }
-    </style> --}}
 </head>
 
 <body>
 
-    {{> loggedInNavbar}}
+	<!-- NAV BAR -->
+	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+		<h5 class="my-0 font-weight-normal">
+			<a class="navbar-brand" href="/news-hub">
+				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+				STOCK NAME
+			</a>
+		</h5>
+
+
+		<form id="event-form" action="/news-hub" method="POST" class="mr-auto">
+			<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+				name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+				<option id="USD" value="USD">USD</option>
+				<option id="JPY" value="JPY">JPY</option>
+				<option id="BGN" value="BGN">BGN</option>
+				<option id="CZK" value="CZK">CZK</option>
+				<option id="DKK" value="DKK">DKK</option>
+				<option id="GBP" value="GBP">GBP</option>
+				<option id="HUF" value="HUF">HUF</option>
+				<option id="PLN" value="PLN">PLN</option>
+				<option id="RON" value="RON">RON</option>
+				<option id="SEK" value="SEK">SEK</option>
+				<option id="CHF" value="CHF">CHF</option>
+				<option id="ISK" value="ISK">ISK</option>
+				<option id="NOK" value="NOK">NOK</option>
+				<option id="HRK" value="HRK">HRK</option>
+				<option id="RUB" value="RUB">RUB</option>
+				<option id="TRY" value="TRY">TRY</option>
+				<option id="AUD" value="AUD">AUD</option>
+				<option id="BRL" value="BRL">BRL</option>
+				<option id="CAD" value="CAD">CAD</option>
+				<option id="CNY" value="CNY">CNY</option>
+				<option id="HKD" value="HKD">HKD</option>
+				<option id="IDR" value="IDR">IDR</option>
+				<option id="ILS" value="ILS">ILS</option>
+				<option id="INR" value="INR">INR</option>
+				<option id="KRW" value="KRW">KRW</option>
+				<option id="MXN" value="MXN">MXN</option>
+				<option id="MYR" value="MYR">MYR</option>
+				<option id="NZD" value="NZD">NZD</option>
+				<option id="PHP" value="PHP">PHP</option>
+				<option id="SGD" value="SGD">SGD</option>
+				<option id="THB" value="THB">THB</option>
+				<option id="ZAR" value="ZAR">ZAR</option>
+			</select>
+		</form>
+
+
+
+		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
+			<a class="p-2 text-light" href="/trading-success">Trading</a>
+			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+			<a class="p-2 text-light" href="/news-hub">Rankings</a>
+		</nav>
+		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+	</div>
 
 
 
@@ -90,7 +89,7 @@
                     <thead>
                         <tr>
                             <th class="col-md-1">Ticker</th>
-                            <th class="col-md-2">Price</th>
+                            <th class="col-md-2">Price ({{{currency_symbol}}})</th>
                             <th class="col-md-3">Trend</th>
                             <th class="col-md-4">Stats</th>
                         </tr>
@@ -100,7 +99,7 @@
                         <tr>
                             <td class="col-md-1">{{this.code}}</td>
                             <td class="col-md-2">{{this.this.price}}</td>
-                            <td class="col-md-3"><img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            <td class="col-md-3"><img class="card-img-top mx-auto d-block trend-img" src="{{{this.img}}}" alt="Card image cap">
                             </td>
                             <td class="col-md-4"><a target="_blank" href="/news/stock/{{this.code}}">Stats</a></td>
 
@@ -127,7 +126,7 @@
                         <tr>
                             <td class="col-md-1">{{this.code}}</td>
                             <td class="col-md-2">{{this.this.price}}</td>
-                            <td class="col-md-3"><img class="card-img-top" src="{{{this.img}}}" alt="Card image cap">
+                            <td class="col-md-3"><img class="card-img-top mx-auto d-block trend-img" src="{{{this.img}}}" alt="Card image cap">
                             </td>
                             <td class="col-md-4"><a target="_blank" href="/news/currency/{{this.code}}">Stats</a></td>
 
@@ -153,6 +152,15 @@
         crossorigin="anonymous"></script>
 
 
+	<script>
+
+	function switchCode(event) {
+		var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
+		document.getElementById("currency-code-select").selectedIndex = index;
+	}
+	switchCode();
+
+	</script>
 
 </body>
 
