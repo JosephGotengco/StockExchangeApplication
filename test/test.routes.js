@@ -1454,61 +1454,6 @@ describe("Routing tests", function () {
     });
 
 
-    var agent = chai.request.agent(app);
-    describe("POST /trading-portfolio", function () {
-        it("should login and go to portfolio page and generate transactions, balance, and current stocks", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "AlexC",
-                    password: "LeagueOfLegends"
-                })
-                .then(function (res) {
-                    agent.get("/trading-portfolio")
-                        .then(function (res) {
-                            agent.post("/trading-portfolio-holdings")
-                                .then(function (res) {
-                                    expect(res).to.have.status(200);
-                                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                                    var $ = cheerio.load(res.text);
-                                    var title = $("h1[class=display-4]").text();
-                                    var display = $("title").text();
-                                    assert.equal(title, "Your Portfolio");
-                                    assert.equal(display, "Portfolio");
-                                    done();
-                                });
-                        });
-                });
-        });
-
-        it("should login and go to portfolio page", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "JimmyT",
-                    password: "Claire"
-                })
-                .then(function (res) {
-                    agent.get("/trading-portfolio")
-                        .then(function (res) {
-                            agent.post("/trading-portfolio-holdings")
-                                .then(function (res) {
-                                    expect(res).to.have.status(200);
-                                    expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                                    var $ = cheerio.load(res.text);
-                                    var title = $("h1[class=display-4]").text();
-                                    var display = $("title").text();
-                                    assert.equal(title, "Your Portfolio");
-                                    assert.equal(display, "Portfolio");
-                                    done();
-                                });
-                        });
-                });
-        });
-    });
-
     describe("GET /admin", function () {
         it("should attempt to access admin page", function (done) {
             request(app)

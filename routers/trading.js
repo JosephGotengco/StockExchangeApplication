@@ -20,40 +20,87 @@ const rate_symbols = require('../feature_functions/rate_symbols');
 
 const router = new express.Router();
 
-router.route("/news-hub").get(isAuthenticated, async (request, response) => {
-	var ssn = request.session.passport.user;
+router.route("/news-hub")
+	.get(isAuthenticated, async (request, response) => {
+		var ssn = request.session.passport.user;
 
-	var rates = await convert();
-	var preference = ssn.currency_preference;
-	var rate = rates[preference];
+		currency_preference = ssn.currency_preference
 
-	if (ssn.stockDataList === undefined) {
-		var stockDataList = await marqueeStock.getMarqueeStock();
-		ssn.stockDataList = stockDataList;
-	}
+		var rates = await convert();
+		var preference = ssn.currency_preference;
+		var rate = rates[preference];
+        var currency_symbol = rate_symbols.getCurrencySymbol(preference);
 
-	var currencyDataList = clone(ssn.currencyDataList);
-	var stockDataList = clone(ssn.stockDataList);
+		if (ssn.stockDataList === undefined) {
+			var stockDataList = await marqueeStock.getMarqueeStock();
+			ssn.stockDataList = stockDataList;
+		}
 
-	currencyDataList.forEach((val, i) => {
-		var price = parseFloat(val.price);
-		var converted_price = rate / price;
-		val.price = converted_price
+		var currencyDataList = clone(ssn.currencyDataList);
+		var stockDataList = clone(ssn.stockDataList);
+
+		currencyDataList.forEach((val, i) => {
+			var price = parseFloat(val.price);
+			var converted_price = rate / price;
+			val.price = converted_price
+		})
+
+		stockDataList.forEach((val, i) => {
+			var price = val.price;
+			var converted_price = price * rate;
+			val.price = converted_price;
+		});
+
+		response.render("news-hub.hbs", {
+			title: "Stock and Currency.",
+			currencyDataList: currencyDataList,
+			stockDataList: stockDataList,
+			display: "Ranking",
+			currency_preference: currency_preference,
+			currency_symbol: currency_symbol
+		});
 	})
-
-	stockDataList.forEach((val, i) => {
-		var price = val.price;
-		var converted_price = price * rate;
-		val.price = converted_price;
+	.post(isAuthenticated, async (request, response) => {
+		var ssn = request.session.passport.user;
+	
+		ssn.currency_preference = request.body.currency_preference;
+		currency_preference = ssn.currency_preference
+	
+		var rates = await convert();
+		var preference = ssn.currency_preference;
+		var rate = rates[preference];
+        var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+	
+		if (ssn.stockDataList === undefined) {
+			var stockDataList = await marqueeStock.getMarqueeStock();
+			ssn.stockDataList = stockDataList;
+		}
+	
+		var currencyDataList = clone(ssn.currencyDataList);
+		var stockDataList = clone(ssn.stockDataList);
+	
+		currencyDataList.forEach((val, i) => {
+			var price = parseFloat(val.price);
+			var converted_price = rate / price;
+			val.price = converted_price
+		})
+	
+		stockDataList.forEach((val, i) => {
+			var price = val.price;
+			var converted_price = price * rate;
+			val.price = converted_price;
+		});
+	
+		response.render("news-hub.hbs", {
+			title: "Stock and Currency.",
+			currencyDataList: currencyDataList,
+			stockDataList: stockDataList,
+			display: "Ranking",
+			currency_preference: currency_preference,
+			currency_symbol: currency_symbol
+		});
 	});
-
-	response.render("news-hub.hbs", {
-		title: "Stock and Currency.",
-		currencyDataList: currencyDataList,
-		stockDataList: stockDataList,
-		display: "Ranking"
-	});
-});
+	
 
 router
 	.route("/news/currency/:id")
@@ -88,6 +135,20 @@ router
 			});
 		} catch (e) {
 			console.error(e);
+		}
+	});
+
+router
+	.route("/test")
+	.post(isAuthenticated, async(request, response) => {
+		try {
+			var data = JSON.stringify(request.body);
+			var data = JSON.parse(data);
+			console.log(data);
+			var updated_users = data.updated_users;
+			console.log(updated_users);
+		} catch (e) {
+			console.log(e);
 		}
 	});
 
@@ -228,16 +289,14 @@ router
 			var currency_preference = ssn.currency_preference;
 
 			var cash2 = ssn.cash2;
-			var earnings = cash2 - 10000;
 			var stocks = ssn.stocks;
 			var num_stocks = ssn.stocks.length;
+			var earnings = cash2 - 10000;			
 			var transactions = ssn.transactions;
 			var num_transactions = transactions.length;
-			// console.log("Start API")
 			var amountBought = countStocksBought(transactions);
 			var amountSold = countStocksSold(transactions);
 			var uniqueTransactions = getUniqueTransactions(transactions);
-			// console.log("First API Batch Done")
 			ssn.userStatsData = {
 				num_stocks: num_stocks,
 				num_transactions: num_transactions,
@@ -358,6 +417,21 @@ router
 			var cash2 = ssn.cash2;
 			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 			var userStocks = ssn.stocks;
+			var num_stocks = ssn.stocks.length;
+			var earnings = cash2 - 10000;			
+			var transactions = ssn.transactions;
+			var num_transactions = transactions.length;
+			var amountBought = countStocksBought(transactions);
+			var amountSold = countStocksSold(transactions);
+			var uniqueTransactions = getUniqueTransactions(transactions);
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
 
 			ssn.preference = "stock";
 			if (ssn.stockDataList === undefined) {
@@ -440,6 +514,21 @@ router
 			var cash2 = ssn.cash2;
 			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 			var userStocks = ssn.stocks;
+			var num_stocks = ssn.stocks.length;
+			var earnings = cash2 - 10000;			
+			var transactions = ssn.transactions;
+			var num_transactions = transactions.length;
+			var amountBought = countStocksBought(transactions);
+			var amountSold = countStocksSold(transactions);
+			var uniqueTransactions = getUniqueTransactions(transactions);
+			ssn.userStatsData = {
+				num_stocks: num_stocks,
+				num_transactions: num_transactions,
+				earnings: earnings,
+				amountBought: amountBought,
+				amountSold: amountSold,
+				uniqueTransactions: uniqueTransactions
+			};
 
 			var rates = await convert();
 			var preference = ssn.currency_preference;
@@ -515,7 +604,22 @@ router
 		var cash2 = ssn.cash2;
 		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 		var userStocks = ssn.stocks;
-
+		var num_stocks = ssn.stocks.length;
+		var earnings = cash2 - 10000;			
+		var transactions = ssn.transactions;
+		var num_transactions = transactions.length;
+		var amountBought = countStocksBought(transactions);
+		var amountSold = countStocksSold(transactions);
+		var uniqueTransactions = getUniqueTransactions(transactions);
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
+		
 		var rates = await convert();
 		var preference = ssn.currency_preference;
 		var rate = rates[preference];

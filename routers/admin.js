@@ -1,7 +1,10 @@
 const express = require('express');
 var mongoose = require("mongoose");
 var assert = require("assert");
-
+// function for converting monetary values
+var convert = require("../feature_functions/getRates");
+// function for retrieving symbols for currency codes
+const rate_symbols = require('../feature_functions/rate_symbols');
 const router = new express.Router();
 
 
@@ -28,18 +31,66 @@ router
 router
     .route("/admin-success")
     .get(isAdmin, (request, response) => {
+        var ssn = request.session.passport.user;
+
         mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
             assert.equal(null, err);
             db.collection("user_accounts")
                 .find()
-                .toArray(function (err, result) {
+                .toArray( async(err, result) => {
                     if (err) {
                         response.send("Unable to fetch Accounts");
                     }
+
+                    
+                    var rates = await convert();
+                    var preference = ssn.currency_preference;
+                    var rate = rates[preference];
+                    var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+                    result.forEach((val, i) => {
+                        val.cash2[0] = val.cash2[0] * rate;
+                    })
+
                     response.render("admin-success.hbs", {
                         title: "Welcome to the Admin page",
                         result: result,
-                        display: "Admin"
+                        display: "Admin",
+                        currency_symbol: currency_symbol,
+                        currency_preference: ssn.currency_preference
+                    });
+                });
+            db.close;
+        });
+    })
+    .post(isAdmin, (request, response) => {
+        var ssn = request.session.passport.user;
+        ssn.currency_preference = request.body.currency_preference;
+
+        mongoose.connect("mongodb://localhost:27017/accounts", function (err, db) {
+            assert.equal(null, err);
+            db.collection("user_accounts")
+                .find()
+                .toArray(async(err, result) => {
+                    if (err) {
+                        response.send("Unable to fetch Accounts");
+                    }
+
+                    var rates = await convert();
+                    var preference = ssn.currency_preference;
+                    var rate = rates[preference];
+                    var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+                    result.forEach((val, i) => {
+                        val.cash2[0] = val.cash2[0] * rate;
+                    })
+
+                    response.render("admin-success.hbs", {
+                        title: "Welcome to the Admin page",
+                        result: result,
+                        display: "Admin",
+                        currency_symbol: currency_symbol,
+                        currency_preference: ssn.currency_preference
                     });
                 });
             db.close;
@@ -229,6 +280,11 @@ function isAuthenticated(request, response, next) {
         response.redirect('/');
     }
 }
+
+function clone(src) {
+    return JSON.parse(JSON.stringify(src));
+}
+
 
 function isAdmin(request, response, next) {
     if (

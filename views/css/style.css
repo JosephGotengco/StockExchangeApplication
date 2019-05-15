@@ -81,3 +81,24 @@ body {
 canvas {
     width: 100px;
 }
+
+.one {
+    background-color: pink;
+}
+
+.two {
+    background-color: red;
+}
+
+.three {
+    background-color: green;
+}
+
+.tab-content {
+    min-height: 90vh;
+}
+
+.trend-img {
+    height: 25px;
+    width: 30px;
+}
