@@ -139,20 +139,6 @@ router
 	});
 
 router
-	.route("/test")
-	.post(isAuthenticated, async(request, response) => {
-		try {
-			var data = JSON.stringify(request.body);
-			var data = JSON.parse(data);
-			console.log(data);
-			var updated_users = data.updated_users;
-			console.log(updated_users);
-		} catch (e) {
-			console.log(e);
-		}
-	});
-
-router
 	.route("/news/stock/:id")
 	.get(isAuthenticated, async (request, response) => {
 		try {
@@ -1089,7 +1075,7 @@ router
 			earnings: ssn.userStatsData.earnings * rate,
 			amountBought: ssn.userStatsData.amountBought,
 			amountSold: ssn.userStatsData.amountSold,
-			stocks: ssn.userStockData.displayStocks,
+			stocks: displayStocks,
 			uniqueTransactions: displayTransactions.slice(
 				-5,
 				displayTransactions.length

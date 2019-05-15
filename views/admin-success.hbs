@@ -24,71 +24,90 @@
 
 <body>
 
-	<!-- NAV BAR -->
-	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
-		<h5 class="my-0 font-weight-normal">
-			<a class="navbar-brand" href="/trading-success">
-				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
-				STOCK NAME
-			</a>
-		</h5>
+    <!-- NAV BAR -->
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+        <h5 class="my-0 font-weight-normal">
+            <a class="navbar-brand" href="/trading-success">
+                <i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+                STOCK NAME
+            </a>
+        </h5>
 
 
-		<form id="event-form" action="/admin-success" method="POST" class="mr-auto">
-			<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
-				name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
-				<option id="USD" value="USD">USD</option>
-				<option id="JPY" value="JPY">JPY</option>
-				<option id="BGN" value="BGN">BGN</option>
-				<option id="CZK" value="CZK">CZK</option>
-				<option id="DKK" value="DKK">DKK</option>
-				<option id="GBP" value="GBP">GBP</option>
-				<option id="HUF" value="HUF">HUF</option>
-				<option id="PLN" value="PLN">PLN</option>
-				<option id="RON" value="RON">RON</option>
-				<option id="SEK" value="SEK">SEK</option>
-				<option id="CHF" value="CHF">CHF</option>
-				<option id="ISK" value="ISK">ISK</option>
-				<option id="NOK" value="NOK">NOK</option>
-				<option id="HRK" value="HRK">HRK</option>
-				<option id="RUB" value="RUB">RUB</option>
-				<option id="TRY" value="TRY">TRY</option>
-				<option id="AUD" value="AUD">AUD</option>
-				<option id="BRL" value="BRL">BRL</option>
-				<option id="CAD" value="CAD">CAD</option>
-				<option id="CNY" value="CNY">CNY</option>
-				<option id="HKD" value="HKD">HKD</option>
-				<option id="IDR" value="IDR">IDR</option>
-				<option id="ILS" value="ILS">ILS</option>
-				<option id="INR" value="INR">INR</option>
-				<option id="KRW" value="KRW">KRW</option>
-				<option id="MXN" value="MXN">MXN</option>
-				<option id="MYR" value="MYR">MYR</option>
-				<option id="NZD" value="NZD">NZD</option>
-				<option id="PHP" value="PHP">PHP</option>
-				<option id="SGD" value="SGD">SGD</option>
-				<option id="THB" value="THB">THB</option>
-				<option id="ZAR" value="ZAR">ZAR</option>
-			</select>
-		</form>
+        <form id="event-form" action="/admin-success" method="POST" class="mr-auto">
+            <select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+                name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+                <option id="USD" value="USD">USD</option>
+                <option id="JPY" value="JPY">JPY</option>
+                <option id="BGN" value="BGN">BGN</option>
+                <option id="CZK" value="CZK">CZK</option>
+                <option id="DKK" value="DKK">DKK</option>
+                <option id="GBP" value="GBP">GBP</option>
+                <option id="HUF" value="HUF">HUF</option>
+                <option id="PLN" value="PLN">PLN</option>
+                <option id="RON" value="RON">RON</option>
+                <option id="SEK" value="SEK">SEK</option>
+                <option id="CHF" value="CHF">CHF</option>
+                <option id="ISK" value="ISK">ISK</option>
+                <option id="NOK" value="NOK">NOK</option>
+                <option id="HRK" value="HRK">HRK</option>
+                <option id="RUB" value="RUB">RUB</option>
+                <option id="TRY" value="TRY">TRY</option>
+                <option id="AUD" value="AUD">AUD</option>
+                <option id="BRL" value="BRL">BRL</option>
+                <option id="CAD" value="CAD">CAD</option>
+                <option id="CNY" value="CNY">CNY</option>
+                <option id="HKD" value="HKD">HKD</option>
+                <option id="IDR" value="IDR">IDR</option>
+                <option id="ILS" value="ILS">ILS</option>
+                <option id="INR" value="INR">INR</option>
+                <option id="KRW" value="KRW">KRW</option>
+                <option id="MXN" value="MXN">MXN</option>
+                <option id="MYR" value="MYR">MYR</option>
+                <option id="NZD" value="NZD">NZD</option>
+                <option id="PHP" value="PHP">PHP</option>
+                <option id="SGD" value="SGD">SGD</option>
+                <option id="THB" value="THB">THB</option>
+                <option id="ZAR" value="ZAR">ZAR</option>
+            </select>
+        </form>
 
 
+        <nav class="my-2 my-md-0 mr-md-3 nav-pills">
+            <a class="p-2 text-light" href="/trading-success">Trading</a>
+            <a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+            <a class="p-2 text-light" href="/news-hub">Rankings</a>
+        </nav>
+        <a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+        <a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+    </div>
 
-		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
-			<a class="p-2 text-light" href="/trading-success">Trading</a>
-			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
-			<a class="p-2 text-light" href="/news-hub">Rankings</a>
-		</nav>
-		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
-		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
-	</div>
-
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Admin Panel -->
     <div class="container">
         <div class="jumbotron jumbotron-fluid">
             <div class='container'>
                 <h1>Welcome to the Admin Page</h1>
+
                 <br>
                 </p>
                 <div>
@@ -131,16 +150,37 @@
     <!-- Footer -->
     {{> footer}}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-        crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="update-response">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </body>
 
 <script>
+
 
     function switchCode(event) {
         var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
@@ -175,7 +215,6 @@
 
 
     $("#SubmitChanges").click(function () {
-
         var query = {
             updated_users: []
         };
@@ -225,7 +264,14 @@
                 },
 
                 success: function (data) {
-                    console.log(data);
+                    console.log(data.flags);
+                    console.log(data.result);
+                    tabledata = data.result;
+                    $( "#update-response").empty();
+                    for (i = 0; i < data.flags.length; i++) {
+                    $( "#update-response").append("<p>" + data.flags[i].username + " " + data.flags[i].msg + "</p>");
+                    }
+                    $('#myModal').modal('toggle')
                     console.log('process success');
                 },
 

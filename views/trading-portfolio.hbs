@@ -102,7 +102,6 @@
 					<h1 class="display-4">Your Portfolio</h1>
 					<p class="lead">Please note all prices are in {{{currency_code}}}.</p>
 				</div>
-
 				<div class='chfont container'>
 					<p class="font-weight-bold">First Name: {{{firstname}}}</p>
 					<p class="font-weight-bold">Last Name: {{{lastname}}}</p>
@@ -169,6 +168,7 @@
 								</tr>
 							</thead>
 							<tbody>
+								{{reverse displayTransactions}}
 								{{#each displayTransactions}}
 								<tr>
 									<td>{{this.year}}, {{this.month}} {{this.day}}</td>
@@ -180,13 +180,11 @@
 									<td>-{{this.price}}</td>
 									{{/ifEquals}}
 									<td>{{this.balance}}</td>
-									<td>
-										{{#ifEquals this.type "S"}}
-									<td>Sale</td>
+									{{#ifEquals this.type "S"}}
+										<td>Sale</td>
 									{{else}}
-									<td>Purchase</td>
+										<td>Purchase</td>
 									{{/ifEquals}}
-									</td>
 								</tr>
 								{{/each}}
 							</tbody>

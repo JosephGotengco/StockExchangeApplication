@@ -61,13 +61,20 @@ hbs.registerHelper("roundToTwo", function (num) {
 	return num.toFixed(2);
 });
 
+hbs.registerHelper('reverse', function (arr) {
+    arr.reverse();
+});
+
 // cookie configuration
 app.use(
 	session({
 		secret: "secretcode",
 		resave: false,
 		saveUninitialized: false,
-		maxAge: 24 * 60 * 60 * 1000
+		cookie: {
+			maxAge: 24 * 60 * 60 * 1000,
+			sameSite: true
+		}
 	})
 );
 
