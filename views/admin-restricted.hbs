@@ -18,7 +18,7 @@
 <body>
 
     <!-- NAV BAR -->
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+    {{!-- <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
         <a class="navbar-brand" href="#">
             <i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
             STOCK NAME
@@ -46,6 +46,41 @@
                 </li>
             </ul>
         </div>
+    </nav> --}}
+
+    <nav class="navbar navbar-expand-lg nav-color">
+        <h5 class="my-0 font-weight-normal">
+            <a class="navbar-brand" href="/trading-success">
+                <i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+                STOCK NAME
+            </a>
+        </h5>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon">
+                <i class="fas fa-bars"></i>
+            </span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="p-2 text-light d-flex align-items-center" href="/trading-success">Trading</a>
+                </li>
+                <li class="nav-item">
+                    <a class="p-2 text-light d-flex align-items-center" href="/trading-portfolio">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="p-2 text-light d-flex align-items-center ranking-right" href="/news-hub">Rankings</a>
+                </li>
+                <li class="nav-item text-nowrap md-space">
+                    <a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign
+                        Out</a>
+                </li>
+                <li class="nav-item md-space">
+                    <a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+                </li>
+            </ul>
+        </div>
     </nav>
 
     <!-- content -->
@@ -56,7 +91,7 @@
     </form>
     <div id='submission'></div>
     <!-- Footer -->
-{{> footer}}
+    {{> footer}}
 
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

@@ -22,6 +22,7 @@ body {
 .tabs {
     height: 100vh;
 }
+
 .nav-margin {
     margin-bottom: 75px;
 }
@@ -62,6 +63,7 @@ body {
 
 .nav-color {
     background-color: #272727;
+    padding: 18px;
 }
 
 .footer {
@@ -71,10 +73,10 @@ body {
 
 
 .footer-spacer {
-    margin-bottom: 200px;
+    margin-bottom: 150px;
 }
 
-.tabulator .tabulator-tableHolder{
+.tabulator .tabulator-tableHolder {
     overflow: hidden !important;
 }
 
@@ -102,3 +104,101 @@ canvas {
     height: 25px;
     width: 30px;
 }
+
+.login-btn {
+    width: 100%;
+}
+
+.login-padding {
+    padding-top: 10px;
+}
+
+lable:before {
+    content: "\f070";
+    color: #aaa;
+    font-size: 22px;
+    font-family: FontAwesome;
+    position: absolute;
+    right: 25px;
+    top: 44px;
+}
+
+.progress-bar_wrap {
+    width: 300px;
+    height: 5px;
+    background: #F6F6FA;
+    display: inline-block;
+    vertical-align: middle;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.form-group-pwd .progress-bar_item {
+    display: inline-block;
+    height: 100%;
+    width: 33.33%;
+    float: left;
+    visibility: hidden;
+    transition: background-color .2s, visisility .1s;
+}
+
+.form-group-pwd .active {
+    visibility: visible;
+}
+
+.progress-bar_item-1 {}
+
+.progress-bar_item-2 {}
+
+.progress-bar_item-3 {}
+
+.progress-bar_text {
+    display: inline-block;
+    color: #aaa;
+    margin-left: 5px;
+    transition: .2s;
+}
+
+.btn-default {
+    border: 1px lightgray solid;
+}
+
+.ranking-right {
+    margin-right: 10px;
+}
+
+.fa-bars {
+    color: white;
+    font-size: 1.5em;
+}
+
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+    .md-space {
+        height: 40px;
+        margin: 10px;
+    }
+}
+
+/* // Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .md-space {
+        height: 40px;
+        margin: 10px;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .md-space {
+        height: 40px;
+        margin: 10px;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {}
