@@ -80,12 +80,22 @@
                               <p><i>{{message1}}</i></p>
                               <div class="row">
                                 <div class="col">
-                                    <form  id="updateuser" action='/admin-success-change-user-type', method='POST'>
-                                        <label for="stocksearch">Enter Username to Change Type to Admin</label>
-                                        <input type="text" class="form-control" name="user_to_admin" id="user_to_admin" placeholder="Username">
+                                    <form  id="updateuser" action='/admin-success-edit-user-traits', method='POST'>
+                                        <input type="hidden" id="userId" name="userId" value={{result.[0]._id}}>
+                                        <label for="stocksearch">First Name</label>
+                                        <input type="text" class="form-control" name="user_firstname" id="user_firstname" placeholder={{result.[0].firstname}}>
+                                        <br>
+                                        <label for="stocksearch">Last Name</label>
+                                        <input type="text" class="form-control" name="user_lastname" id="user_lastname" placeholder={{result.[0].lastname}}>
+                                        <br>
+                                        <label for="stocksearch">Username</label>
+                                        <input type="text" class="form-control" name="username_to_edit" id="username_to_edit" placeholder={{result.[0].username}}>
+                                        <br>
+                                        <label for="stocksearch">Type</label>
+                                        <input type="text" class="form-control" name="user_type" id="user_type" placeholder={{result.[0].type}}>
                                         <br>
                                             <p align="left">
-                                                <button type="submit" class="btn btn-danger">Update</button>
+                                                <button type="submit" class="btn btn-danger">Edit</button>
                                             </p>
                                         <br>
                                     </form>

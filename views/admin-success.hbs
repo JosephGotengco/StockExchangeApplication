@@ -77,14 +77,15 @@
 
                                 </div>
                               </div>
+                              <p><i>{{message1}}</i></p>
                               <div class="row">
                                 <div class="col">
-                                    <form  id="updateuser" action='/admin-success-change-user-type', method='POST'>
-                                        <label for="stocksearch">Enter Username to Change Type to Admin</label>
-                                        <input type="text" class="form-control" name="user_to_admin" id="user_to_admin" placeholder="Username">
+                                    <form  id="updateuser" action='/admin-success-edit-user', method='POST'>
+                                        <label for="stocksearch">To Edit User, Enter Username</label>
+                                        <input type="text" class="form-control" name="user_to_edit" id="user_to_edit" placeholder="Username">
                                         <br>
                                             <p align="left">
-                                                <button type="submit" class="btn btn-danger">Update</button>
+                                                <button type="submit" class="btn btn-danger">Edit</button>
                                             </p>
                                         <br>
                                     </form>

@@ -866,64 +866,163 @@ app.post('/admin-success-user-accounts', isAdmin, function(req, res, next) {
 	});
 });
 
-app.post('/admin-success-change-user-type', isAdmin, function(req, res, next) {
-	var userToAdmin = req.body.user_to_admin;
-	var username = req.session.passport.user.username
-	var type = "admin";
-	console.log(userToAdmin);
-	console.log(req.body.user_to_admin);
-	if(userToAdmin == username){
-		res.render('admin-success-change-user-type.hbs', {
+// app.post('/admin-success-edit-user-traits', isAdmin, function(req, res, next) {
+// 	var userId = req.body.userId
+// 	var firstnameToEdit = req.body.user_firstname;
+// 	var lastnameToEdit = req.body.user_lastname;
+// 	var usernameToEdit = req.body.username_to_edit;
+// 	var typeToEdit = req.body.user_type;
+// 	var username = req.session.passport.user.username;
+
+// 	if(usernameToEdit == username){
+// 		res.render('admin-success-edit-user.hbs', {
+// 			message1: "Cannot change ur own account here."
+// 		});
+// 		return;
+// 	}else{
+// 		if(usernameToEdit == '') {
+// 			res.render('admin-success-edit-user.hbs', {
+// 				message1: "Cannot be empty",
+// 			});
+// 		}else{
+// 			message1 = '';
+// 			mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+// 				assert.equal(null, err);
+
+// 				var query = { _id: ObjectID(userId) }
+
+// 				db.collection('user_accounts').find(query).toArray(function(err, result) {
+// 					if(err) {
+// 						message = 'Unable to Update Account';
+// 						console.log(message)
+// 						// console.log(err);
+// 						res.render('admin-success-edit-user.hbs', {
+// 							message1: message
+// 						});
+// 					};
+// 					console.log(result);
+// 					if(result === undefined || result.length == 0) {
+// 						message = 'No user exists with that username';
+// 						console.log(message)
+// 						res.render('admin-success-edit-user.hbs', {
+// 							message1: message
+// 						});
+// 					}else {
+// 						db.collection('user_accounts').updateOne(
+// 							{ "_id": ObjectID(userId)},
+// 							{ $set: { "firstname": firstnameToEdit, "lastname": lastnameToEdit, "username": usernameToEdit, "type": type  }}
+// 						);
+
+// 						res.render('admin-success.hbs', {
+// 							message1: 'Updated Successfully'
+// 						});
+// 					};
+// 				});
+// 			});
+// 		};
+// 	};
+// });
+
+app.post('/admin-success-edit-user', isAdmin, function(req, res, next) {
+	var userToEdit = req.body.user_to_edit;
+	var username = req.session.passport.user.username;
+	// console.log(userToEdit);
+	// console.log(username);
+	if(userToEdit == username){
+		res.render('admin-success.hbs', {
 			message1: "You are already an admin."
 		});
 		return;
 	}else{
-		if(userToAdmin == '') {
-			res.render('admin-success-change-user-type.hbs', {
+		if(userToEdit == '') {
+			res.render('admin-success.hbs', {
 				message1: "Cannot be empty",
 			});
-		}else{
+		}else {
 			message1 = '';
 			mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
-				assert.equal(null, err);
+				assert.equal(null,err);
 
-				var query = { username: userToAdmin }
-
-				console.log(query)
+				var query = { username: userToEdit };
+				// console.log(query);
 				db.collection('user_accounts').find(query).toArray(function(err, result) {
 					if(err) {
-						message = 'Unable to Update Account';
-						console.log(message)
-						// console.log(err);
-						res.render('admin-success-change-user-type.hbs', {
+						message = "Unable to fetch accounts";
+						res.render('admin-success', {
 							message1: message
 						});
-					};
-					console.log(result);
-					if(result === undefined || result.length == 0) {
+					}else if(result === undefined || result.length == 0){
 						message = 'No user exists with that username';
-						console.log(message)
-						res.render('admin-success-change-user-type.hbs', {
+						console.log(message);
+						res.render('admin-success.hbs', {
 							message1: message
+						});
+					}else{
+						console.log(result);
+						console.log(result[0].type);
+
+						res.render('admin-success-edit-user.hbs', {
+							result: result
 						});
 					}
-					else if(result[0].type == type){
-						message = 'User is already an admin';
-						res.render('admin-success-change-user-type.hbs', {
-							message1: message
-						})
-					}else {
-						db.collection('user_accounts').updateOne(
-							{ "username": userToAdmin},
-							{ $set: { "type": type }
-						});
-						res.render('admin-success-change-user-type.hbs', {
-							message1: 'Updated Successfully'
-						});
-					};
 				});
+			});	
+		}};
+	});
+
+app.post('/admin-success-edit-user-traits', isAdmin, function(req, res, next) {
+	var userId = req.body.userId
+	var firstnameToEdit = req.body.user_firstname;
+	var lastnameToEdit = req.body.user_lastname;
+	var usernameToEdit = req.body.username_to_edit;
+	var typeToEdit = req.body.user_type;
+
+	var message = '';
+	if(firstnameToEdit == '' || firstnameToEdit == undefined) {
+		res.render('admin-success-edit-user.hbs', {
+			message1: "Firstname cannot be empty." 
+		});
+	}else if(lastnameToEdit == '' || lastnameToEdit == undefined) {
+		res.render('admin-success-edit-user.hbs', {
+			message1: "Lastname cannot be empty." 
+		});
+	}else if(usernameToEdit == '' || usernameToEdit == undefined) {
+		res.render('admin-success-edit-user.hbs', {
+			message1: "Username cannot be empty." 
+		});
+	}else if(typeToEdit == '' || typeToEdit == undefined) {
+		res.render('admin-success-edit-user.hbs', {
+			message1: "Type cannot be empty." 
+		});
+	}else{
+		mongoose.connect("mongodb://localhost:27017/accounts", function(err, db) {
+			assert.equal(null, err);
+			var query = { _id: ObjectID(userId) };
+
+			db.collection('user_accounts').find(query).toArray(function(err, result) {
+				if(err) {
+					console.log(err);
+					res.render('admin-success-edit-user.hbs', {
+						message1: "Cannot fetch Accounts."
+					});
+				}else if(result === undefined || result.length == 0){
+					message = 'No user exists with that id';
+					console.log(message);
+					res.render('admin-success-edit-user.hbs', {
+						message1: message
+					});
+				}else{
+					db.collection('user_accounts').updateOne(
+						{"_id": ObjectID(userId)},
+						{$set: {"firstname": firstnameToEdit, "lastname": lastnameToEdit, "username": usernameToEdit, "type": typeToEdit  }}
+						);
+
+					res.render('admin-success.hbs', {
+						message1: 'Updated Successfully'
+					});
+				};
 			});
-		};
+		})
 	};
 });
 
