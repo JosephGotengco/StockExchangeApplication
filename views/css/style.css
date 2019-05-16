@@ -187,6 +187,8 @@ lable:before {
         height: 40px;
         margin: 10px;
     }
+
+
 }
 
 /* Medium devices (tablets, 768px and up) */
@@ -195,6 +197,7 @@ lable:before {
         height: 40px;
         margin: 10px;
     }
+
 }
 
 /* Large devices (desktops, 992px and up) */
