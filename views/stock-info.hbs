@@ -19,23 +19,40 @@
 <body>
 
 	<!-- NAV BAR -->
-	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
-		<h5 class="my-0 mr-md-auto font-weight-normal">
+	<nav class="navbar navbar-expand-lg nav-color">
+		<h5 class="my-0 font-weight-normal">
 			<a class="navbar-brand" href="/trading-success">
 				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
 				STOCK NAME
 			</a>
-
 		</h5>
-
-		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
-			<a class="p-2 text-light" href="/trading-success">Trading</a>
-			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
-			<a class="p-2 text-light" href="/news-hub">Rankings</a>
-		</nav>
-		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
-		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
-	</div>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+			aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon">
+				<i class="fas fa-bars"></i>
+			</span>
+		</button>
+		<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center" href="/trading-success">Trading</a>
+				</li>
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center" href="/trading-portfolio">Portfolio</a>
+				</li>
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center ranking-right" href="/news-hub">Rankings</a>
+				</li>
+				<li class="nav-item text-nowrap md-space">
+					<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign
+						Out</a>
+				</li>
+				<li class="nav-item md-space">
+					<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
 
 	{{!-- Graph --}}
 	<canvas style="padding: 20px;" class="footer-spacer" id="myChart" width="300" height="100"></canvas>
