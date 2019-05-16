@@ -25,7 +25,7 @@ hbs.registerPartials(__dirname + "/views/partials/");
 mongoose.Promise = global.Promise;
 
 // used for logging in? (unsure)
-mongoose.connect("mongodb://localhost:27017/accounts", {
+mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts", {
 	useNewUrlParser: true
 });
 
@@ -61,13 +61,20 @@ hbs.registerHelper("roundToTwo", function (num) {
 	return num.toFixed(2);
 });
 
+hbs.registerHelper('reverse', function (arr) {
+    arr.reverse();
+});
+
 // cookie configuration
 app.use(
 	session({
 		secret: "secretcode",
 		resave: false,
 		saveUninitialized: false,
-		maxAge: 24 * 60 * 60 * 1000
+		cookie: {
+			maxAge: 24 * 60 * 60 * 1000,
+			sameSite: true
+		}
 	})
 );
 
