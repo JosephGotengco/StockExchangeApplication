@@ -68,7 +68,7 @@ beforeEach(() => {
 
 
 const Fixtures = require("node-mongodb-fixtures");
-const uri = "mongodb://localhost:27017/accounts";
+const uri = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 const options = null;
 
 const fixtures = new Fixtures({
@@ -78,7 +78,7 @@ const fixtures = new Fixtures({
 
 
 fixtures
-    .connect("mongodb://localhost:27017/accounts")
+    .connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts")
     .then(() => fixtures.unload())
     .then(() => fixtures.load())
     .catch(e => console.error(e))
