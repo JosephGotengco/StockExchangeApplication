@@ -36,36 +36,36 @@ router.route("/test").post(isAuthenticated, async (request, response) => {
             // VALIDATION
             if (check_str(firstname) === false) {
                 // do something
-                console.log("hit 1");
+                // console.log("hit 1");
                 var msg = `first name must be 3-30 characters long and must only contain letters.`;
                 flags.push({username: username, msg: msg});
             } else if (check_str(lastname) === false) {
                 // do something
-                console.log("hit 2");
+                // console.log("hit 2");
                 var msg = `last name must be 3-30 characters long and must only contain letters.`;
                 flags.push({username: username, msg: msg});
             } else if (typeof cash2[0] !== "float" && typeof cash2[0] !== "number") {
                 // do something
-                console.log("hit 3");
+                // console.log("hit 3");
                 var msg = `cash must be a float or a number.`;
                 flags.push({username: username, msg: msg});
             } else if (cash2[0] < 0) {
                 // do something
-                console.log("hit 4");
+                // console.log("hit 4");
                 var msg = `cash cannot be below 0.`;
                 flags.push({username: username, msg: msg});
             } else if (check_str(type) === false) {
                 // do something
-                console.log("hit 5");
+                // console.log("hit 5");
                 var msg = `user type must either be the string standard or admin.`;
                 flags.push({username: username, msg: msg});
             } else if (type !== "admin" && type !== "standard") {
                 // do something
-                console.log("hit 6");
+                // console.log("hit 6");
                 var msg = `user type must either be the string standard or admin.`;
                 flags.push({username: username, msg: msg});
             } else {
-                console.log("pass");
+                // console.log("pass");
                 var msg = `was successfully updated.`;
                 flags.push({username: username, msg: msg});
                 // UPDATE DATABASE
@@ -112,7 +112,7 @@ router.route("/test").post(isAuthenticated, async (request, response) => {
                         result: result
                     }
 
-                    console.log(data);
+                    // console.log(data);
                     response.status(200);
                     response.contentType("json");
                     response.send(data);
@@ -235,7 +235,7 @@ router
     .post(isAdmin, (request, response) => {
         request.body = JSON.stringify(request.body);
         request.body = JSON.parse(request.body);
-        console.log(request.body);
+        // console.log(request.body);
 
         var user_name_to_delete = request.body.user_id;
         var username = request.session.passport.user.username;

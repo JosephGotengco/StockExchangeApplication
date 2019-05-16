@@ -1582,13 +1582,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "No user exists with that username");
                             done();
                         });
                 });
@@ -1610,13 +1607,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "Cannot delete your own account!");
                             done();
                         });
                 });
@@ -1638,13 +1632,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "User is Deleted");
                             done();
                         });
                 });
@@ -1666,13 +1657,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "No user exists with that username");
                             done();
                         });
                 });
