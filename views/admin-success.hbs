@@ -162,7 +162,7 @@
                     </button>
                 </div>
                 <div class="modal-body" id="update-response">
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -170,13 +170,35 @@
             </div>
         </div>
     </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-            crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-            crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <div class="modal fade" id="delete-confirmation-modal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="delete-response">
+
+                </div>
+                <div class="modal-footer">
+                    <button id="delete-confirmation-button" type="button" class="btn btn-danger"
+                        data-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </body>
 
 <script>
@@ -208,9 +230,45 @@
             { title: "Last Name", field: "lastname", editor: true },
             { title: "Balance ({{{currency_symbol}}})", field: "cash2", width: 150, editor: true },
             { title: "Account Type", field: "type", width: 150, editor: true },
+            {
+                formatter: "buttonCross", width: 40, align: "center", headerSort: false, cellClick: function (e, cell) {
+                    $("#delete-response").empty();
+                    var row_username = cell.getRow().getData().username;
+                    $("#delete-response").append("<p> Are you sure you want to delete the user " + row_username + "?</p>");
+                    $('#delete-confirmation-modal').modal('toggle');
+                    $("#delete-confirmation-button").click(function () {
+                        var delete_query = {
+                            user_id: row_username
+                        }
+                        $.ajax({
+                            url: "/admin-success-delete-user-success",
+                            type: "POST",
+                            dataType: "json",
+                            data: JSON.stringify(delete_query),
+                            contentType: "application/json",
+                            cache: false,
+                            timeout: 5000,
+                            complete: function () {
+                                //called when complete
+                                console.log('process complete');
+                            },
+
+                            success: function (data) {
+                                if (data.msg === "User is Deleted") {
+                                    cell.getRow().delete();
+                                }
+                                console.log(data);
+                            },
+
+                            error: function () {
+                                console.log('process error');
+                            }
+                        });
+                    })
+                }
+            },
         ]
     });
-
 
 
 
@@ -267,9 +325,9 @@
                     console.log(data.flags);
                     console.log(data.result);
                     tabledata = data.result;
-                    $( "#update-response").empty();
+                    $("#update-response").empty();
                     for (i = 0; i < data.flags.length; i++) {
-                    $( "#update-response").append("<p>" + data.flags[i].username + " " + data.flags[i].msg + "</p>");
+                        $("#update-response").append("<p>" + data.flags[i].username + " " + data.flags[i].msg + "</p>");
                     }
                     $('#myModal').modal('toggle')
                     console.log('process success');

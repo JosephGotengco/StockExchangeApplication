@@ -233,19 +233,35 @@ router
 router
     .route("/admin-success-delete-user-success")
     .post(isAdmin, (request, response) => {
+        request.body = JSON.stringify(request.body);
+        request.body = JSON.parse(request.body);
+        console.log(request.body);
+
         var user_name_to_delete = request.body.user_id;
         var username = request.session.passport.user.username;
 
         if (user_name_to_delete == username) {
-            response.render("admin-success.hbs", {
-                message: "Cannot delete your own account!"
-            });
+            var message = "Cannot delete your own account!"
+            // response.render("admin-success.hbs", {
+            //     message: "Cannot delete your own account!"
+            // });
+            response.status(200);
+            response.contentType("json");
+            response.send({
+                msg: message
+            })
             return;
         } else {
             if (user_name_to_delete == "") {
-                response.render("admin-success.hbs", {
-                    message: "Cannot be empty"
-                });
+                var message = "Cannot be empty"
+                // response.render("admin-success.hbs", {
+                //     message: "Cannot be empty"
+                // });
+                response.status(200);
+                response.contentType("json");
+                response.send({
+                    msg: message
+                })
             } else {
                 message = "";
                 mongoose.connect("mongodb://localhost:27017/accounts", function (
@@ -261,17 +277,27 @@ router
                         .toArray(function (err, result) {
                             if (err) {
                                 message = "Unable to Delete Account";
-                                response.render("admin-success.hbs", {
-                                    message: message,
-                                    display: "Admin"
-                                });
+                                // response.render("admin-success.hbs", {
+                                //     message: message,
+                                //     display: "Admin"
+                                // });
+                                response.status(200);
+                                response.contentType("json");
+                                response.send({
+                                    msg: message
+                                })
                             }
                             if (result === undefined || result.length == 0) {
                                 message = "No user exists with that username";
-                                response.render("admin-success.hbs", {
-                                    message: message,
-                                    display: "Admin"
-                                });
+                                // response.render("admin-success.hbs", {
+                                //     message: message,
+                                //     display: "Admin"
+                                // });
+                                response.status(200);
+                                response.contentType("json");
+                                response.send({
+                                    msg: message
+                                })
                             } else {
                                 db.collection("user_accounts").deleteOne(query, function (
                                     err,
@@ -279,10 +305,15 @@ router
                                 ) {
                                     if (err) throw err;
                                     message = "User is Deleted";
-                                    response.render("admin-success.hbs", {
-                                        message: message,
-                                        display: "Admin"
-                                    });
+                                    response.status(200);
+                                    response.contentType("json");
+                                    response.send({
+                                        msg: message
+                                    })
+                                    // response.render("admin-success.hbs", {
+                                    //     message: message,
+                                    //     display: "Admin"
+                                    // });
                                     db.close;
                                 });
                             }
