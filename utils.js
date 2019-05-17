@@ -8,7 +8,6 @@ module.exports.getDb = function() {
 }
 
 module.exports.init = function(callback) {
-	// MongoClient.connect('mongodb://localhost:27017/test', function(err, client) {
 	MongoClient.connect(DB_URI, function(err, client) {
 		if (err) {
 			return console.log('Unable to connect to DB');
