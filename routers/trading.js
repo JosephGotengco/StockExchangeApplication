@@ -211,8 +211,10 @@ router
 			var preference = ssn.currency_preference;
 			var rate = rates[preference];
 
-			var displayTransactions = clone(uniqueTransactions)
+			var displayTransactions = clone(uniqueTransactions);
+			console.log(displayTransactions);
 			displayTransactions.forEach((val, i) => {
+				console.log(val);
 				var total_cost = val.total_cost;
 				displayTransactions[i].total_cost = rate * total_cost;
 				var balance = val.balance;
@@ -225,6 +227,8 @@ router
 				displayStocks[i].total_cost = rate * total_cost;
 				var today_rate = val.today_rate;
 				displayStocks[i].today_rate = rate * today_rate;
+				var profit = val.profit;
+				displayStocks[i].profit = rate * profit;
 			})
 
 
@@ -277,9 +281,9 @@ router
 			var cash2 = ssn.cash2;
 			var stocks = ssn.stocks;
 			var num_stocks = ssn.stocks.length;
-			var earnings = cash2 - 10000;			
 			var transactions = ssn.transactions;
 			var num_transactions = transactions.length;
+			var earnings = countTotalSale(transactions);			
 			var amountBought = countStocksBought(transactions);
 			var amountSold = countStocksSold(transactions);
 			var uniqueTransactions = getUniqueTransactions(transactions);
@@ -359,6 +363,8 @@ router
 				displayStocks[i].total_cost = rate * total_cost;
 				var today_rate = val.today_rate;
 				displayStocks[i].today_rate = rate * today_rate;
+				var profit = val.profit;
+				displayStocks[i].profit = rate * profit;
 			})
 
 			var displayMarqueeData = clone(marqueeData);
@@ -404,9 +410,9 @@ router
 			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 			var userStocks = ssn.stocks;
 			var num_stocks = ssn.stocks.length;
-			var earnings = cash2 - 10000;			
 			var transactions = ssn.transactions;
 			var num_transactions = transactions.length;
+			var earnings = countTotalSale(transactions)			
 			var amountBought = countStocksBought(transactions);
 			var amountSold = countStocksSold(transactions);
 			var uniqueTransactions = getUniqueTransactions(transactions);
@@ -453,6 +459,8 @@ router
 				displayStocks[i].total_cost = rate * total_cost;
 				var today_rate = val.today_rate;
 				displayStocks[i].today_rate = rate * today_rate;
+				var profit = val.profit;
+				displayStocks[i].profit = rate * profit;
 			})
 
 
@@ -501,9 +509,9 @@ router
 			var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 			var userStocks = ssn.stocks;
 			var num_stocks = ssn.stocks.length;
-			var earnings = cash2 - 10000;			
 			var transactions = ssn.transactions;
 			var num_transactions = transactions.length;
+			var earnings = countTotalSale(transactions);			
 			var amountBought = countStocksBought(transactions);
 			var amountSold = countStocksSold(transactions);
 			var uniqueTransactions = getUniqueTransactions(transactions);
@@ -545,6 +553,8 @@ router
 				displayStocks[i].total_cost = rate * total_cost;
 				var today_rate = val.today_rate;
 				displayStocks[i].today_rate = rate * today_rate;
+				var profit = val.profit;
+				displayStocks[i].profit = rate * profit;
 			})
 
 
@@ -591,9 +601,9 @@ router
 		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 		var userStocks = ssn.stocks;
 		var num_stocks = ssn.stocks.length;
-		var earnings = cash2 - 10000;			
 		var transactions = ssn.transactions;
 		var num_transactions = transactions.length;
+		var earnings = countTotalSale(transactions);			
 		var amountBought = countStocksBought(transactions);
 		var amountSold = countStocksSold(transactions);
 		var uniqueTransactions = getUniqueTransactions(transactions);
@@ -624,7 +634,7 @@ router
 
 
 
-			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: ${currency_symbol}${stock_price * rate} ${currency_preference}.`;
+			message = `The price of the selected ticker '${stock}' which belongs to '${stock_name}' is currently: ${currency_symbol}${(stock_price * rate).toFixed(2)} ${currency_preference}.`;
 		} catch (err) {
 			if (stock === "") {
 				message = "Please enter a stock ticker i.e. TSLA, MSFT";
@@ -659,6 +669,8 @@ router
 			displayStocks[i].total_cost = rate * total_cost;
 			var today_rate = val.today_rate;
 			displayStocks[i].today_rate = rate * today_rate;
+			var profit = val.profit;
+			displayStocks[i].profit = rate * profit;
 		})
 
 
@@ -674,7 +686,7 @@ router
 
 		response.render("trading-success.hbs", {
 			title: message,
-			head: `Cash balance: ${currency_symbol}${cash2[0] * rate}`,
+			head: `Cash balance: ${currency_symbol}${(cash2[0] * rate).toFixed(2)}`,
 			marqueeData: displayMarqueeData,
 			display: "Trading",
 			preference: ssn.preference,
@@ -703,13 +715,13 @@ router
 
 		var _id = ssn._id;
 		var cash2 = ssn.cash2;
-		var earnings = cash2 - 10000;
 		var stocks = ssn.stocks;
 		var userStocks = ssn.stocks;
 		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 		var num_stocks = ssn.stocks.length;
 		var transactions = ssn.transactions;
 		var num_transactions = transactions.length;
+		var earnings = countTotalSale(transactions);
 
 		var qty = parseFloat(request.body.buystockqty);
 		var stock = request.body.buystockticker.toUpperCase();
@@ -731,20 +743,7 @@ router
 			var total_cost = Math.round(stock_price * qty * 100) / 100;
 			var cash_remaining = Math.round((cash2 - total_cost) * 100) / 100;
 
-			var amountBought = countStocksBought(transactions);
 
-			var amountSold = countStocksSold(transactions);
-
-			var uniqueTransactions = getUniqueTransactions(transactions);
-
-			ssn.userStatsData = {
-				num_stocks: num_stocks,
-				num_transactions: num_transactions,
-				earnings: earnings,
-				amountBought: amountBought,
-				amountSold: amountSold,
-				uniqueTransactions: uniqueTransactions
-			};
 
 			if (cash_remaining >= 0 && total_cost !== 0 && qty > 0) {
 				var db = utils.getDb();
@@ -786,15 +785,15 @@ router
 					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
 				);
 
-				message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at ${currency_symbol}${stock_price * rate}/share for ${currency_symbol}${total_cost * rate}.`;
+				message = `You successfully purchased ${qty} shares of ${stock_name} (${stock}) at ${currency_symbol}${(stock_price * rate).toFixed(2)}/share for ${currency_symbol}${(total_cost * rate).toFixed(2)}.`;
 			} else if (total_cost === 0) {
 				message = `Sorry you need to purchase at least 1 stock. Change your quantity to 1 or more.`;
 			} else if (qty < 0) {
 				message = `You cannot buy negative shares.`;
 			} else {
 				message = `Sorry you only have ${currency_symbol}${
-					cash2[0] * rate
-					}. The purchase did not go through. The total cost was ${currency_symbol}${total_cost * rate}.`;
+					(cash2[0] * rate).toFixed(2)
+					}. The purchase did not go through. The total cost was ${currency_symbol}${(total_cost * rate).toFixed(2)}.`;
 			}
 		} catch (err) {
 			if (stock === "") {
@@ -856,6 +855,8 @@ router
 			displayStocks[i].total_cost = rate * total_cost;
 			var today_rate = val.today_rate;
 			displayStocks[i].today_rate = rate * today_rate;
+			var profit = val.profit;
+			displayStocks[i].profit = rate * profit;
 		})
 
 
@@ -867,9 +868,24 @@ router
 			displayMarqueeData[i].price = rate * price;
 		})
 
+		var amountBought = countStocksBought(transactions);
+
+		var amountSold = countStocksSold(transactions);
+
+		var uniqueTransactions = getUniqueTransactions(transactions);
+
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
+
 		response.render("trading-success.hbs", {
 			title: message,
-			head: `Cash balance: ${currency_symbol}${cash2[0] * rate}`,
+			head: `Cash balance: ${currency_symbol}${(cash2[0] * rate).toFixed(2)}`,
 			marqueeData: displayMarqueeData,
 			display: "Trading",
 			preference: ssn.preference,
@@ -910,13 +926,13 @@ router
 
 		var _id = ssn._id;
 		var cash2 = ssn.cash2;
-		var earnings = cash2 - 10000;
+		var transactions = ssn.transactions;
+		var num_transactions = transactions.length;
 		var stocks = ssn.stocks;
 		var userStocks = ssn.stocks;
 		var uniqueTransactions = ssn.userStatsData.uniqueTransactions;
 		var num_stocks = ssn.stocks.length;
-		var transactions = ssn.transactions;
-		var num_transactions = transactions.length;
+
 
 		var qty = parseFloat(request.body.sellstockqty);
 		var stock = request.body.sellstockticker.toUpperCase();
@@ -942,14 +958,14 @@ router
 				var stock_qty = ssn.stocks[index].amount;
 				var current_cost = ssn.stocks[index].total_cost;
 			} else {
-				throw "you don't have this stock (abritrary error msg LOL)";
+				throw "You have no stocks.";
 			}
 			var stock_remaining = stock_qty - qty;
 
 			var amountBought = countStocksBought(transactions);
 
 			var amountSold = countStocksSold(transactions);
-
+	
 			var uniqueTransactions = getUniqueTransactions(transactions);
 			ssn.userStatsData = {
 				num_stocks: num_stocks,
@@ -991,7 +1007,7 @@ router
 					{ _id: ObjectID(_id) },
 					{ $set: { cash2: cash2, stocks: stocks, transactions: transactions } }
 				);
-				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at ${currency_symbol}${stock_price * rate}/share for ${currency_symbol}${total_sale * rate}.`;
+				message = `You successfully sold ${qty} shares of ${stock_name} (${stock}) at ${currency_symbol}${(stock_price * rate).toFixed(2)}/share for ${currency_symbol}${(total_sale * rate).toFixed(2)}.`;
 			} else {
 				message = `You need to sell at least 1 share of ${stock}.`;
 			}
@@ -999,6 +1015,7 @@ router
 			if (stock === "") {
 				message = `You cannot leave the sell input blank. Please input a stock ticker`;
 			} else {
+				// console.log(err);
 				message = `You do not own any shares with the ticker '${stock}'.`;
 			}
 		}
@@ -1054,6 +1071,8 @@ router
 			displayStocks[i].total_cost = rate * total_cost;
 			var today_rate = val.today_rate;
 			displayStocks[i].today_rate = rate * today_rate;
+			var profit = val.profit;
+			displayStocks[i].profit = rate * profit;
 		})
 
 		var displayMarqueeData = clone(marqueeData);
@@ -1062,6 +1081,23 @@ router
 			var price = parseFloat(price);
 			displayMarqueeData[i].price = rate * price;
 		})
+
+		var amountBought = countStocksBought(transactions);
+
+		var amountSold = countStocksSold(transactions);
+
+		var uniqueTransactions = getUniqueTransactions(transactions);
+
+		var earnings = countTotalSale(transactions);			
+
+		ssn.userStatsData = {
+			num_stocks: num_stocks,
+			num_transactions: num_transactions,
+			earnings: earnings,
+			amountBought: amountBought,
+			amountSold: amountSold,
+			uniqueTransactions: uniqueTransactions
+		};
 
 		response.render("trading-success.hbs", {
 			title: message,
@@ -1109,6 +1145,7 @@ function countStocksSold(transactionArray) {
 	return amountSold;
 }
 
+
 function countStocksBought(transactionArray) {
 	var amountBought = 0;
 	for (i = 0; i < transactionArray.length; i++) {
@@ -1132,6 +1169,26 @@ function getUniqueTransactions(transactionArray) {
 	}
 	return uniqueTransactions;
 }
+
+function countTotalSale(transactionArray) {
+	var total_sale = 0;
+	for (i = 0; i < transactionArray.length; i++) {
+		if (transactionArray[i].type === "S") {
+			total_sale += transactionArray[i].total_sale;
+		}
+	}
+	return total_sale;
+}
+
+// function countTotalPurchase(transactionArray) {
+// 	var total_purchase = 0;
+// 	for (i = 0; i < transactionArray.length; i++) {
+// 		if (transactionArray[i].type === "B") {
+// 			total_purchase += transactionArray[i].total_purchase;
+// 		}
+// 	}
+// 	return total_purchase;
+// }
 
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {

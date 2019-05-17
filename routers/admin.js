@@ -73,61 +73,42 @@ router.route("/test").post(isAuthenticated, async (request, response) => {
                 var db = utils.getDb();
 
                 var query = { username: username };
-                db.collection("user_accounts")
-                    .find(query)
-                    .toArray(function (err, result) {
-                        if (err) {
-                            console.log(err);
-                            res.render("admin-success-edit-user.hbs", {
-                                message1: "Cannot fetch Accounts."
-                            });
-                        } else {
-                            db.collection("user_accounts").updateOne(
-                                { username: username },
-                                {
-                                    $set: {
-                                        firstname: firstname,
-                                        lastname: lastname,
-                                        cash2: cash2,
-                                        type: type
-                                    }
-                                }
-                            );
-                        }
-                    });
+
+                db.collection("user_accounts").updateOne(query, {
+                    $set: {
+                        firstname: firstname,
+                        lastname: lastname,
+                        cash2: cash2,
+                        type: type
+                    }
+                });
             }
         }
-
         var db = utils.getDb();
 
         db.collection("user_accounts")
             .find()
-            .toArray(async (err, result) => {
+            .toArray((err, result) => {
                 if (err) {
-                    response.send("Unable to fetch Accounts");
+                    flags.push({ username: username, msg: "could not be updated." });
+                } else {
+                    console.log("---------------------ARRAY++++++++++++++++++=");
+                    console.log(result[result.length - 1]);
+
+                    var data = {
+                        flags: flags,
+                        result: result
+                    };
+                    data.result.forEach((val, i) => {
+                        val.cash2[0] = val.cash2[0] * rate;
+                    });
+
+                    response.status(200);
+                    response.contentType("json");
+                    response.send(data);
                 }
-
-                var rates = await convert();
-                var preference = ssn.currency_preference;
-                var rate = rates[preference];
-                var currency_symbol = rate_symbols.getCurrencySymbol(preference);
-
-                result.forEach((val, i) => {
-                    val.cash2[0] = val.cash2[0] * rate;
-                });
-
-                var data = {
-                    flags: flags,
-                    result: result
-                };
-
-                // console.log(data);
-                response.status(200);
-                response.contentType("json");
-                response.send(data);
             });
         db.close;
-
     } catch (e) {
         console.log(e);
     }
@@ -181,7 +162,6 @@ router
                 });
             });
         db.close;
-
     })
     .post(isAdmin, (request, response) => {
         var ssn = request.session.passport.user;
@@ -202,7 +182,7 @@ router
                 var currency_symbol = rate_symbols.getCurrencySymbol(preference);
 
                 result.forEach((val, i) => {
-                    val.cash2[0] = val.cash2[0] * rate;
+                    val.cash2[0] = (val.cash2[0] * rate).toFixed(2);
                 });
 
                 response.render("admin-success.hbs", {
@@ -214,7 +194,6 @@ router
                 });
             });
         db.close;
-
     });
 
 router
@@ -234,7 +213,6 @@ router
                 });
             });
         db.close;
-
     });
 
 router
@@ -325,87 +303,87 @@ router
         }
     });
 
-router.route("/admin-update").post(isAdmin, (request, response) => {
-    try {
-        var username = request.body.user_id;
-        // Need to apply argument checks to these guys
-        var newBal = parseFloat(request.body.newBal);
-        var newFN = request.body.firstName;
-        var newLN = request.body.lastName;
-        // var newPass = request.body.password;
-        var findQuery = { username: username };
-        var updateQuery = {
-            $set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
-        };
+// router.route("/admin-update").post(isAdmin, (request, response) => {
+//     try {
+//         var username = request.body.user_id;
+//         // Need to apply argument checks to these guys
+//         var newBal = parseFloat(request.body.newBal);
+//         var newFN = request.body.firstName;
+//         var newLN = request.body.lastName;
+//         // var newPass = request.body.password;
+//         var findQuery = { username: username };
+//         var updateQuery = {
+//             $set: { firstname: newFN, lastname: newLN, cash2: [newBal] }
+//         };
 
-        var message;
+//         var message;
 
-        if (check_str(newFN) === false) {
-            message = `First name must be 3-30 characters long and must only contain letters.`;
-            response.render("admin-success.hbs", {
-                message: message,
-                display: "Admin"
-            });
-        } else if (check_str(newLN) === false) {
-            message = `Last name must be 3-30 characters long and must only contain letters.`;
-            response.render("admin-success.hbs", {
-                message: message,
-                display: "Admin"
-            });
-        } else if (username === "" || username === undefined) {
-            response.render("admin-success.hbs", {
-                message: "Cannot be empty",
-                display: "Admin"
-            });
-        } else if (newBal < 0 || newBal === undefined) {
-            message = `You cannot set the user, ${username}, to below $0.`;
-            response.render("admin-success.hbs", {
-                message: message,
-                display: "Admin"
-            });
-        } else {
-            var db = utils.getDb();
+//         if (check_str(newFN) === false) {
+//             message = `First name must be 3-30 characters long and must only contain letters.`;
+//             response.render("admin-success.hbs", {
+//                 message: message,
+//                 display: "Admin"
+//             });
+//         } else if (check_str(newLN) === false) {
+//             message = `Last name must be 3-30 characters long and must only contain letters.`;
+//             response.render("admin-success.hbs", {
+//                 message: message,
+//                 display: "Admin"
+//             });
+//         } else if (username === "" || username === undefined) {
+//             response.render("admin-success.hbs", {
+//                 message: "Cannot be empty",
+//                 display: "Admin"
+//             });
+//         } else if (newBal < 0 || newBal === undefined) {
+//             message = `You cannot set the user, ${username}, to below $0.`;
+//             response.render("admin-success.hbs", {
+//                 message: message,
+//                 display: "Admin"
+//             });
+//         } else {
+//             var db = utils.getDb();
 
-            db.collection("user_accounts")
-                .find(findQuery)
-                .toArray(function (err, result) {
-                    if (err) {
-                        message = "Unable to Update Account";
-                        response.render("admin-success.hbs", {
-                            message: message
-                        });
-                    }
-                    if (result === undefined || result.length == 0) {
-                        message = "No user exists with that username";
-                        response.render("admin-success.hbs", {
-                            message: message
-                        });
-                    } else {
-                        db.collection("user_accounts").updateOne(
-                            findQuery,
-                            updateQuery,
-                            { upsert: false },
-                            function (err, result) {
-                                if (err) throw err;
-                                request.session.passport.user.cash2[0] = newBal;
-                                message = `The user, ${username}, now has the balance of $${newBal}`;
-                                response.render("admin-success.hbs", {
-                                    message: message,
-                                    display: "Admin"
-                                });
+//             db.collection("user_accounts")
+//                 .find(findQuery)
+//                 .toArray(function (err, result) {
+//                     if (err) {
+//                         message = "Unable to Update Account";
+//                         response.render("admin-success.hbs", {
+//                             message: message
+//                         });
+//                     }
+//                     if (result === undefined || result.length == 0) {
+//                         message = "No user exists with that username";
+//                         response.render("admin-success.hbs", {
+//                             message: message
+//                         });
+//                     } else {
+//                         db.collection("user_accounts").updateOne(
+//                             findQuery,
+//                             updateQuery,
+//                             { upsert: false },
+//                             function (err, result) {
+//                                 if (err) throw err;
+//                                 request.session.passport.user.cash2[0] = newBal;
+//                                 message = `The user, ${username}, now has the balance of $${newBal}`;
+//                                 response.render("admin-success.hbs", {
+//                                     message: message,
+//                                     display: "Admin"
+//                                 });
 
-                                db.close;
-                            }
-                        );
-                    }
-                }
-                );
-        }
-    } catch (e) {
-        console.log(e);
-        response.render("admin-success.hbs");
-    }
-});
+//                                 db.close;
+//                             }
+//                         );
+//                     }
+//                 }
+//                 );
+//         }
+//     } catch (e) {
+//         console.log(e);
+//         response.render("admin-success.hbs");
+//     }
+// });
 
 function check_str(string_input) {
     // checks if string value is between 3 and 12 characters, uses RegEx to confirm only alphabetical characters

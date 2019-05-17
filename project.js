@@ -9,7 +9,8 @@ var session = require("express-session");
 var utils = require("./utils");
 var cookieParser = require("cookie-parser");
 var bcrypt = require("bcrypt");
-
+// const DB_URI = "mongodb://localhost:27017/accounts";
+const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 
 
 // Importing routes
@@ -25,7 +26,7 @@ hbs.registerPartials(__dirname + "/views/partials/");
 mongoose.Promise = global.Promise;
 
 // used for logging in? (unsure)
-mongoose.connect("mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts", {
+mongoose.connect(DB_URI, {
 	useNewUrlParser: true
 });
 
