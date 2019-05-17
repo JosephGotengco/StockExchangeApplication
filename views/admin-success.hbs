@@ -23,72 +23,167 @@
 </head>
 
 <body>
-
-	<!-- NAV BAR -->
-	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+	<nav class="navbar navbar-expand-lg nav-color">
 		<h5 class="my-0 font-weight-normal">
 			<a class="navbar-brand" href="/trading-success">
 				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
 				STOCK NAME
 			</a>
 		</h5>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+			aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon">
+				<i class="fas fa-bars"></i>
+			</span>
+		</button>
+		<div class="collapse navbar-collapse justify-content-start" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item md-space">
+					<form id="event-form" action="/admin-success" method="POST">
+						<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+							name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+							<option id="USD" value="USD">USD</option>
+							<option id="JPY" value="JPY">JPY</option>
+							<option id="BGN" value="BGN">BGN</option>
+							<option id="CZK" value="CZK">CZK</option>
+							<option id="DKK" value="DKK">DKK</option>
+							<option id="GBP" value="GBP">GBP</option>
+							<option id="HUF" value="HUF">HUF</option>
+							<option id="PLN" value="PLN">PLN</option>
+							<option id="RON" value="RON">RON</option>
+							<option id="SEK" value="SEK">SEK</option>
+							<option id="CHF" value="CHF">CHF</option>
+							<option id="ISK" value="ISK">ISK</option>
+							<option id="NOK" value="NOK">NOK</option>
+							<option id="HRK" value="HRK">HRK</option>
+							<option id="RUB" value="RUB">RUB</option>
+							<option id="TRY" value="TRY">TRY</option>
+							<option id="AUD" value="AUD">AUD</option>
+							<option id="BRL" value="BRL">BRL</option>
+							<option id="CAD" value="CAD">CAD</option>
+							<option id="CNY" value="CNY">CNY</option>
+							<option id="HKD" value="HKD">HKD</option>
+							<option id="IDR" value="IDR">IDR</option>
+							<option id="ILS" value="ILS">ILS</option>
+							<option id="INR" value="INR">INR</option>
+							<option id="KRW" value="KRW">KRW</option>
+							<option id="MXN" value="MXN">MXN</option>
+							<option id="MYR" value="MYR">MYR</option>
+							<option id="NZD" value="NZD">NZD</option>
+							<option id="PHP" value="PHP">PHP</option>
+							<option id="SGD" value="SGD">SGD</option>
+							<option id="THB" value="THB">THB</option>
+							<option id="ZAR" value="ZAR">ZAR</option>
+						</select>
+					</form>
+				</li>
+			</ul>
+		</div>
+		<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center" href="/trading-success">Trading</a>
+				</li>
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center" href="/trading-portfolio">Portfolio</a>
+				</li>
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center ranking-right" href="/news-hub">Rankings</a>
+				</li>
+				<li class="nav-item text-nowrap md-space">
+					<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign
+						Out</a>
+				</li>
+				<li class="nav-item md-space">
+					<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+    <!-- NAV BAR -->
+    {{!-- <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
+        <h5 class="my-0 font-weight-normal">
+            <a class="navbar-brand" href="/trading-success">
+                <i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+                STOCK NAME
+            </a>
+        </h5>
 
 
-		<form id="event-form" action="/admin-success" method="POST" class="mr-auto">
-			<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
-				name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
-				<option id="USD" value="USD">USD</option>
-				<option id="JPY" value="JPY">JPY</option>
-				<option id="BGN" value="BGN">BGN</option>
-				<option id="CZK" value="CZK">CZK</option>
-				<option id="DKK" value="DKK">DKK</option>
-				<option id="GBP" value="GBP">GBP</option>
-				<option id="HUF" value="HUF">HUF</option>
-				<option id="PLN" value="PLN">PLN</option>
-				<option id="RON" value="RON">RON</option>
-				<option id="SEK" value="SEK">SEK</option>
-				<option id="CHF" value="CHF">CHF</option>
-				<option id="ISK" value="ISK">ISK</option>
-				<option id="NOK" value="NOK">NOK</option>
-				<option id="HRK" value="HRK">HRK</option>
-				<option id="RUB" value="RUB">RUB</option>
-				<option id="TRY" value="TRY">TRY</option>
-				<option id="AUD" value="AUD">AUD</option>
-				<option id="BRL" value="BRL">BRL</option>
-				<option id="CAD" value="CAD">CAD</option>
-				<option id="CNY" value="CNY">CNY</option>
-				<option id="HKD" value="HKD">HKD</option>
-				<option id="IDR" value="IDR">IDR</option>
-				<option id="ILS" value="ILS">ILS</option>
-				<option id="INR" value="INR">INR</option>
-				<option id="KRW" value="KRW">KRW</option>
-				<option id="MXN" value="MXN">MXN</option>
-				<option id="MYR" value="MYR">MYR</option>
-				<option id="NZD" value="NZD">NZD</option>
-				<option id="PHP" value="PHP">PHP</option>
-				<option id="SGD" value="SGD">SGD</option>
-				<option id="THB" value="THB">THB</option>
-				<option id="ZAR" value="ZAR">ZAR</option>
-			</select>
-		</form>
+        <form id="event-form" action="/admin-success" method="POST" class="mr-auto">
+            <select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+                name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+                <option id="USD" value="USD">USD</option>
+                <option id="JPY" value="JPY">JPY</option>
+                <option id="BGN" value="BGN">BGN</option>
+                <option id="CZK" value="CZK">CZK</option>
+                <option id="DKK" value="DKK">DKK</option>
+                <option id="GBP" value="GBP">GBP</option>
+                <option id="HUF" value="HUF">HUF</option>
+                <option id="PLN" value="PLN">PLN</option>
+                <option id="RON" value="RON">RON</option>
+                <option id="SEK" value="SEK">SEK</option>
+                <option id="CHF" value="CHF">CHF</option>
+                <option id="ISK" value="ISK">ISK</option>
+                <option id="NOK" value="NOK">NOK</option>
+                <option id="HRK" value="HRK">HRK</option>
+                <option id="RUB" value="RUB">RUB</option>
+                <option id="TRY" value="TRY">TRY</option>
+                <option id="AUD" value="AUD">AUD</option>
+                <option id="BRL" value="BRL">BRL</option>
+                <option id="CAD" value="CAD">CAD</option>
+                <option id="CNY" value="CNY">CNY</option>
+                <option id="HKD" value="HKD">HKD</option>
+                <option id="IDR" value="IDR">IDR</option>
+                <option id="ILS" value="ILS">ILS</option>
+                <option id="INR" value="INR">INR</option>
+                <option id="KRW" value="KRW">KRW</option>
+                <option id="MXN" value="MXN">MXN</option>
+                <option id="MYR" value="MYR">MYR</option>
+                <option id="NZD" value="NZD">NZD</option>
+                <option id="PHP" value="PHP">PHP</option>
+                <option id="SGD" value="SGD">SGD</option>
+                <option id="THB" value="THB">THB</option>
+                <option id="ZAR" value="ZAR">ZAR</option>
+            </select>
+        </form>
 
 
+        <nav class="my-2 my-md-0 mr-md-3 nav-pills">
+            <a class="p-2 text-light" href="/trading-success">Trading</a>
+            <a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+            <a class="p-2 text-light" href="/news-hub">Rankings</a>
+        </nav>
+        <a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+        <a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+    </div> --}}
 
-		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
-			<a class="p-2 text-light" href="/trading-success">Trading</a>
-			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
-			<a class="p-2 text-light" href="/news-hub">Rankings</a>
-		</nav>
-		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
-		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
-	</div>
-
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Admin Panel -->
     <div class="container">
-        <div class="jumbotron jumbotron-fluid">
+        <div class="jumbotron jumbotron-fluid bg-white">
             <div class='container'>
                 <h1>Welcome to the Admin Page</h1>
+
                 <br>
                 </p>
                 <div>
@@ -107,7 +202,7 @@
                 </div>
             </div>
             <br>
-            <div class='container'>
+            {{!-- <div class='container'>
                 <p><i>{{message}}</i></p>
                 <div class="row">
                     <div class="col">
@@ -123,7 +218,7 @@
 
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
     </div>
@@ -131,6 +226,48 @@
     <!-- Footer -->
     {{> footer}}
 
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="update-response">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete-confirmation-modal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="delete-response">
+
+                </div>
+                <div class="modal-footer">
+                    <button id="delete-confirmation-button" type="button" class="btn btn-danger"
+                        data-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
@@ -142,6 +279,7 @@
 
 <script>
 
+
     function switchCode(event) {
         var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
         document.getElementById("currency-code-select").selectedIndex = index;
@@ -152,9 +290,8 @@
 
 
 <script>
-
+    
     var tabledata = {{{ json result }}};
-
     //create Tabulator on DOM element with id "example-table"
     var table = new Tabulator("#example-table", {
         height: 205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
@@ -166,20 +303,56 @@
             { title: "Username", field: "username" },
             { title: "First Name", field: "firstname", editor: true },
             { title: "Last Name", field: "lastname", editor: true },
-            { title: "Balance ({{{currency_symbol}}})", field: "cash2", width: 150, editor: true },
+            { title: "Balance ({{{currency_symbol}}})", field: "cash2", width: 150, editor: true, formatter: "money"},
             { title: "Account Type", field: "type", width: 150, editor: true },
+            {
+                formatter: "buttonCross", width: 40, align: "center", headerSort: false, cellClick: function (e, cell) {
+                    $("#delete-response").empty();
+                    var row_username = cell.getRow().getData().username;
+                    $("#delete-response").append("<p> Are you sure you want to delete the user " + row_username + "?</p>");
+                    $('#delete-confirmation-modal').modal('toggle');
+                    $("#delete-confirmation-button").click(function () {
+                        var delete_query = {
+                            user_id: row_username
+                        }
+                        $.ajax({
+                            url: "/admin-success-delete-user-success",
+                            type: "POST",
+                            dataType: "json",
+                            data: JSON.stringify(delete_query),
+                            contentType: "application/json",
+                            cache: false,
+                            timeout: 5000,
+                            complete: function () {
+                                //called when complete
+                            },
+
+                            success: function (data) {
+                                if (data.msg === "User is Deleted") {
+                                    cell.getRow().delete();
+                                }
+                                $("#update-response").empty();
+                                $("#update-response").append("<p>" + data.msg + "</p>");
+                                $('#myModal').modal('toggle')
+                            },
+
+                            error: function () {
+                            }
+                        });
+                    })
+                }
+            },
         ]
     });
 
 
 
-
     $("#SubmitChanges").click(function () {
-
         var query = {
             updated_users: []
         };
         var updated_users = [];
+        var cloned_tabledata = clone(tabledata);
         $('.tabulator-row').each(function (i, obj) {
             var new_user = {};
             var username = $("[tabulator-field=username]", obj).text();
@@ -191,11 +364,9 @@
             new_user.username = username;
             new_user.firstname = firstname;
             new_user.lastname = lastname;
-            new_user.cash2 = [parseFloat(cash2)];
+            new_user.cash2 = [parseFloat(cash2.split(",").join(""))];
             new_user.type = type;
             updated_users.push(new_user);
-            var cloned_tabledata = clone(tabledata)
-
             for (var i = cloned_tabledata.length; i--;) {
                 var matched = matchTable(cloned_tabledata[i]);
                 if (matched.username === new_user.username) {
@@ -206,10 +377,8 @@
                 }
             }
         });
-        console.log(query);
 
         if (query.updated_users.length === 0) {
-            console.log("no changes made");
         } else {
             $.ajax({
                 url: "/test",
@@ -221,16 +390,19 @@
                 timeout: 5000,
                 complete: function () {
                     //called when complete
-                    console.log('process complete');
                 },
 
                 success: function (data) {
-                    console.log(data);
-                    console.log('process success');
+                    tabledata = data.result;
+                    console.log(data.result);
+                    $("#update-response").empty();
+                    for (i = 0; i < data.flags.length; i++) {
+                        $("#update-response").append("<p>" + data.flags[i].username + " " + data.flags[i].msg + "</p>");
+                    }
+                    $('#myModal').modal('toggle')
                 },
 
                 error: function () {
-                    console.log('process error');
                 }
             });
         }
@@ -241,10 +413,12 @@
         var updated = Object.values(updated);
 
 
+
         for (var i = original.length; i--;) {
             if (original[i] !== updated[i]) {
                 if (typeof original[i] === "object") {
                     if (original[i][0] !== updated[i][0]) {
+                        {{!-- console.log(original[i], updated[i]); --}}
                         return true
                     }
                 } else {

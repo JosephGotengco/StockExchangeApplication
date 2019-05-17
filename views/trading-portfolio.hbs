@@ -21,6 +21,64 @@
 
 
 	<!-- NAV BAR -->
+	{{!-- <div class="navbar navbar-expand-lg nav-color">
+		<h5 class="my-0 font-weight-normal">
+			<a class="navbar-brand" href="/trading-success">
+				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
+				STOCK NAME
+			</a>
+		</h5>
+
+
+		<form id="event-form" action="/trading-portfolio" method="POST" class="mr-auto">
+			<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+				name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+				<option id="USD" value="USD">USD</option>
+				<option id="JPY" value="JPY">JPY</option>
+				<option id="BGN" value="BGN">BGN</option>
+				<option id="CZK" value="CZK">CZK</option>
+				<option id="DKK" value="DKK">DKK</option>
+				<option id="GBP" value="GBP">GBP</option>
+				<option id="HUF" value="HUF">HUF</option>
+				<option id="PLN" value="PLN">PLN</option>
+				<option id="RON" value="RON">RON</option>
+				<option id="SEK" value="SEK">SEK</option>
+				<option id="CHF" value="CHF">CHF</option>
+				<option id="ISK" value="ISK">ISK</option>
+				<option id="NOK" value="NOK">NOK</option>
+				<option id="HRK" value="HRK">HRK</option>
+				<option id="RUB" value="RUB">RUB</option>
+				<option id="TRY" value="TRY">TRY</option>
+				<option id="AUD" value="AUD">AUD</option>
+				<option id="BRL" value="BRL">BRL</option>
+				<option id="CAD" value="CAD">CAD</option>
+				<option id="CNY" value="CNY">CNY</option>
+				<option id="HKD" value="HKD">HKD</option>
+				<option id="IDR" value="IDR">IDR</option>
+				<option id="ILS" value="ILS">ILS</option>
+				<option id="INR" value="INR">INR</option>
+				<option id="KRW" value="KRW">KRW</option>
+				<option id="MXN" value="MXN">MXN</option>
+				<option id="MYR" value="MYR">MYR</option>
+				<option id="NZD" value="NZD">NZD</option>
+				<option id="PHP" value="PHP">PHP</option>
+				<option id="SGD" value="SGD">SGD</option>
+				<option id="THB" value="THB">THB</option>
+				<option id="ZAR" value="ZAR">ZAR</option>
+			</select>
+		</form>
+
+
+
+		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
+			<a class="p-2 text-light" href="/trading-success">Trading</a>
+			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
+			<a class="p-2 text-light" href="/news-hub">Rankings</a>
+		</nav>
+		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
+		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+	</div> --}}
+
 	<nav class="navbar navbar-expand-lg nav-color">
 		<h5 class="my-0 font-weight-normal">
 			<a class="navbar-brand" href="/trading-success">
@@ -37,7 +95,7 @@
 		<div class="collapse navbar-collapse justify-content-start" id="navbarNav">
 			<ul class="navbar-nav">
 				<li class="nav-item md-space">
-					<form id="event-form" action="/convert/currency" method="POST">
+					<form id="event-form" action="/trading-portfolio" method="POST">
 						<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
 							name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
 							<option id="USD" value="USD">USD</option>
@@ -99,7 +157,6 @@
 		</div>
 	</nav>
 
-
 	<div class="container mb-5">
 		<ul class="nav nav-tabs" id="pills-tab" role="tablist">
 			<li class="nav-item">
@@ -121,7 +178,6 @@
 					<h1 class="display-4">Your Portfolio</h1>
 					<p class="lead">Please note all prices are in {{{currency_code}}}.</p>
 				</div>
-
 				<div class='chfont container'>
 					<p class="font-weight-bold">First Name: {{{firstname}}}</p>
 					<p class="font-weight-bold">Last Name: {{{lastname}}}</p>
@@ -136,20 +192,20 @@
 						{{this.stock_name}} ({{this.amount}}),
 						{{/each}}
 					</p> --}}
-					<p class="font-weight-bold">Balance: {{head}}</p>
-					<p class="font-weight-bold">Total Earnings: {{{earnings}}}</p>
+					<p class="font-weight-bold">Balance: {{roundToTwo head}}</p>
+					<p class="font-weight-bold">Total Earnings: {{{roundToTwo earnings}}}</p>
 					<br>
 					<p class="font-weight-bold">Your Stocks:</p>
 					<div class="row">
 						{{#if stocks}}
 						{{#each stocks}}
-						<div class="card col-md-3 mx-2 my-2">
+						<div class="card col-sm-12 col-md-6 col-lg-4 mx-2 my-2">
 							<div class="card-body">
 								<h5 class="card-title">{{{this.stock_name}}}</h5>
 								<p class="d-flex justify-content-between"><small>AMOUNT:</small>
 									<small>{{{this.amount}}}<i class="far fa-clone ml-1"></i></small></p>
 								<p class="d-flex justify-content-between"><small>PROFIT:</small>
-									<small>{{{../currency_symbol}}} {{{this.profit}}}<i
+									<small>{{{../currency_symbol}}} {{{roundToTwo this.profit}}}<i
 											class="far fa-money-bill-alt ml-1"></i></small></p>
 								<p class="d-flex justify-content-between"><small>PRICE/STOCK:</small>
 									<small>{{{../currency_symbol}}} {{{roundToTwo this.today_rate}}}<i
@@ -188,24 +244,23 @@
 								</tr>
 							</thead>
 							<tbody>
+								{{reverse displayTransactions}}
 								{{#each displayTransactions}}
 								<tr>
 									<td>{{this.year}}, {{this.month}} {{this.day}}</td>
 									<td>{{this.stock_name}}</td>
 									<td>{{this.qty}}</td>
 									{{#ifEquals this.type "S"}}
-									<td>{{this.price}}</td>
+									<td>{{roundToTwo this.price}}</td>
 									{{else}}
-									<td>-{{this.price}}</td>
+									<td>-{{roundToTwo this.price}}</td>
 									{{/ifEquals}}
-									<td>{{this.balance}}</td>
-									<td>
-										{{#ifEquals this.type "S"}}
+									<td>{{roundToTwo this.balance}}</td>
+									{{#ifEquals this.type "S"}}
 									<td>Sale</td>
 									{{else}}
 									<td>Purchase</td>
 									{{/ifEquals}}
-									</td>
 								</tr>
 								{{/each}}
 							</tbody>
@@ -215,11 +270,21 @@
 			</div>
 			<div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
 				<div class="container">
-					<h1 class="display-4">Your Portfolio</h1>
-					<p>WORK IN PROGRESS</p>
-					<div class="row">
+					<h1 class="display-4">Portfolio Statistics</h1>
+					<div class="row mb-5 pb-5">
 						<div class="col-md-6">
 							<canvas id="buy_vs_sell" width="200" height="100"></canvas>
+						</div>
+						<div class="col-md-6">
+							<canvas id="purchases" width="200" height="100"></canvas>
+						</div>
+					</div>
+					<div class="row mt-5">
+						<div class="col-md-6">
+							<canvas id="sales" width="200" height="100"></canvas>
+						</div>
+						<div class="col-md-6">
+							<canvas id="amount" width="200" height="100"></canvas>
 						</div>
 					</div>
 				</div>
@@ -259,7 +324,10 @@
 	<!-- ChartJS CDN 4 -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
 	<script>
-
+		{{!-- console.log({{{ json purchases }}});
+		console.log({{{ json sales }}});
+		console.log({{{ json stockAmount }}});
+		console.log({{{ json earningsStock }}}); --}}
 		function switchCode(event) {
 			var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
 			document.getElementById("currency-code-select").selectedIndex = index;
@@ -293,8 +361,75 @@
 				}
 			}
 		});
+	</script>
+	<script>
+		var purchases = {{{ json purchases }}};
+		var ctx = document.getElementById('purchases');
+		data = {
+			datasets: [{
+				backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+				data: Object.values(purchases)
+			}],
 
+			// These labels appear in the legend and in the tooltips when hovering different arcs
+			labels: Object.keys(purchases),
+		};
+		var myDoughnutChart = new Chart(ctx, {
+			type: 'doughnut',
+			data: data,
+			options: {
+				title: {
+					display: true,
+					text: 'Purchases By Stock'
+				}
+			}
+		});
+	</script>
+	<script>
+		var sales = {{{ json sales }}};
+		var ctx = document.getElementById('sales');
+		data = {
+			datasets: [{
+				backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+				data: Object.values(sales)
+			}],
 
+			// These labels appear in the legend and in the tooltips when hovering different arcs
+			labels: Object.keys(sales),
+		};
+		var myDoughnutChart = new Chart(ctx, {
+			type: 'doughnut',
+			data: data,
+			options: {
+				title: {
+					display: true,
+					text: 'Sales By Stock'
+				}
+			}
+		});
+	</script>
+		<script>
+		var amount = {{{ json stockAmount }}};
+		var ctx = document.getElementById('amount');
+		data = {
+			datasets: [{
+				backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+				data: Object.values(amount)
+			}],
+
+			// These labels appear in the legend and in the tooltips when hovering different arcs
+			labels: Object.keys(amount),
+		};
+		var myDoughnutChart = new Chart(ctx, {
+			type: 'doughnut',
+			data: data,
+			options: {
+				title: {
+					display: true,
+					text: 'Amount By Stock'
+				}
+			}
+		});
 	</script>
 </body>
 

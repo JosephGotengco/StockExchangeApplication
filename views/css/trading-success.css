@@ -13,7 +13,11 @@
 .pointer:hover {
     cursor: pointer;
 }
-
+@media only screen and (max-width: 1300px) {
+    .metrics-container {
+        display: none;
+    }
+}
 @media only screen and (max-width: 600px) {
     .left-line {
         border-left: 1px none #333;
@@ -26,4 +30,5 @@
     .remove-on-small-screen {
         display: none;
     }
+
 }
