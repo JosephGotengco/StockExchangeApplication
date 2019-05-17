@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test";
 
-const DB_URI = "mongodb://localhost:27017/accounts";
-// const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
+// const DB_URI = "mongodb://localhost:27017/accounts";
+const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 
 const request = require("supertest");
 const assert = require("chai").assert;
