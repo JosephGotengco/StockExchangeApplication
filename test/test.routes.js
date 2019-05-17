@@ -1111,7 +1111,7 @@ describe("Routing tests", function () {
                             var $ = cheerio.load(res.text);
                             var title = $("div[role=alert]").text();
                             var display = $("title").text();
-                            assert.equal(title, "Sorry you only have $0. The purchase did not go through. The total cost was $195.47.");
+                            assert.equal(title, "Sorry you only have $0.00. The purchase did not go through. The total cost was $195.47.");
                             assert.equal(display, "Trading");
                             done();
                         });
@@ -1582,13 +1582,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "No user exists with that username");
                             done();
                         });
                 });
@@ -1610,13 +1607,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "Cannot delete your own account!");
                             done();
                         });
                 });
@@ -1638,13 +1632,10 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "User is Deleted");
                             done();
                         });
                 });
@@ -1666,141 +1657,16 @@ describe("Routing tests", function () {
                         })
                         .end(function (err, res) {
                             expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
+                            expect(res).to.have.header('content-type', 'application/json; charset=utf-8');
+                            var response = res.body;
+                            var msg = response.msg;
+                            assert.equal(msg, "No user exists with that username");
                             done();
                         });
                 });
         });
 
-        it("should login as admin and upder a user's firstname, lastname, and account balance", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "JoeySalads",
-                    password: "Castle12345"
-                })
-                .then(function (res) {
-                    agent.post("/admin-update")
-                        .send({
-                            _method: "post",
-                            user_id: "JimmyT",
-                            firstName: "Joey",
-                            lastName: "Gotengco",
-                            newBal: 50000
-                        })
-                        .end(function (err, res) {
-                            expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
-                            done();
-                        });
-                });
-        });
 
-        it("should login as admin and update their own account", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "JoeySalads",
-                    password: "Castle12345"
-                })
-                .then(function (res) {
-                    agent.post("/admin-update")
-                        .send({
-                            _method: "post",
-                            user_id: "JoeySalads",
-                            firstName: "Joey",
-                            lastName: "Gotengco",
-                            newBal: 500000
-                        })
-                        .end(function (err, res) {
-                            expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
-                            done();
-                        });
-                });
-        });
-
-        it("should login as admin and update their own account with a negative balance", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "JoeySalads",
-                    password: "Castle12345"
-                })
-                .then(function (res) {
-                    agent.post("/admin-update")
-                        .send({
-                            _method: "post",
-                            user_id: "JoeySalads",
-                            firstName: "Joey",
-                            lastName: "Gotengco",
-                            newBal: -1
-                        })
-                        .end(function (err, res) {
-                            expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
-                            done();
-                        });
-                });
-        });
-
-        it("should login as admin and attempt to update a user with an invalid user_id", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "JoeySalads",
-                    password: "Castle12345"
-                })
-                .then(function (res) {
-                    agent.post("/admin-update")
-                        .send({
-                            _method: "post",
-                            user_id: "",
-                            firstName: "Joey",
-                            lastName: "Gotengco",
-                            newBal: 100
-                        })
-                        .end(function (err, res) {
-                            expect(res).to.have.status(200);
-                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
-                            var $ = cheerio.load(res.text);
-                            var title = $("div > h1").text();
-                            assert.equal(
-                                title,
-                                "Welcome to the Admin Page"
-                            );
-                            done();
-                        });
-                });
-        });
     });
 
 })
