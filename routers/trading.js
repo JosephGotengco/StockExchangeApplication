@@ -212,9 +212,7 @@ router
 			var rate = rates[preference];
 
 			var displayTransactions = clone(uniqueTransactions);
-			console.log(displayTransactions);
 			displayTransactions.forEach((val, i) => {
-				console.log(val);
 				var total_cost = val.total_cost;
 				displayTransactions[i].total_cost = rate * total_cost;
 				var balance = val.balance;
