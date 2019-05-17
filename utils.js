@@ -1,6 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
-// const DB_URI = "mongodb://localhost:27017/accounts";
-const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
+const DB_URI = "mongodb://localhost:27017/accounts";
+// const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 var _db = null;
 
 module.exports.getDb = function() {
