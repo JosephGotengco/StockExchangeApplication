@@ -1,5 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
-
+// const DB_URI = "mongodb://localhost:27017/accounts";
+const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 var _db = null;
 
 module.exports.getDb = function() {
@@ -8,7 +9,7 @@ module.exports.getDb = function() {
 
 module.exports.init = function(callback) {
 	// MongoClient.connect('mongodb://localhost:27017/test', function(err, client) {
-	MongoClient.connect('mongodb://localhost:27017/accounts', function(err, client) {
+	MongoClient.connect(DB_URI, function(err, client) {
 		if (err) {
 			return console.log('Unable to connect to DB');
 		}

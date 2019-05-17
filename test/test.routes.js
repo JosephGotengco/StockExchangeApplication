@@ -1,5 +1,8 @@
 process.env.NODE_ENV = "test";
 
+// const DB_URI = "mongodb://localhost:27017/accounts";
+const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
+
 const request = require("supertest");
 const assert = require("chai").assert;
 const expect = require("chai").expect;
@@ -68,7 +71,7 @@ beforeEach(() => {
 
 
 const Fixtures = require("node-mongodb-fixtures");
-const uri = "mongodb://localhost:27017/accounts";
+const uri = DB_URI;
 const options = null;
 
 const fixtures = new Fixtures({
@@ -78,7 +81,7 @@ const fixtures = new Fixtures({
 
 
 fixtures
-    .connect("mongodb://localhost:27017/accounts")
+    .connect(DB_URI)
     .then(() => fixtures.unload())
     .then(() => fixtures.load())
     .catch(e => console.error(e))
@@ -723,6 +726,7 @@ describe("Routing tests", function () {
                     return agent.get("/news-hub").then(function (res) {
                         expect(res).to.have.status(200);
                         expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        // STOCK TESTING
                         var nflx_patt = /NFLX/;
                         assert.isTrue(nflx_patt.test(res.text));
                         var aapl_patt = /AAPL/;
@@ -743,23 +747,7 @@ describe("Routing tests", function () {
                         assert.isTrue(nke_patt.test(res.text));
                         var amzn_patt = /AMZN/;
                         assert.isTrue(amzn_patt.test(res.text));
-                        done();
-                    });
-                });
-        });
-
-        it("should log in and access news-hub page", function (done) {
-            agent
-                .post("/login")
-                .send({
-                    _method: "post",
-                    username: "JoeySalads",
-                    password: "Castle12345"
-                })
-                .then(function (res) {
-                    return agent.get("/news-hub").then(function (res) {
-                        expect(res).to.have.status(200);
-                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        // CURRENCY TESTING
                         var cad_patt = /CAD/;
                         assert.isTrue(cad_patt.test(res.text));
                         var bgn_patt = /BGN/;
@@ -780,6 +768,26 @@ describe("Routing tests", function () {
                         assert.isTrue(inr_patt.test(res.text));
                         var cny_patt = /CNY/;
                         assert.isTrue(cny_patt.test(res.text));
+                        done();
+                    });
+                });
+        });
+
+        it("should log in and change currency on the news-hub page", function (done) {
+            agent
+                .post("/login")
+                .send({
+                    _method: "post",
+                    username: "JoeySalads",
+                    password: "Castle12345"
+                })
+                .then(function (res) {
+                    return agent.post("/news-hub").then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("title").text();
+                        assert.equal(title, "Ranking");
                         done();
                     });
                 });
@@ -819,6 +827,60 @@ describe("Routing tests", function () {
                 })
                 .then(function (res) {
                     return agent.post("/trading-success-stocks").then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Welcome to the trading page.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+                });
+        });
+
+        it("should log in and change the currency on the trading success page", function (done) {
+            agent
+                .post("/login")
+                .send({
+                    _method: "post",
+                    username: "tester",
+                    password: "tester"
+                })
+                .then(function (res) {
+                    return agent.post("/convert/currency")
+                    .send({
+                        _method: "post",
+                        currency_preference: "JPY"
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("div[role=alert]").text();
+                        var display = $("title").text();
+                        assert.equal(title, "Welcome to the trading page.");
+                        assert.equal(display, "Trading");
+                        done();
+                    });
+                });
+        });
+
+        it("should log in and change the currency on the trading success page", function (done) {
+            agent
+                .post("/login")
+                .send({
+                    _method: "post",
+                    username: "JoeySalads",
+                    password: "Castle12345"
+                })
+                .then(function (res) {
+                    return agent.post("/trading-success-currency")
+                    .send({
+                        _method: "post",
+                        currency_preference: "JPY"
+                    })
+                    .then(function (res) {
                         expect(res).to.have.status(200);
                         expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
                         var $ = cheerio.load(res.text);
@@ -974,8 +1036,8 @@ describe("Routing tests", function () {
                 .post("/login")
                 .send({
                     _method: "post",
-                    username: "JoeySalads",
-                    password: "Castle12345"
+                    username: "tester",
+                    password: "tester"
                 })
                 .then(function (res) {
                     agent.post("/trading-success-stocks")
@@ -1245,8 +1307,8 @@ describe("Routing tests", function () {
                 .post("/login")
                 .send({
                     _method: "post",
-                    username: "AlexC",
-                    password: "LeagueOfLegends"
+                    username: "tester",
+                    password: "tester"
                 })
                 .then(function (res) {
                     return agent.post("/trading-success-sell")
@@ -1261,7 +1323,7 @@ describe("Routing tests", function () {
                             var $ = cheerio.load(res.text);
                             var title = $("div[role=alert]").text();
                             var display = $("title").text();
-                            assert.equal(title, "You are trying to sell 100 shares of FB when you only have 4 shares.");
+                            assert.equal(title, "You are trying to sell 100 shares of FB when you only have 5 shares.");
                             assert.equal(display, "Trading");
                             done();
                         });
@@ -1665,10 +1727,64 @@ describe("Routing tests", function () {
                         });
                 });
         });
-
-
     });
 
+
+    var agent = chai.request.agent(app);
+    describe("GET /trading-portfolio", function () {
+        it("should login and access the portfolio page", function (done) {
+            agent
+                .post("/login")
+                .send({
+                    _method: "post",
+                    username: "JoeySalads",
+                    password: "Castle12345"
+                })
+                .then(function (res) {
+                    agent.get("/trading-portfolio")
+                        .end(function (err, res) {
+                            expect(res).to.have.status(200);
+                            expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                            var $ = cheerio.load(res.text);
+                            var title = $("title").text();
+                            assert.equal(
+                                title,
+                                "Portfolio"
+                            );
+                            done();
+                        });
+                });
+        });
+
+        it("should login and change currency on the portfolio page", function (done) {
+            agent
+                .post("/login")
+                .send({
+                    _method: "post",
+                    username: "AlexC",
+                    password: "LeagueOfLegends"
+                })
+                .then(function (res) {
+                    agent.post("/trading-portfolio")
+                    .send({
+                        _method: "post",
+                        currency_preference: "JPY"
+                    })
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res).to.have.header('content-type', 'text/html; charset=utf-8');
+                        var $ = cheerio.load(res.text);
+                        var title = $("title").text();
+                        assert.equal(
+                            title,
+                            "Portfolio"
+                        );
+                        done();
+                    })
+                });
+        });
+    });
+    
 })
 
 

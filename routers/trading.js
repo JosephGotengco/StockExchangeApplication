@@ -211,7 +211,7 @@ router
 			var preference = ssn.currency_preference;
 			var rate = rates[preference];
 
-			var displayTransactions = clone(uniqueTransactions)
+			var displayTransactions = clone(uniqueTransactions);
 			displayTransactions.forEach((val, i) => {
 				var total_cost = val.total_cost;
 				displayTransactions[i].total_cost = rate * total_cost;
@@ -956,7 +956,7 @@ router
 				var stock_qty = ssn.stocks[index].amount;
 				var current_cost = ssn.stocks[index].total_cost;
 			} else {
-				throw "you don't have this stock (abritrary error msg LOL)";
+				throw "You have no stocks.";
 			}
 			var stock_remaining = stock_qty - qty;
 
@@ -1013,7 +1013,7 @@ router
 			if (stock === "") {
 				message = `You cannot leave the sell input blank. Please input a stock ticker`;
 			} else {
-				console.log(err);
+				// console.log(err);
 				message = `You do not own any shares with the ticker '${stock}'.`;
 			}
 		}
@@ -1178,15 +1178,15 @@ function countTotalSale(transactionArray) {
 	return total_sale;
 }
 
-function countTotalPurchase(transactionArray) {
-	var total_purchase = 0;
-	for (i = 0; i < transactionArray.length; i++) {
-		if (transactionArray[i].type === "B") {
-			total_purchase += transactionArray[i].total_purchase;
-		}
-	}
-	return total_purchase;
-}
+// function countTotalPurchase(transactionArray) {
+// 	var total_purchase = 0;
+// 	for (i = 0; i < transactionArray.length; i++) {
+// 		if (transactionArray[i].type === "B") {
+// 			total_purchase += transactionArray[i].total_purchase;
+// 		}
+// 	}
+// 	return total_purchase;
+// }
 
 function isAuthenticated(request, response, next) {
 	if (request.session.passport !== undefined) {
