@@ -74,7 +74,7 @@ router.route("/test").post(isAuthenticated, async (request, response) => {
 
                 var query = { username: username };
 
-                db.collection("user_accounts").updateOne(query, {
+                var update_result = await db.collection("user_accounts").updateOne(query, {
                     $set: {
                         firstname: firstname,
                         lastname: lastname,
@@ -82,9 +82,10 @@ router.route("/test").post(isAuthenticated, async (request, response) => {
                         type: type
                     }
                 });
+
+                // console.log(update_result);
             }
         }
-        var db = utils.getDb();
 
         db.collection("user_accounts")
             .find()
@@ -92,8 +93,8 @@ router.route("/test").post(isAuthenticated, async (request, response) => {
                 if (err) {
                     flags.push({ username: username, msg: "could not be updated." });
                 } else {
-                    console.log("---------------------ARRAY++++++++++++++++++=");
-                    console.log(result[result.length - 1]);
+                    // console.log("---------------------ARRAY++++++++++++++++++=");
+                    // console.log(result[result.length - 1]);
 
                     var data = {
                         flags: flags,

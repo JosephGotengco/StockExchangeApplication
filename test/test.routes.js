@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test";
 
-// const DB_URI = "mongodb://localhost:27017/accounts";
-const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
+const DB_URI = "mongodb://localhost:27017/accounts";
+// const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 
 const request = require("supertest");
 const assert = require("chai").assert;
@@ -179,6 +179,7 @@ describe("Routing tests", function () {
                     firstname: "",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -207,6 +208,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -235,6 +237,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -263,6 +266,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -291,6 +295,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "",
                     s1Q: "What primary school did you attend?",
@@ -316,6 +321,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "",
@@ -341,6 +347,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -366,6 +373,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -391,6 +399,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -416,6 +425,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -444,6 +454,7 @@ describe("Routing tests", function () {
                     firstname: "validFirstname",
                     lastname: "validLastname",
                     username: "validUsername",
+                    email: "validemail@email.com",
                     password: "validPassword",
                     confirm_password: "validPassword",
                     s1Q: "What primary school did you attend?",
@@ -861,6 +872,8 @@ describe("Routing tests", function () {
                         var display = $("title").text();
                         assert.equal(title, "Welcome to the trading page.");
                         assert.equal(display, "Trading");
+                        var JPY_CODE = /¥/;
+                        assert.isTrue(JPY_CODE.test(res.text));
                         done();
                     });
                 });

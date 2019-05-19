@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 var validator = require("email-validator");
-var emailExistence = require("email-existence");
+
 var utils = require("../utils");
 
 const router = new express.Router();
@@ -24,8 +24,8 @@ const sQuestions = [
 ];
 
 var staticData = {
-	s1Questions: sQuestions.slice(0,5),
-	s2Questions: sQuestions.slice(5,100),
+	s1Questions: sQuestions.slice(0, 5),
+	s2Questions: sQuestions.slice(5, 100),
 	display: "Register"
 }
 
@@ -41,7 +41,7 @@ router
 router
 	.route("/register")
 	.get((request, response) => {
-		response.render("register.hbs", {title: "To create an account please enter credentials.", ...staticData});
+		response.render("register.hbs", { title: "To create an account please enter credentials.", ...staticData });
 	})
 	.post((request, response) => {
 		var db = utils.getDb();
@@ -56,6 +56,7 @@ router
 		var s1A = request.body.s1A;
 		var s2Q = request.body.s2Q;
 		var s2A = request.body.s2A;
+
 
 
 		var message;
@@ -76,21 +77,20 @@ router
 		} else if (check_str(attributes[1]) === false) {
 			message = `Last name must be 3-30 characters long and must only contain letters.`;
 			response.render("register.hbs", {
-				title: message,...staticData
+				title: message, ...staticData
 			});
 		} else if (check_uniq(attributes[2]) === false) {
 			message = `Username must have 5-15 characters and may only be alphanumeric.`;
 			response.render("register.hbs", {
 				title: message, ...staticData
 			});
-		} 
-		// else if (validator.validate(email) === false) {
-		// 	message = `Email must have 5-15 characters and may only be alphanumeric.`;
-		// 	response.render("register.hbs", {
-		// 		title: message, ...staticData
-		// 	});
-		// } 
-		else if (check_uniq(attributes[3]) === false) {
+		}
+		else if (validator.validate(email) === false) {
+			message = `Email must be valid.`;
+			response.render("register.hbs", {
+				title: message, ...staticData
+			})
+		} else if (check_uniq(attributes[3]) === false) {
 			message = `Password must have 5-15 characters and may only be alphanumeric.`;
 			response.render("register.hbs", {
 				title: message,
@@ -102,7 +102,7 @@ router
 				title: message,
 				...staticData
 			});
-		} else if (sQuestions.slice(0,5).includes(s1Q) === false) {
+		} else if (sQuestions.slice(0, 5).includes(s1Q) === false) {
 			message = `Please pick and answer the first security question.`;
 			response.render("register.hbs", {
 				title: message,
@@ -114,7 +114,7 @@ router
 				title: message,
 				...staticData
 			});
-		} else if (sQuestions.slice(5,100).includes(s2Q) === false) {
+		} else if (sQuestions.slice(5, 100).includes(s2Q) === false) {
 			message = `Please pick and answer a second security question.`;
 			response.render("register.hbs", {
 				title: message,
@@ -184,6 +184,7 @@ router
 			});
 		}
 	});
+
 
 
 

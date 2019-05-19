@@ -224,3 +224,7 @@ select {
   max-width: 400px;
   overflow-x: hidden;
 }
+
+.modal-open {
+  overflow: scroll;
+}

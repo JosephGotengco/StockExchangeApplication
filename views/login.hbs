@@ -11,9 +11,9 @@
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 	<link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-	<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
-	<link rel="icon" href="./favicon.ico" type="image/x-icon">
-	<link rel='stylesheet' href='./css/style.css'>
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel='stylesheet' href='/css/style.css'>
 
 </head>
 
@@ -28,6 +28,7 @@
 		<div class="container-fluid d-flex">
 			<div class="m-auto">
 				<form action="/login" method="POST">
+					<input type="hidden" name="_csrf" value="{{csrfToken}}">
 					<br>
 					<br>
 					<div class="form-group">
@@ -40,7 +41,8 @@
 						<input type="password" class="form-control" name='password' id="password"
 							placeholder="Password">
 					</div>
-
+					<a href="/reset/password">Forgot Your Password?</a>
+					<br>
 					<input type="submit" class="btn btn-secondary" value="Login">
 				</form>
 				<div id='submission'></div>
@@ -65,7 +67,8 @@
 		crossorigin="anonymous"></script>
 
 </body>
-	{{> footer}}
+{{> footer}}
+
 </html>
 
 

@@ -294,11 +294,11 @@
     var tabledata = {{{ json result }}};
     //create Tabulator on DOM element with id "example-table"
     var table = new Tabulator("#example-table", {
-        height: 205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
         data: clone(tabledata), //assign data to table
         layout: "fitColumns",
-        resizableRows: false,
-        resizableColumns: false,
+        history:true,  
+        resizableRows: true,
+        resizableColumns: true,
         columns: [ //Define Table Columns
             { title: "Username", field: "username" },
             { title: "First Name", field: "firstname", editor: true },
@@ -307,11 +307,16 @@
             { title: "Account Type", field: "type", width: 150, editor: true },
             {
                 formatter: "buttonCross", width: 40, align: "center", headerSort: false, cellClick: function (e, cell) {
+                    
+                    var data = table.getData();
+                    console.log(data);
+                    
                     $("#delete-response").empty();
                     var row_username = cell.getRow().getData().username;
                     $("#delete-response").append("<p> Are you sure you want to delete the user " + row_username + "?</p>");
                     $('#delete-confirmation-modal').modal('toggle');
                     $("#delete-confirmation-button").click(function () {
+
                         var delete_query = {
                             user_id: row_username
                         }
@@ -347,7 +352,10 @@
 
 
 
-    $("#SubmitChanges").click(function () {
+    $("#SubmitChanges").click(function (e) {
+
+        e.preventDefault();
+
         var query = {
             updated_users: []
         };
@@ -379,6 +387,9 @@
         });
 
         if (query.updated_users.length === 0) {
+                    $("#update-response").empty();
+                    $("#update-response").append("<p> You haven't updated any users yet. </p>");
+                    $('#myModal').modal('toggle');
         } else {
             $.ajax({
                 url: "/test",
@@ -390,16 +401,18 @@
                 timeout: 5000,
                 complete: function () {
                     //called when complete
+                    console.log("complete")
                 },
 
                 success: function (data) {
                     tabledata = data.result;
-                    console.log(data.result);
+                    {{!-- console.log(data.result); --}}
+                    console.log("success");
                     $("#update-response").empty();
                     for (i = 0; i < data.flags.length; i++) {
                         $("#update-response").append("<p>" + data.flags[i].username + " " + data.flags[i].msg + "</p>");
                     }
-                    $('#myModal').modal('toggle')
+                    $('#myModal').modal('toggle');
                 },
 
                 error: function () {
