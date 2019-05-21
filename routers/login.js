@@ -54,7 +54,7 @@ router
             });
         });
     })
-    .post(logIP, 
+    .post(
         passport.authenticate("local", {
             successRedirect: "/trading-success",
             failureRedirect: "/login-fail"
@@ -72,7 +72,7 @@ router
             });
         });
     })
-    .post(logIP,
+    .post(
         passport.authenticate("local", {
             successRedirect: "/trading-success",
             failureRedirect: "/login-fail"
@@ -92,7 +92,7 @@ router
             });
         });
     })
-    .post(logIP,
+    .post(
         passport.authenticate("local", {
             successRedirect: "/trading-success",
             failureRedirect: "/login-fail"
