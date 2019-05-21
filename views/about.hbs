@@ -1,45 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Stock Name | About</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>About</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
 		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="./css/style.css">
-	<link rel="stylesheet" href="./css/about.css">
-</head>
-<body>
-{{> loggedInNavbar}}
-<div class="container px-0 mx-0 col-lg-12">
-    <div class="row col-lg-12">
-		<div class="hero-text text-center">
-			<p>Stock Trading</p>
-			<p class="font-weight-bold">Made Free</p>
-			<button class="btn btn-success"><a>Start Trading</a></button>
-		</div>
-    </div>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel='stylesheet' href='/css/style.css'>
 
-    <div class="row col-lg-12">
-		
+</head>
+
+<body>
+
+    <!-- Nav Bar -->
+    {{> loggedOutNavbar}}
+
+    <div class="jumbotron mx-auto" style="width: 1200px;">
+        <h1 class="display-4">About Stock Name</h1>
+        <p class="lead">Who we are and what we have created</p>
+        <hr class="my-4">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card" style="height: 425px;">
+                    <img class="mx-auto" src="images/bcit-logo.png" alt="Card image cap" height="200" width="200">
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center;">WHO WE ARE</h5>
+                        <p class="card-text" style="text-align: center;">We are a group of students from BCIT that are
+                            currently enrolled in the CIT program.
+                            We are consisted of 4 first-term students and 2 second-term students. With different skill
+                            levels and attributes, we were each able
+                            to contribute to this group in our own ways to help finish this project.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card" style="height: 425px;">
+                    <br><br><br><img class="mx-auto pt-3" src="images/logo.png" alt="Card image cap" height="50"
+                        width="200"><br><br><br>
+                    <div class="card-body">
+                        <h5 class="card-title" style="text-align: center;">WHAT IS OUR PROJECT</h5>
+                        <p class="card-text" style="text-align: center;">We have created a stock exchanging website that
+                            uses real-time price on both stocks
+                            and currencies. We also have various features like showing whether the prices have gone up
+                            or dropped down, graphs to easily display
+                            and understand the price differences, and also a portfolio page to see which stocks have
+                            been purchased and how much profit has been made.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+    {{> footer}}
 </body>
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-		crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-		crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-		crossorigin="anonymous"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </html>

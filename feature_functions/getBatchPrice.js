@@ -16,21 +16,21 @@ var getBatchClosePrice = async(stock) => {
 
     } catch (e) {
         if (e instanceof TypeError && e.message === "wrong type") {
-            console.log("hit1")
+            // console.log("hit1")
             return false
         } else if (e instanceof TypeError && e.message === "no response") {
-            console.log("hit2")
-
+            // console.log("hit2")
             return false
         } else if (e.response === undefined) {
-            console.log(e)
-            console.log("hit3")
+            // console.log(e)
+            // console.log("hit3")
             return false
         } else {
             console.log(e);
         }
     }
 }
+
 
 
 

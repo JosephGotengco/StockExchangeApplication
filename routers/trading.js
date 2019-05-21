@@ -130,13 +130,51 @@ router
 				labels: labels,
 				data: data,
 				display: `${currency_code} Price`,
-				currency_code: preference,
-				currency_symbol: currency_symbol
+				currency_code: currency_code,
+				currency_symbol: currency_symbol,
+				currency_preference: preference
 			});
 		} catch (e) {
 			console.error(e);
 		}
-	});
+	})
+	.post(isAuthenticated, async (request, response) => {
+		try {
+			var currency_code = request.params.id;
+			var ssn = request.session.passport.user;
+
+			var chart_data = await currFunc.getCurrData(currency_code);
+
+			var labels = Object.keys(chart_data);
+			var data = Object.values(chart_data);
+
+			ssn.currency_preference = request.body.currency_preference;
+			currency_preference = ssn.currency_preference
+
+			var rates = await convert();
+			var preference = ssn.currency_preference;
+			var rate = rates[preference];
+			var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+			for (i = 0; i < data.length; i++) {
+				var price = data[i];
+				data[i] = rate / price;
+			}
+
+			response.render("currency-info.hbs", {
+				title: "Welcome to the trading page.",
+				chart_title: `${currency_code} Price`,
+				labels: labels,
+				data: data,
+				display: `${currency_code} Price`,
+				currency_code: currency_code,
+				currency_symbol: currency_symbol,
+				currency_preference: currency_preference
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	})
 
 router
 	.route("/news/stock/:id")
@@ -148,8 +186,45 @@ router
 			var chart_data = await stockFunc.getStockData(ticker);
 
 			var labels = Object.keys(chart_data);
+			var data = Object.values(chart_data)
+
+			var rates = await convert();
+			var preference = ssn.currency_preference;
+			var rate = rates[preference];
+			var currency_symbol = rate_symbols.getCurrencySymbol(preference);
+
+			for (i = 0; i < data.length; i++) {
+				var price = data[i];
+				data[i] = price * rate;
+			}
+
+			response.render("stock-info.hbs", {
+				title: "Welcome to the trading page.",
+				chart_title: `${ticker} Price`,
+				labels: labels,
+				data: data,
+				display: `${ticker} Price`,
+				ticker: ticker,
+				currency_code: preference,
+				currency_symbol: currency_symbol
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	})
+	.post(isAuthenticated, async (request, response) => {
+		try {
+			var ticker = request.params.id;
+			var ssn = request.session.passport.user;
+
+			var chart_data = await stockFunc.getStockData(ticker);
+
+			var labels = Object.keys(chart_data);
 			var data = Object.values(chart_data);
 			
+			ssn.currency_preference = request.body.currency_preference;
+			currency_preference = ssn.currency_preference
+
 			var rates = await convert();
 			var preference = ssn.currency_preference;
 			var rate = rates[preference];
@@ -167,12 +242,13 @@ router
 				data: data,
 				display: `${ticker} Price`,
 				currency_code: preference,
-				currency_symbol: currency_symbol
+				currency_symbol: currency_symbol,
+				ticker: ticker
 			});
 		} catch (e) {
 			console.error(e);
 		}
-	});
+	})
 
 router.route("/trading").get((request, response) => {
 	response.render("trading.hbs", {

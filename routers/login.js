@@ -54,7 +54,7 @@ router
             });
         });
     })
-    .post(logIP,
+    .post(logIP, 
         passport.authenticate("local", {
             successRedirect: "/trading-success",
             failureRedirect: "/login-fail"
@@ -112,7 +112,7 @@ router
     })
     .post(async (request, response) => {
         var ip_address = request.ip;
-        console.log(ip_address);
+        // console.log(ip_address);
         var data = JSON.stringify(request.body);
         var data = JSON.parse(data);
         var username = data.recoveryUsername;
@@ -192,7 +192,7 @@ router
                                     if (error) {
                                         console.log(error);
                                     } else {
-                                        console.log("Email sent: " + info.response);
+                                        // console.log("Email sent: " + info.response);
                                         done(err);
                                     }
                                 });

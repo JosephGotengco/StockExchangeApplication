@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>{{display}}</title>
+	<title>Stock Name | {{display}}</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -18,24 +18,85 @@
 
 <body>
 
-	<!-- NAV BAR -->
-	<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm nav-color">
-		<h5 class="my-0 mr-md-auto font-weight-normal">
+
+	<nav class="navbar navbar-expand-lg nav-color">
+		<h5 class="my-0 font-weight-normal">
 			<a class="navbar-brand" href="/trading-success">
 				<i class="fas fa-chart-line fa-2x d-inline-block align-middle"></i>
 				STOCK NAME
 			</a>
-
 		</h5>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+			aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon">
+				<i class="fas fa-bars"></i>
+			</span>
+		</button>
+		<div class="collapse navbar-collapse justify-content-start" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item md-space">
+					<form id="event-form" action="/news/stock/{{ticker}}" method="POST">
+						<select id="currency-code-select" class="browser-default custom-select button-container mr-3"
+							name="currency_preference" onchange="this.form.submit();" onload="switchCode(event);">
+							<option id="USD" value="USD">USD</option>
+							<option id="JPY" value="JPY">JPY</option>
+							<option id="BGN" value="BGN">BGN</option>
+							<option id="CZK" value="CZK">CZK</option>
+							<option id="DKK" value="DKK">DKK</option>
+							<option id="GBP" value="GBP">GBP</option>
+							<option id="HUF" value="HUF">HUF</option>
+							<option id="PLN" value="PLN">PLN</option>
+							<option id="RON" value="RON">RON</option>
+							<option id="SEK" value="SEK">SEK</option>
+							<option id="CHF" value="CHF">CHF</option>
+							<option id="ISK" value="ISK">ISK</option>
+							<option id="NOK" value="NOK">NOK</option>
+							<option id="HRK" value="HRK">HRK</option>
+							<option id="RUB" value="RUB">RUB</option>
+							<option id="TRY" value="TRY">TRY</option>
+							<option id="AUD" value="AUD">AUD</option>
+							<option id="BRL" value="BRL">BRL</option>
+							<option id="CAD" value="CAD">CAD</option>
+							<option id="CNY" value="CNY">CNY</option>
+							<option id="HKD" value="HKD">HKD</option>
+							<option id="IDR" value="IDR">IDR</option>
+							<option id="ILS" value="ILS">ILS</option>
+							<option id="INR" value="INR">INR</option>
+							<option id="KRW" value="KRW">KRW</option>
+							<option id="MXN" value="MXN">MXN</option>
+							<option id="MYR" value="MYR">MYR</option>
+							<option id="NZD" value="NZD">NZD</option>
+							<option id="PHP" value="PHP">PHP</option>
+							<option id="SGD" value="SGD">SGD</option>
+							<option id="THB" value="THB">THB</option>
+							<option id="ZAR" value="ZAR">ZAR</option>
+						</select>
+					</form>
+				</li>
+			</ul>
+		</div>
+		<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center" href="/trading-success">Trading</a>
+				</li>
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center" href="/trading-portfolio">Portfolio</a>
+				</li>
+				<li class="nav-item">
+					<a class="p-2 text-light d-flex align-items-center ranking-right" href="/news-hub">Rankings</a>
+				</li>
+				<li class="nav-item text-nowrap md-space">
+					<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign
+						Out</a>
+				</li>
+				<li class="nav-item md-space">
+					<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
 
-		<nav class="my-2 my-md-0 mr-md-3 nav-pills">
-			<a class="p-2 text-light" href="/trading-success">Trading</a>
-			<a class="p-2 text-light" href="/trading-portfolio">Portfolio</a>
-			<a class="p-2 text-light" href="/news-hub">Rankings</a>
-		</nav>
-		<a class="btn btn-outline-danger" href="/logout" style="margin-right: 7px;">Sign Out</a>
-		<a class="btn btn-outline-info" href="/admin-success" style="margin-right: 7px;">Admin</a>
-	</div>
 
 	{{!-- Graph --}}
 	<canvas style="padding: 20px;" class="footer-spacer" id="myChart" width="300" height="100"></canvas>
@@ -55,7 +116,16 @@
 		crossorigin="anonymous"></script>
 	<script type='text/javascript' src='bundle_1.js'></script>
 </body>
+<script>
 
+
+    function switchCode(event) {
+        var index = document.getElementById("currency-code-select").options.namedItem("{{currency_code}}").index;
+        document.getElementById("currency-code-select").selectedIndex = index;
+    }
+    switchCode();
+
+</script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
 	integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 	crossorigin="anonymous"></script>
