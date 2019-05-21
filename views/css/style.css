@@ -46,7 +46,7 @@ body {
 
 .content {
   display: flex;
-  height: 65vh;
+  height: 90vh;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -133,7 +133,6 @@ lable:before {
   display: inline-block;
   height: 100%;
   width: 33.33%;
-  float: left;
   visibility: hidden;
   transition: background-color 0.2s, visisility 0.1s;
 }
@@ -142,14 +141,6 @@ lable:before {
   visibility: visible;
 }
 
-.progress-bar_item-1 {
-}
-
-.progress-bar_item-2 {
-}
-
-.progress-bar_item-3 {
-}
 
 .progress-bar_text {
   display: inline-block;
@@ -223,4 +214,8 @@ select {
 .balance {
   max-width: 400px;
   overflow-x: hidden;
+}
+
+.modal-open {
+  overflow: scroll;
 }

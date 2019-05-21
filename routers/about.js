@@ -3,17 +3,17 @@ const express = require('express');
 const router = new express.Router();
 
 router
+    .route("/home")
+    .get((request, response) => {
+        response.render("home.hbs");
+    })
+
+router
     .route("/about")
-    .get(isAuthenticated, (request, response) => {
+    .get((request, response) => {
         response.render("about.hbs");
     })
 
-function isAuthenticated(request, response, next) {
-	if (request.session.passport !== undefined) {
-		next();
-	} else {
-		response.redirect("/");
-	}
-}
 
 module.exports = router;
+
