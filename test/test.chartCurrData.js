@@ -6,8 +6,8 @@ var formatDate = require('../feature_functions/formatDate')
 describe('chartCurrData function tests', function () {
 
 	var date = new Date();
-	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-	var lastDay = moment().subtract(30, 'days');
+	var firstDay = new Date(date.getFullYear(), date.getMonth(), date.getDay());
+	var lastDay = moment().subtract(365, 'days');
 	var formatted_firstDay = formatDate.formatDate(firstDay);
 	var formatted_lastDay = formatDate.formatDate(lastDay);
 

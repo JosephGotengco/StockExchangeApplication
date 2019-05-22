@@ -9,7 +9,7 @@ describe('Test chart stock data function (chartStockData) ', function () {
         // Put the base of the url in nock
         nock('https://ws-api.iextrading.com')
             // Put the end point in the .get()
-            .get('/1.0/stock/market/batch?symbols=FB&types=chart&range=1m')
+            .get('/1.0/stock/market/batch?symbols=FB&types=chart&range=1y')
 
             // You basically split up the URL so if you combine them it would like look:
             // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
@@ -22,7 +22,7 @@ describe('Test chart stock data function (chartStockData) ', function () {
         // Put the base of the url in nock
         nock('https://ws-api.iextrading.com')
             // Put the end point in the .get()
-            .get('/1.0/stock/market/batch?symbols=invalidCode&types=chart&range=1m')
+            .get('/1.0/stock/market/batch?symbols=invalidCode&types=chart&range=1y')
 
             // You basically split up the URL so if you combine them it would like look:
             // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
@@ -35,7 +35,7 @@ describe('Test chart stock data function (chartStockData) ', function () {
         // Put the base of the url in nock
         nock('https://ws-api.iextrading.com')
             // Put the end point in the .get()
-            .get('/1.0/stock/market/batch?symbols=SNAP&types=chart&range=1m')
+            .get('/1.0/stock/market/batch?symbols=SNAP&types=chart&range=1y')
 
         // You basically split up the URL so if you combine them it would like look:
         // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
