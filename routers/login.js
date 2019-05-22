@@ -211,14 +211,14 @@ router
 router
     .route("/reset/password/auth/:token")
     .get((request, response) => {
-        console.log(request.params.token);
+        // console.log(request.params.token);
         response.render("password-recovery.hbs");
     })
     .post((request, response) => {
         var data = JSON.stringify(request.body);
         var data = JSON.parse(data);
         var msg;
-        console.log(data);
+        // console.log(data);
         var token = data.token;
 
         response.status(200);
@@ -277,7 +277,7 @@ router
                             // });
                         }
                     } else {
-                        console.log("Hour has passed");
+                        // console.log("Hour has passed");
                         msg = `The password reset token associated with the email is no longer valid. Please request for a new password reset email.`;
                         var response_data = {
                             msg: msg
