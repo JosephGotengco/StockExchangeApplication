@@ -186,7 +186,10 @@
 								</tr>
 							</thead>
 							<tbody>
-								{{reverse displayTransactions}}
+								{{#if displayTransactions}}
+									{{reverse displayTransactions}}
+								{{else}}
+								{{/if}}
 								{{#each displayTransactions}}
 								<tr>
 									<td>{{this.year}}, {{this.month}} {{this.day}}</td>
