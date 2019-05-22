@@ -1,6 +1,6 @@
 const express = require("express");
 const passport = require("passport");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 var fs = require("fs");
 var nodemailer = require("nodemailer");
 var hbs = require("nodemailer-express-handlebars");
@@ -211,14 +211,14 @@ router
 router
     .route("/reset/password/auth/:token")
     .get((request, response) => {
-        console.log(request.params.token);
+        // console.log(request.params.token);
         response.render("password-recovery.hbs");
     })
     .post((request, response) => {
         var data = JSON.stringify(request.body);
         var data = JSON.parse(data);
         var msg;
-        console.log(data);
+        // console.log(data);
         var token = data.token;
 
         response.status(200);
@@ -251,20 +251,21 @@ router
                                 msg: msg
                             }
                         } else {
-                            bcrypt.hash(new_password, saltRounds, (err, hash) => {
-                                if (err) {
-                                    msg = `There was an error changing your password. Please try again.`;
-                                    var response_data = {
-                                        msg: msg
-                                    }
-                                    response.send(response_data);
-                                    console.error(err);
-                                } else {
+                            // bcrypt.hash(new_password, saltRounds, (err, hash) => {
+                            //     if (err) {
+                            //         msg = `There was an error changing your password. Please try again.`;
+                            //         var response_data = {
+                            //             msg: msg
+                            //         }
+                            //         response.send(response_data);
+                            //         console.error(err);
+                            //     } else {
                                     db.collection("user_accounts").findOneAndUpdate(
                                         { reset_password_token: token },
                                         {
                                             $set: {
-                                                password: hash
+                                                // password: hash
+                                                password: new_password
                                             }
                                         });
                                     msg = `Your password has been successfully updated.`;
@@ -272,11 +273,11 @@ router
                                         msg: msg
                                     }
                                     response.send(response_data);
-                                }
-                            });
+                                // }
+                            // });
                         }
                     } else {
-                        console.log("Hour has passed");
+                        // console.log("Hour has passed");
                         msg = `The password reset token associated with the email is no longer valid. Please request for a new password reset email.`;
                         var response_data = {
                             msg: msg

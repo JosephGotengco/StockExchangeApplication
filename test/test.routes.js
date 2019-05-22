@@ -752,6 +752,36 @@ describe("Routing tests", function () {
                     )
                 });
         });
+        it("should send a password reset email", async () => {
+            agent
+                .post("/reset/password")
+                .send({
+                    method: "_post",
+                    recoveryUsername: ""
+                })
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header(
+                        "content-type",
+                        "application/json; charset=utf-8"
+                    )
+                });
+        });
+        it("should go to reset password endpoint", async () => {
+            agent
+                .post("/reset/password/auth/:InvalidToken")
+                .send({
+                    method: "_post",
+                    recoveryUsername: "JoeySalads"
+                })
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.have.header(
+                        "content-type",
+                        "application/json; charset=utf-8"
+                    )
+                });
+        });
     });
 
     var agent = chai.request.agent(app);

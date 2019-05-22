@@ -347,7 +347,6 @@ router
 	.get(isAuthenticated, async (request, response) => {
 		try {
 			var ssn = request.session.passport.user;
-
 			if (ssn.currency_preference === undefined) {
 				ssn.currency_preference = "USD";
 			}
