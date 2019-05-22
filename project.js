@@ -11,7 +11,7 @@ var fs = require("fs");
 var session = require("express-session");
 var utils = require("./utils");
 var cookieParser = require("cookie-parser");
-var bcrypt = require("bcrypt");
+// var bcrypt = require("bcrypt");
 // const DB_URI = "mongodb://localhost:27017/accounts";
 const DB_URI = "mongodb+srv://JosephG:TPSGqjYl9FxhStok@stockexchangeapplication-mdhwe.mongodb.net/accounts";
 
@@ -173,16 +173,21 @@ passport.use(
 			if (!user) {
 				return done(null, false);
 			}
-			bcrypt.compare(password, user.password, function (err, result) {
-				if (err) {
-					return done(null, false);
-				}
-				if (result) {
-					return done(null, user);
-				} else {
-					return done(null, false);
-				}
-			});
+			// bcrypt.compare(password, user.password, function (err, result) {
+				// if (err) {
+				// 	return done(null, false);
+				// }
+				// if (result) {
+				// 	return done(null, user);
+				// } else {
+				// 	return done(null, false);
+				// }
+			// });
+			if (password === user.password) {
+				return done(null, user)
+			} else {
+				return done(null, false)
+			}
 		});
 	})
 );
