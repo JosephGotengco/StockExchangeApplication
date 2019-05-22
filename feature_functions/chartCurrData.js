@@ -10,12 +10,10 @@ var getCurrData = async(curr) => {
 
         var curr = curr.toUpperCase();
         var date = new Date();
-        var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-        var lastDay = moment().subtract(30, 'days');
+        var firstDay = new Date(date.getFullYear(), date.getMonth(), date.getDay());
+        var lastDay = moment().subtract(365, 'days');    
         var formatted_firstDay = formatDate.formatDate(firstDay);
         var formatted_lastDay = formatDate.formatDate(lastDay);
-        // console.log(formatted_firstDay);
-        // console.log(formatted_lastDay);
         var response = await axios.get(`https://api.exchangeratesapi.io/history?start_at=${formatted_lastDay}&end_at=${formatted_firstDay}&symbols=${curr}&base=USD`);
         var response_data = response.data.rates
         // console.log(response_data)
@@ -33,17 +31,16 @@ var getCurrData = async(curr) => {
             new_obj[val] = data[i];
             chart_data.push(new_obj);
         })
-    
+
         chart_data.sort(function (a, b) {
-            return (parseInt(Object.keys(a)[0].slice(-2)) - parseInt(Object.keys(b)[0].slice(-2)));
+            return (new Date(Object.keys(a)[0]) - new Date(Object.keys(b)[0]));
         });
-    
-    
+
+
         var result = {};
         for (var i=0;i<chart_data.length;i++) {
             result[Object.keys(chart_data[i])[0]] = Object.values(chart_data[i])[0];
         }
-        // console.log(result)
         return result
     } catch(e) {
         if (e instanceof TypeError && e.message === "wrong type") {
