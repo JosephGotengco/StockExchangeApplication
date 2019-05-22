@@ -183,7 +183,7 @@ router
                                     subject: "Password Reset",
                                     context: {
                                         url:
-                                            "http://localhost:8080/reset/password/auth/" +
+                                            "https://team-stock-name.herokuapp.com/reset/password/auth/" +
                                             token,
                                         name: user.value.username
                                     }
@@ -230,7 +230,11 @@ router
                 console.log(err);
             } else {
                 if (result === null) {
-                    console.log(result);
+                    msg = `Nice try. I thought of this already.`;
+                    var response_data = {
+                        msg: msg
+                    }
+                    response.send(response_data);
                 } else {
                     if (result.reset_password_expires - Date.now() < 60 * 60 * 1000) {
                         var new_password = data.new_password;
