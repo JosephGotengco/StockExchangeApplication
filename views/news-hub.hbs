@@ -2,19 +2,19 @@
 <html lang="en">
 
 <head>
-    <title>Stock Name | {{display}}</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<title>Stock Name | {{display}}</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
-    <link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
-    <link rel='stylesheet' href="/css/style.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+		integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=PT+Serif|Playfair+Display" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Old+Standard+TT" rel="stylesheet">
+	<link rel="shortcut icon" type="image/x-icon" href="images/icon1.png" />
+	<link rel='stylesheet' href="/css/style.css">
 
 </head>
 
@@ -100,83 +100,85 @@
 
 
 
-    <div class="row p-5 footer-spacer">
-        <div class="col-sm-12 col-md-12 col-lg-6">
-            <h2 class="sub-header">Stocks</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th class="col-md-1">Ticker</th>
-                            <th class="col-md-2">Price ({{{currency_symbol}}})</th>
-                            <th class="col-md-3">Trend</th>
-                            <th class="col-md-4">Stats</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each stockDataList}}
-                        <tr>
-                            <td class="col-md-1">{{this.code}}</td>
-                            <td class="col-md-2">{{roundToTwo this.this.price}}</td>
-                            <td class="col-md-3"><img class="card-img-top mx-auto d-block trend-img" src="{{{this.img}}}" alt="Card image cap">
-                            </td>
-                            <td class="col-md-4"><a target="_blank" href="/news/stock/{{this.code}}">Stats</a></td>
+	<div class="row p-5 footer-spacer">
+		<div class="col-sm-12 col-md-12 col-lg-6">
+			<h2 class="sub-header">Stocks</h2>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th class="col-md-1">Ticker</th>
+							<th class="col-md-2">Price ({{{currency_symbol}}})</th>
+							<th class="col-md-3">Trend</th>
+							<th class="col-md-4">Stats</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each stockDataList}}
+						<tr>
+							<td class="col-md-1">{{this.code}}</td>
+							<td class="col-md-2 cell-width">{{roundToTwo this.this.price}}</td>
+							<td class="col-md-3"><img class="card-img-top mx-auto d-block trend-img"
+									src="{{{this.img}}}" alt="Card image cap">
+							</td>
+							<td class="col-md-4"><a target="_blank" href="/news/stock/{{this.code}}">Stats</a></td>
 
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-12 col-lg-6">
-            <h2 class="sub-header">Currencies</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Price ({{{currency_symbol}}})</th>
-                            <th>Trend</th>
-                            <th>Stats</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each currencyDataList}}
-                        <tr>
-                            <td class="col-md-1">{{this.code}}</td>
-                            <td class="col-md-2 cell-width">{{roundToTwo this.this.price}}</td>
-                            <td class="col-md-3"><img class="card-img-top mx-auto d-block trend-img" src="{{{this.img}}}" alt="Card image cap"></td>
-                            <td class="col-md-4"><a target="_blank" href="/news/currency/{{this.code}}">Stats</a></td>
+						</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-12 col-lg-6">
+			<h2 class="sub-header">Currencies</h2>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Code</th>
+							<th>Price ({{{currency_symbol}}})</th>
+							<th>Trend</th>
+							<th>Stats</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each currencyDataList}}
+						<tr>
+							<td class="col-md-1">{{this.code}}</td>
+							<td class="col-md-2 cell-width">{{roundToTwo this.this.price}}</td>
+							<td class="col-md-3"><img class="card-img-top mx-auto d-block trend-img"
+									src="{{{this.img}}}" alt="Card image cap"></td>
+							<td class="col-md-4"><a target="_blank" href="/news/currency/{{this.code}}">Stats</a></td>
 
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+						</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 
-    {{> footer}}
+	{{> footer}}
 
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+		integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
 
 
 	<script>
 
-	function switchCode(event) {
-		var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
-		document.getElementById("currency-code-select").selectedIndex = index;
-	}
-	switchCode();
+		function switchCode(event) {
+			var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
+			document.getElementById("currency-code-select").selectedIndex = index;
+		}
+		switchCode();
 
 	</script>
 
