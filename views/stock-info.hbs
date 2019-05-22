@@ -104,58 +104,68 @@
 	<!-- Footer -->
 	{{> footer}}
 
-
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
 		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 		crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
 		integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
 		crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-		integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 		crossorigin="anonymous"></script>
-	<script type='text/javascript' src='bundle_1.js'></script>
-</body>
-<script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.22/vue.min.js'></script>
 
+	<!-- ChartJS CDN 1 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"
+		crossorigin="anonymous"></script>
 
-    function switchCode(event) {
-        var index = document.getElementById("currency-code-select").options.namedItem("{{currency_code}}").index;
-        document.getElementById("currency-code-select").selectedIndex = index;
-    }
-    switchCode();
+	<!-- ChartJS CDN 2 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
+		crossorigin="anonymous"></script>
 
-</script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-	integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-	crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-	integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-	crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-	integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-	crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!-- ChartJS CDN 3 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js" crossorigin="anonymous"></script>
 
-<!-- ChartJS CDN 1 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js" crossorigin="anonymous"></script>
+	<!-- ChartJS CDN 4 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+	<script>
 
-<!-- ChartJS CDN 2 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
-	crossorigin="anonymous"></script>
+		function switchCode(event) {
+			var index = document.getElementById("currency-code-select").options.namedItem("{{currency_preference}}").index;
+			document.getElementById("currency-code-select").selectedIndex = index;
+		}
+		switchCode();
 
-<!-- ChartJS CDN 3 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js" crossorigin="anonymous"></script>
-
-<!-- ChartJS CDN 4 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-
-
+	</script>
 <script>
 
 
 	// Any of the following formats may be used
 	var ctx = document.getElementById('myChart');
+	var data = {{{ json data }}};
+	var key_length = Object.keys(data).length;
+	function getSum(total, num) {
+		return total + num;
+	}
+	var val_sum = Object.values(data).reduce(getSum);
+	var avg = val_sum / key_length;
+
+	console.log(avg);
+	var start_point = data[0];
+	var last_point = data[data.length-1];
+	console.log(last_point)
+	var avg = (last_point - start_point)/key_length;
+	var avg_line = [];
+	avg_line.push(start_point);
+	for (var i=0;i<key_length-1;i++) {
+		var end = avg_line.length-1;
+		var new_point = avg_line[end] + avg;
+		avg_line.push(new_point);
+	}
+	console.log(avg_line);
+
 	var myColors = ['red', 'green', 'blue'];
 	var myChart = new Chart(ctx, {
 		type: 'line',
@@ -185,6 +195,21 @@
 		pointHitRadius: 1,
 		borderCapStyle: 'miter',
 		tension: 0
+			},
+			{
+		label: 'Average',
+		data: avg_line,
+		backgroundColor: [
+		'lightblue'
+	],
+		borderColor: [
+		'lightblue'
+	],
+		fill: false,
+		borderWidth: 1,
+		pointHitRadius: 20,
+		borderCapStyle: 'miter',
+		tension: 0
 			}]
 		},
 	options: {
@@ -209,4 +234,5 @@
 	});
 </script>
 
+</body>
 </html>

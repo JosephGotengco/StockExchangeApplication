@@ -206,7 +206,8 @@ router
 				display: `${ticker} Price`,
 				ticker: ticker,
 				currency_code: preference,
-				currency_symbol: currency_symbol
+				currency_symbol: currency_symbol,
+				currency_preference: preference
 			});
 		} catch (e) {
 			console.error(e);
@@ -243,7 +244,8 @@ router
 				display: `${ticker} Price`,
 				currency_code: preference,
 				currency_symbol: currency_symbol,
-				ticker: ticker
+				ticker: ticker,
+				currency_preference: preference
 			});
 		} catch (e) {
 			console.error(e);
