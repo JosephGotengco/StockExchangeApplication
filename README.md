@@ -7,7 +7,7 @@
 This stock exchange application built up on an existing project. The project's environment was local and used mongoDB to store information. To get stock data, the project used the IEX stock trading API. The current features that existed prior to this project were:
 - User login/registration
 - Buy, sell, and check prices of stocks
-This project was started on April 23, 2019 and finished on May 24, 2019 for classes ACIT 2911, for Term twos and ACIT XXXX, for Term ones. However, members may work on it after course end date for personal reasons. The features we added (in order from start to finish) were:
+This project was started on April 23, 2019 and finished on May 24, 2019 for classes ACIT 2911 - Agile Development Project. However, members may work on it after course end date for personal reasons. The features we added (in order from start to finish) were:
 - A news feed
   - Scrolling text of ten currency or stock prices (users can click a button to swtich between).
 - A graph page when they click on the text in the news feed
@@ -20,16 +20,21 @@ This project was started on April 23, 2019 and finished on May 24, 2019 for clas
   - Contains graphs of user data
   - Contains transaction history
   - Basic account information
+- Currency Converter
+  - Users can switch between 32 different currencies (changes all monetary values on the page + currency symbols)
 - Overall, we added more pages and improve aesthetics
 
 ## Testing
 We made 101 unit tests and we covered 90.32% of the entire project.
 
 ## Members
-1. Joseph Gotengco
-2. Sukh Khera
-3. Louis Chen
-4. Krasimir Zarkov
-5. Juna Ka
-6. Matthew Marty
+1. Joseph Gotengco - Team Leader/Scrum Master/Back-End Developer
+2. Sukh Khera - Back End Developer
+3. Louis Chen - Front End Developer
+4. Krasimir Zarkov - Front End Developer
+5. Juna Ka - Front End Developer
+6. Matthew Marty - Front End Developer
 
+APIs used:
+1. https://exchangeratesapi.io/ - Currency Data
+2. https://iexcloud.io/ - Stock Data
