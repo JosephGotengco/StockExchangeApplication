@@ -1,5 +1,5 @@
 const express = require("express");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 var validator = require("email-validator");
 
 var utils = require("../utils");
@@ -131,10 +131,10 @@ router
 		}
 
 		if (check) {
-			// bcrypt.hash(password, saltRounds, (err, hash) => {
-			// 	if (err) {
-			// 		console.error(err);
-			// 	} else {
+			bcrypt.hash(password, saltRounds, (err, hash) => {
+				if (err) {
+					console.error(err);
+				} else {
 					db.collection("user_accounts").findOne(
 						{ username: username },
 						function (err, result) {
@@ -145,8 +145,8 @@ router
 										lastname: lastname,
 										username: username,
 										email: email,
-										// password: hash,
-										password: password,
+										password: hash,
+										// password: password,
 										s1Q: s1Q,
 										s1A: s1A,
 										s2Q: s2Q,
@@ -181,8 +181,8 @@ router
 							}
 						}
 					);
-			// 	}
-			// });
+				}
+			});
 		}
 	});
 
