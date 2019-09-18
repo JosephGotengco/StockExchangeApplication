@@ -4,25 +4,25 @@ var getMarqueeStock = async() => {
     var stock_info = await axios.get(`https://cloud.iexapis.com/stable/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m&token=pk_5187144627fe41f783caf3f0341d7f3e`);
     var json = stock_info.data;
 
-    nflx_info = json['NFLX'].chart.slice(-1)[0].close,
-    aapl_info = json['AAPL'].chart.slice(-1)[0].close,
-    tsla_info = json['TSLA'].chart.slice(-1)[0].close,
-    goog_info = json['GOOG'].chart.slice(-1)[0].close,
-    sbux_info = json['SBUX'].chart.slice(-1)[0].close,
-    fb_info = json['FB'].chart.slice(-1)[0].close,
-    ba_info = json['BA'].chart.slice(-1)[0].close,
-    baba_info = json['BABA'].chart.slice(-1)[0].close,
-    nke_info = json['NKE'].chart.slice(-1)[0].close,
-    amzn_info = json['AMZN'].chart.slice(-1)[0].close, 
-    yest_nflx_info = json['NFLX'].chart.slice(-2)[0].close,
+    nflx_info = json['NFLX'].chart.slice(-1)[0].close
+    aapl_info = json['AAPL'].chart.slice(-1)[0].close
+    tsla_info = json['TSLA'].chart.slice(-1)[0].close
+    goog_info = json['GOOG'].chart.slice(-1)[0].close
+    sbux_info = json['SBUX'].chart.slice(-1)[0].close
+    fb_info = json['FB'].chart.slice(-1)[0].close
+    ba_info = json['BA'].chart.slice(-1)[0].close
+    baba_info = json['BABA'].chart.slice(-1)[0].close
+    nke_info = json['NKE'].chart.slice(-1)[0].close
+    amzn_info = json['AMZN'].chart.slice(-1)[0].close 
+    yest_nflx_info = json['NFLX'].chart.slice(-2)[0].close
     yest_aapl_info = json['AAPL'].chart.slice(-2)[0].close,
-    yest_tsla_info = json["TSLA"].chart.slice(-2)[0].close,
-    yest_goog_info = json['GOOG'].chart.slice(-2)[0].close,
-    yest_sbux_info = json['SBUX'].chart.slice(-2)[0].close,
-    yest_fb_info = json['FB'].chart.slice(-2)[0].close,
-    yest_ba_info = json['BA'].chart.slice(-2)[0].close,
-    yest_baba_info = json['BABA'].chart.slice(-2)[0].close,
-    yest_nke_info = json['NKE'].chart.slice(-2)[0].close,
+    yest_tsla_info = json["TSLA"].chart.slice(-2)[0].close
+    yest_goog_info = json['GOOG'].chart.slice(-2)[0].close
+    yest_sbux_info = json['SBUX'].chart.slice(-2)[0].close
+    yest_fb_info = json['FB'].chart.slice(-2)[0].close
+    yest_ba_info = json['BA'].chart.slice(-2)[0].close
+    yest_baba_info = json['BABA'].chart.slice(-2)[0].close
+    yest_nke_info = json['NKE'].chart.slice(-2)[0].close
     yest_amzn_info = json['AMZN'].chart.slice(-2)[0].close
 
 

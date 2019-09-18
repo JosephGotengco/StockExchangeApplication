@@ -4,12 +4,11 @@ const nock = require('nock');
 
 describe('Test chart stock data function (chartStockData) ', function () {
 
-
     beforeEach(() => {
         // Put the base of the url in nock
-        nock('https://ws-api.iextrading.com')
+        nock('https://cloud.iexapis.com')
             // Put the end point in the .get()
-            .get('/1.0/stock/market/batch?symbols=FB&types=chart&range=1y')
+            .get('/stable/stock/market/batch?symbols=FB&types=chart&range=1y&token=pk_5187144627fe41f783caf3f0341d7f3e')
 
             // You basically split up the URL so if you combine them it would like look:
             // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
@@ -20,9 +19,9 @@ describe('Test chart stock data function (chartStockData) ', function () {
 
     beforeEach(() => {
         // Put the base of the url in nock
-        nock('https://ws-api.iextrading.com')
+        nock('https://cloud.iexapis.com')
             // Put the end point in the .get()
-            .get('/1.0/stock/market/batch?symbols=invalidCode&types=chart&range=1y')
+            .get('/stable/stock/market/batch?symbols=invalidCode&types=chart&range=1y&token=pk_5187144627fe41f783caf3f0341d7f3e')
 
             // You basically split up the URL so if you combine them it would like look:
             // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
@@ -33,9 +32,9 @@ describe('Test chart stock data function (chartStockData) ', function () {
 
     beforeEach(() => {
         // Put the base of the url in nock
-        nock('https://ws-api.iextrading.com')
+        nock('https://cloud.iexapis.com')
             // Put the end point in the .get()
-            .get('/1.0/stock/market/batch?symbols=SNAP&types=chart&range=1y')
+            .get('/stable/stock/market/batch?symbols=SNAP&types=chart&range=1y&token=pk_5187144627fe41f783caf3f0341d7f3e')
 
         // You basically split up the URL so if you combine them it would like look:
         // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m

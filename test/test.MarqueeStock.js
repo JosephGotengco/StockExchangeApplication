@@ -10,226 +10,223 @@ const MarqueeStock = require('../feature_functions/MarqueeStock');
 chai.use(chaiHttp);
 
 beforeEach(() => {
-    // Put the base of the url in nock
-    nock('https://ws-api.iextrading.com')
+  // Put the base of the url in nock
+  nock('https://cloud.iexapis.com')
     // Put the end point in the .get()
-    .get('/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m')
-  
+    .get('/stable/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m&token=pk_5187144627fe41f783caf3f0341d7f3e')
+
     // You basically split up the URL so if you combine them it would like look:
     // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
-  
+
     // first arg is the status code u return and the second arg is the data 
     .reply(200, reg_mock_data);
-  });
-
-describe('getMarqueeStock function tests', function () {
-    it("should return data of ten stocks in array of objects", function (done) {
-        var callFunc = async() => {
-            var response = await MarqueeStock.getMarqueeStock()
-            // console.log(response);
-            var nflx_data = response[0];
-            assert.equal(nflx_data.code, 'NFLX');
-            assert.equal(nflx_data.price, '379.06');
-            assert.equal(nflx_data.img, '../images/greentriangle.png');
-            
-            var aapl_data = response[1];
-            assert.equal(aapl_data.code, 'AAPL');
-            assert.equal(aapl_data.price, '209.15');
-            assert.equal(aapl_data.img, '../images/redtriangle.png');
-
-            var tsla_data = response[2];
-            assert.equal(tsla_data.code, 'TSLA');
-            assert.equal(tsla_data.price, '244.1');
-            assert.equal(tsla_data.img, '../images/greentriangle.png');
-
-            var goog_data = response[3];
-            assert.equal(goog_data.code, 'GOOG');
-            assert.equal(goog_data.price, '1162.61');
-            assert.equal(goog_data.img, '../images/redtriangle.png');
-
-            var sbux_data = response[4];
-            assert.equal(sbux_data.code, 'SBUX');
-            assert.equal(sbux_data.price, '77.47');
-            assert.equal(sbux_data.img, '../images/redtriangle.png');
-
-            var fb_data = response[5];
-            assert.equal(fb_data.code, 'FB');
-            assert.equal(fb_data.price, '192.53');
-            assert.equal(fb_data.img, '../images/redtriangle.png');
-
-            var ba_data = response[6];
-            assert.equal(ba_data.code, 'BA');
-            assert.equal(ba_data.price, '375.8');
-            assert.equal(ba_data.img, '../images/redtriangle.png');
-
-            var baba_data = response[7];
-            assert.equal(baba_data.code, 'BABA');
-            assert.equal(baba_data.price, '190.39');
-            assert.equal(baba_data.img, '../images/greentriangle.png');
-
-            var nke_data = response[8];
-            assert.equal(nke_data.code, 'NKE');
-            assert.equal(nke_data.price, '85.27');
-            assert.equal(nke_data.img, '../images/redtriangle.png');
-
-            var amzn_data = response[9];
-            assert.equal(amzn_data.code, 'AMZN');
-            assert.equal(amzn_data.price, '1900.82');
-            assert.equal(amzn_data.img, '../images/redtriangle.png');
-
-            done()
-        }
-        callFunc()
-    });
-});
-
-
-beforeEach(() => {
-  // Put the base of the url in nock
-  nock('https://ws-api.iextrading.com')
-  // Put the end point in the .get()
-  .get('/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m')
-
-  // You basically split up the URL so if you combine them it would like look:
-  // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
-
-  // first arg is the status code u return and the second arg is the data 
-  .reply(200, red_mock_data);
 });
 
 describe('getMarqueeStock function tests', function () {
   it("should return data of ten stocks in array of objects", function (done) {
-      var callFunc = async() => {
-          var response = await MarqueeStock.getMarqueeStock()
-          // console.log(response);
-          var nflx_data = response[0];
-          assert.equal(nflx_data.code, 'NFLX');
-          assert.equal(nflx_data.price, '378.81');
-          assert.equal(nflx_data.img, '../images/redtriangle.png');
-          
-          var aapl_data = response[1];
-          assert.equal(aapl_data.code, 'AAPL');
-          assert.equal(aapl_data.price, '209.15');
-          assert.equal(aapl_data.img, '../images/redtriangle.png');
+    var callFunc = async () => {
+      var response = await MarqueeStock.getMarqueeStock()
+      var nflx_data = response[0];
+      assert.equal(nflx_data.code, 'NFLX');
+      assert.equal(nflx_data.price, '379.06');
+      assert.equal(nflx_data.img, '../images/greentriangle.png');
 
-          var tsla_data = response[2];
-          assert.equal(tsla_data.code, 'TSLA');
-          assert.equal(tsla_data.price, '234.01');
-          assert.equal(tsla_data.img, '../images/redtriangle.png');
+      var aapl_data = response[1];
+      assert.equal(aapl_data.code, 'AAPL');
+      assert.equal(aapl_data.price, '209.15');
+      assert.equal(aapl_data.img, '../images/redtriangle.png');
 
-          var goog_data = response[3];
-          assert.equal(goog_data.code, 'GOOG');
-          assert.equal(goog_data.price, '1162.61');
-          assert.equal(goog_data.img, '../images/redtriangle.png');
+      var tsla_data = response[2];
+      assert.equal(tsla_data.code, 'TSLA');
+      assert.equal(tsla_data.price, '244.1');
+      assert.equal(tsla_data.img, '../images/greentriangle.png');
 
-          var sbux_data = response[4];
-          assert.equal(sbux_data.code, 'SBUX');
-          assert.equal(sbux_data.price, '77.47');
-          assert.equal(sbux_data.img, '../images/redtriangle.png');
+      var goog_data = response[3];
+      assert.equal(goog_data.code, 'GOOG');
+      assert.equal(goog_data.price, '1162.61');
+      assert.equal(goog_data.img, '../images/redtriangle.png');
 
-          var fb_data = response[5];
-          assert.equal(fb_data.code, 'FB');
-          assert.equal(fb_data.price, '192.53');
-          assert.equal(fb_data.img, '../images/redtriangle.png');
+      var sbux_data = response[4];
+      assert.equal(sbux_data.code, 'SBUX');
+      assert.equal(sbux_data.price, '77.47');
+      assert.equal(sbux_data.img, '../images/redtriangle.png');
 
-          var ba_data = response[6];
-          assert.equal(ba_data.code, 'BA');
-          assert.equal(ba_data.price, '375.8');
-          assert.equal(ba_data.img, '../images/redtriangle.png');
+      var fb_data = response[5];
+      assert.equal(fb_data.code, 'FB');
+      assert.equal(fb_data.price, '192.53');
+      assert.equal(fb_data.img, '../images/redtriangle.png');
 
-          var baba_data = response[7];
-          assert.equal(baba_data.code, 'BABA');
-          assert.equal(baba_data.price, '189.31');
-          assert.equal(baba_data.img, '../images/redtriangle.png');
+      var ba_data = response[6];
+      assert.equal(ba_data.code, 'BA');
+      assert.equal(ba_data.price, '375.8');
+      assert.equal(ba_data.img, '../images/redtriangle.png');
 
-          var nke_data = response[8];
-          assert.equal(nke_data.code, 'NKE');
-          assert.equal(nke_data.price, '85.27');
-          assert.equal(nke_data.img, '../images/redtriangle.png');
+      var baba_data = response[7];
+      assert.equal(baba_data.code, 'BABA');
+      assert.equal(baba_data.price, '190.39');
+      assert.equal(baba_data.img, '../images/greentriangle.png');
 
-          var amzn_data = response[9];
-          assert.equal(amzn_data.code, 'AMZN');
-          assert.equal(amzn_data.price, '1900.82');
-          assert.equal(amzn_data.img, '../images/redtriangle.png');
+      var nke_data = response[8];
+      assert.equal(nke_data.code, 'NKE');
+      assert.equal(nke_data.price, '85.27');
+      assert.equal(nke_data.img, '../images/redtriangle.png');
 
-          done()
-      }
-      callFunc()
+      var amzn_data = response[9];
+      assert.equal(amzn_data.code, 'AMZN');
+      assert.equal(amzn_data.price, '1900.82');
+      assert.equal(amzn_data.img, '../images/redtriangle.png');
+
+      done()
+    }
+    callFunc()
   });
 });
 
 
 beforeEach(() => {
   // Put the base of the url in nock
-  nock('https://ws-api.iextrading.com')
-  // Put the end point in the .get()
-  .get('/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m')
+  nock('https://cloud.iexapis.com')
+    // Put the end point in the .get()
+    .get('/stable/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m&token=pk_5187144627fe41f783caf3f0341d7f3e')
 
-  // You basically split up the URL so if you combine them it would like look:
-  // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
+    // You basically split up the URL so if you combine them it would like look:
+    // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
 
-  // first arg is the status code u return and the second arg is the data 
-  .reply(200, green_mock_data);
+    // first arg is the status code u return and the second arg is the data 
+    .reply(200, red_mock_data);
 });
 
 describe('getMarqueeStock function tests', function () {
   it("should return data of ten stocks in array of objects", function (done) {
-      var callFunc = async() => {
-          var response = await MarqueeStock.getMarqueeStock()
-          // console.log(response);
-          var nflx_data = response[0];
-          assert.equal(nflx_data.code, 'NFLX');
-          assert.equal(nflx_data.price, '379.06');
-          assert.equal(nflx_data.img, '../images/greentriangle.png');
-          
-          var aapl_data = response[1];
-          assert.equal(aapl_data.code, 'AAPL');
-          assert.equal(aapl_data.price, '210.52');
-          assert.equal(aapl_data.img, '../images/greentriangle.png');
+    var callFunc = async () => {
+      var response = await MarqueeStock.getMarqueeStock()
+      var nflx_data = response[0];
+      assert.equal(nflx_data.code, 'NFLX');
+      assert.equal(nflx_data.price, '378.81');
+      assert.equal(nflx_data.img, '../images/redtriangle.png');
 
-          var tsla_data = response[2];
-          assert.equal(tsla_data.code, 'TSLA');
-          assert.equal(tsla_data.price, '244.1');
-          assert.equal(tsla_data.img, '../images/greentriangle.png');
+      var aapl_data = response[1];
+      assert.equal(aapl_data.code, 'AAPL');
+      assert.equal(aapl_data.price, '209.15');
+      assert.equal(aapl_data.img, '../images/redtriangle.png');
 
-          var goog_data = response[3];
-          assert.equal(goog_data.code, 'GOOG');
-          assert.equal(goog_data.price, '1168.08');
-          assert.equal(goog_data.img, '../images/greentriangle.png');
+      var tsla_data = response[2];
+      assert.equal(tsla_data.code, 'TSLA');
+      assert.equal(tsla_data.price, '234.01');
+      assert.equal(tsla_data.img, '../images/redtriangle.png');
 
-          var sbux_data = response[4];
-          assert.equal(sbux_data.code, 'SBUX');
-          assert.equal(sbux_data.price, '77.52');
-          assert.equal(sbux_data.img, '../images/greentriangle.png');
+      var goog_data = response[3];
+      assert.equal(goog_data.code, 'GOOG');
+      assert.equal(goog_data.price, '1162.61');
+      assert.equal(goog_data.img, '../images/redtriangle.png');
 
-          var fb_data = response[5];
-          assert.equal(fb_data.code, 'FB');
-          assert.equal(fb_data.price, '193.03');
-          assert.equal(fb_data.img, '../images/greentriangle.png');
+      var sbux_data = response[4];
+      assert.equal(sbux_data.code, 'SBUX');
+      assert.equal(sbux_data.price, '77.47');
+      assert.equal(sbux_data.img, '../images/redtriangle.png');
 
-          var ba_data = response[6];
-          assert.equal(ba_data.code, 'BA');
-          assert.equal(ba_data.price, '376.8');
-          assert.equal(ba_data.img, '../images/greentriangle.png');
+      var fb_data = response[5];
+      assert.equal(fb_data.code, 'FB');
+      assert.equal(fb_data.price, '192.53');
+      assert.equal(fb_data.img, '../images/redtriangle.png');
 
-          var baba_data = response[7];
-          assert.equal(baba_data.code, 'BABA');
-          assert.equal(baba_data.price, '190.39');
-          assert.equal(baba_data.img, '../images/greentriangle.png');
+      var ba_data = response[6];
+      assert.equal(ba_data.code, 'BA');
+      assert.equal(ba_data.price, '375.8');
+      assert.equal(ba_data.img, '../images/redtriangle.png');
 
-          var nke_data = response[8];
-          assert.equal(nke_data.code, 'NKE');
-          assert.equal(nke_data.price, '85.9');
-          assert.equal(nke_data.img, '../images/greentriangle.png');
+      var baba_data = response[7];
+      assert.equal(baba_data.code, 'BABA');
+      assert.equal(baba_data.price, '189.31');
+      assert.equal(baba_data.img, '../images/redtriangle.png');
 
-          var amzn_data = response[9];
-          assert.equal(amzn_data.code, 'AMZN');
-          assert.equal(amzn_data.price, '1911.52');
-          assert.equal(amzn_data.img, '../images/greentriangle.png');
+      var nke_data = response[8];
+      assert.equal(nke_data.code, 'NKE');
+      assert.equal(nke_data.price, '85.27');
+      assert.equal(nke_data.img, '../images/redtriangle.png');
 
-          done()
-      }
-      callFunc()
+      var amzn_data = response[9];
+      assert.equal(amzn_data.code, 'AMZN');
+      assert.equal(amzn_data.price, '1900.82');
+      assert.equal(amzn_data.img, '../images/redtriangle.png');
+
+      done()
+    }
+    callFunc()
+  });
+});
+
+
+beforeEach(() => {
+  // Put the base of the url in nock
+  nock('https://cloud.iexapis.com')
+    // Put the end point in the .get()
+    .get('/stable/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m&token=pk_5187144627fe41f783caf3f0341d7f3e')
+
+    // You basically split up the URL so if you combine them it would like look:
+    // https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=FB&types=chart&range=1m
+
+    // first arg is the status code u return and the second arg is the data 
+    .reply(200, green_mock_data);
+});
+
+describe('getMarqueeStock function tests', function () {
+  it("should return data of ten stocks in array of objects", function (done) {
+    var callFunc = async () => {
+      var response = await MarqueeStock.getMarqueeStock()
+      var nflx_data = response[0];
+      assert.equal(nflx_data.code, 'NFLX');
+      assert.equal(nflx_data.price, '379.06');
+      assert.equal(nflx_data.img, '../images/greentriangle.png');
+
+      var aapl_data = response[1];
+      assert.equal(aapl_data.code, 'AAPL');
+      assert.equal(aapl_data.price, '210.52');
+      assert.equal(aapl_data.img, '../images/greentriangle.png');
+
+      var tsla_data = response[2];
+      assert.equal(tsla_data.code, 'TSLA');
+      assert.equal(tsla_data.price, '244.1');
+      assert.equal(tsla_data.img, '../images/greentriangle.png');
+
+      var goog_data = response[3];
+      assert.equal(goog_data.code, 'GOOG');
+      assert.equal(goog_data.price, '1168.08');
+      assert.equal(goog_data.img, '../images/greentriangle.png');
+
+      var sbux_data = response[4];
+      assert.equal(sbux_data.code, 'SBUX');
+      assert.equal(sbux_data.price, '77.52');
+      assert.equal(sbux_data.img, '../images/greentriangle.png');
+
+      var fb_data = response[5];
+      assert.equal(fb_data.code, 'FB');
+      assert.equal(fb_data.price, '193.03');
+      assert.equal(fb_data.img, '../images/greentriangle.png');
+
+      var ba_data = response[6];
+      assert.equal(ba_data.code, 'BA');
+      assert.equal(ba_data.price, '376.8');
+      assert.equal(ba_data.img, '../images/greentriangle.png');
+
+      var baba_data = response[7];
+      assert.equal(baba_data.code, 'BABA');
+      assert.equal(baba_data.price, '190.39');
+      assert.equal(baba_data.img, '../images/greentriangle.png');
+
+      var nke_data = response[8];
+      assert.equal(nke_data.code, 'NKE');
+      assert.equal(nke_data.price, '85.9');
+      assert.equal(nke_data.img, '../images/greentriangle.png');
+
+      var amzn_data = response[9];
+      assert.equal(amzn_data.code, 'AMZN');
+      assert.equal(amzn_data.price, '1911.52');
+      assert.equal(amzn_data.img, '../images/greentriangle.png');
+
+      done()
+    }
+    callFunc()
   });
 });
 

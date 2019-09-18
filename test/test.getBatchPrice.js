@@ -3,16 +3,16 @@ const nock = require('nock');
 var getBatchPrice = require("../feature_functions/getBatchPrice");
 
 beforeEach(() => {
-    nock('https://ws-api.iextrading.com')
-        .get(`/1.0/stock/market/batch?symbols=FB,SNAP,&types=chart&range=1m&last=5`)
+    nock('https://cloud.iexapis.com')
+        .get(`/stable/stock/market/batch?symbols=FB,SNAP,&types=chart&range=1m&last=5&token=pk_5187144627fe41f783caf3f0341d7f3e`)
         .reply(200, mock_data);
 });
-        
+
 beforeEach(() => {
-    nock('https://ws-api.iextrading.com')
-        .get(`/1.0/stock/market/batch?symbols=FB,SNAP,AAPL,&types=chart&range=1m&last=5`)
-        // no reply
-    });
+    nock('https://cloud.iexapis.com')
+        .get(`/stable/stock/market/batch?symbols=FB,SNAP,AAPL,&types=chart&range=1m&last=5&token=pk_5187144627fe41f783caf3f0341d7f3e`)
+    // no reply
+});
 
 describe('getBatchPrice function tests', () => {
     it("should return closing prices of data", async () => {
@@ -21,7 +21,7 @@ describe('getBatchPrice function tests', () => {
         var expected = { FB: 185.3, SNAP: 11.49 };
         var expected_FB = expected["FB"];
         var expected_SNAP = expected["SNAP"];
-        
+
         var actual_FB = result["FB"];
         var actual_SNAP = result["SNAP"];
 
@@ -38,7 +38,7 @@ describe('getBatchPrice function tests', () => {
 
 
 
-    it("should get no reply", async() => {
+    it("should get no reply", async () => {
         var tickers = "FB,SNAP,AAPL,";
         var result = await getBatchPrice.getBatchClosePrice(tickers);
         assert.isFalse(result);
