@@ -5,7 +5,7 @@ var getBatchClosePrice = async(stock) => {
         if (typeof stock != "string") {
             throw TypeError("wrong type")
         }
-        var url = `https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=${stock}&types=chart&range=1m&last=5`;
+        var url = `https://cloud.iexapis.com/stable/stock/market/batch?symbols=${stock}&types=chart&range=1m&last=5&token=pk_5187144627fe41f783caf3f0341d7f3e`;
         var response_data = (await axios.get(url)).data;
         const keys = Object.keys(response_data);
         var close_prices = {};

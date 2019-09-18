@@ -37,7 +37,8 @@ mongoose.Promise = global.Promise;
 
 // used for logging in? (unsure)
 mongoose.connect(DB_URI, {
-	useNewUrlParser: true
+	useNewUrlParser: true,
+	useUnifiedTopology: true
 });
 
 // make the application instance

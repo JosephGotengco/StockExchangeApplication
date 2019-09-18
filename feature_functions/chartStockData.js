@@ -5,7 +5,7 @@ var getStockData = async(stock) => {
         if (typeof stock != "string") {
             throw TypeError("wrong type")
         }
-        var response_data = (await axios.get(`https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=${stock}&types=chart&range=1y`)).data;
+        var response_data = (await axios.get(`https://cloud.iexapis.com/stable/stock/market/batch?symbols=${stock}&types=chart&range=1y&token=pk_5187144627fe41f783caf3f0341d7f3e`)).data;
         if (Object.keys(response_data).length === 0 || Object.values(response_data).length === 0) {
             throw TypeError("no response");
         }

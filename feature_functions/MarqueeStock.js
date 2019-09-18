@@ -1,7 +1,7 @@
 var axios = require("axios");
 
 var getMarqueeStock = async() => {
-    var stock_info = await axios.get('https://ws-api.iextrading.com/1.0/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m');
+    var stock_info = await axios.get(`https://cloud.iexapis.com/stable/stock/market/batch?symbols=NFLX,AAPL,TSLA,GOOG,SBUX,FB,BA,BABA,NKE,AMZN&types=chart&range=1m&token=pk_5187144627fe41f783caf3f0341d7f3e`);
     var json = stock_info.data;
 
     nflx_info = json['NFLX'].chart.slice(-1)[0].close,
