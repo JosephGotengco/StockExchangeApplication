@@ -3,6 +3,8 @@
 
 ![Build Status](https://travis-ci.org/JosephGotengco/StockExchangeApplication.svg?branch=master)
 
+[![StockNameAgile](https://drive.google.com/uc?export=view&id=1tjh1B4ToIuVzPkovbMmzAoARrILfeyqh)](https://team-stock-name.herokuapp.com/)
+
 ## Description
 This stock exchange application built up on an existing project. The project's environment was local and used mongoDB to store information. To get stock data, the project used the IEX stock trading API. The current features that existed prior to this project were:
 - User login/registration
