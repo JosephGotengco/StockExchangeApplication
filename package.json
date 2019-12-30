@@ -29,7 +29,7 @@
     "express-rate-limit": "^3.5.1",
     "express-session": "^1.15.6",
     "express-validator": "^5.3.1",
-    "handlebars": "^4.1.1",
+    "handlebars": "^4.3.0",
     "hbs": "^4.0.3",
     "hbs-helpers": "^1.0.3",
     "helmet": "^3.18.0",
