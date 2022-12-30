@@ -50,7 +50,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "cheerio": "^1.0.0-rc.3",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "mocha-simple-html-reporter": "^1.1.0",
     "mockgoose": "^8.0.1",
     "nock": "^10.0.6",
